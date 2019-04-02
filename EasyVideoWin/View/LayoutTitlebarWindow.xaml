@@ -1,0 +1,40 @@
+﻿<CustomControls:CustomShowHideBaseWindow x:Class="EasyVideoWin.View.LayoutTitlebarWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EasyVideoWin.View"
+        xmlns:ViewModel="clr-namespace:EasyVideoWin.ViewModel"
+        xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
+        mc:Ignorable="d"
+        Title="LayoutTitlebarWindow" Height="40" Width="1280" Background="#313131" WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False">
+    <Window.DataContext>
+        <ViewModel:LayoutTitlebarWindowViewModel/>
+    </Window.DataContext>
+    <StackPanel Orientation="Vertical" x:Name="contentPanel">
+        <Grid x:Name="titleBar" Background="#313131" Height="40">
+            <!--<Grid.Visibility>
+                <Binding Path="ShowTitleBar" Converter="{StaticResource BoolToVis}"/>
+            </Grid.Visibility>-->
+            <TextBlock x:Name="titleText" Text="{Binding ConferenceNumber, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <DockPanel HorizontalAlignment="Left">
+                <CustomControls:SimpleImageButton x:Name="callQualityBtn" Margin="10, 0, 0, 0" ImageWidth="24" ImageHeight="24"
+                                        Width="24" Height="24"
+                                        TextVisibility="Collapsed"
+                                        ImageSource="{Binding CallQualityImageSource}"
+                                        Command="{Binding MediaStatisticsCommand}"
+                                        Cursor="Hand" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <Label Name="callDurationLabel" Margin="10, 0, 0, 0" FontSize="16" Foreground="White" Content="{Binding CallDuration}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+            </DockPanel>
+            <DockPanel HorizontalAlignment="Right">
+                
+                <CustomControls:WpfImageButton x:Name="exitFullScreenBtn" ImageWidth="40" ImageHeight="40"
+                                               TextVisibility="Collapsed"
+                                           NormalImage="pack://application:,,,/Resources/Icons/TitleBar/icon_player_exit_fullscreen_default.png"
+                                           PressedImage="pack://application:,,,/Resources/Icons/TitleBar/icon_player_exit_fullscreen_click.png"
+                                           MouseOverImage="pack://application:,,,/Resources/Icons/TitleBar/icon_player_exit_fullscreen_hover.png"
+                                           Cursor="Hand" Click="ExitFullScreenBtn_Click"/>
+            </DockPanel>
+        </Grid>
+    </StackPanel>
+</CustomControls:CustomShowHideBaseWindow>

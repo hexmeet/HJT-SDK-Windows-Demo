@@ -1,0 +1,1550 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\CefSharp.Wpf.71.0.0\build\CefSharp.Wpf.props" Condition="Exists('..\packages\CefSharp.Wpf.71.0.0\build\CefSharp.Wpf.props')" />
+  <Import Project="..\packages\CefSharp.WinForms.71.0.0\build\CefSharp.WinForms.props" Condition="Exists('..\packages\CefSharp.WinForms.71.0.0\build\CefSharp.WinForms.props')" />
+  <Import Project="..\packages\CefSharp.Common.71.0.0\build\CefSharp.Common.props" Condition="Exists('..\packages\CefSharp.Common.71.0.0\build\CefSharp.Common.props')" />
+  <Import Project="..\packages\cef.redist.x86.3.3578.1863\build\cef.redist.x86.props" Condition="Exists('..\packages\cef.redist.x86.3.3578.1863\build\cef.redist.x86.props')" />
+  <Import Project="..\packages\cef.redist.x64.3.3578.1863\build\cef.redist.x64.props" Condition="Exists('..\packages\cef.redist.x64.3.3578.1863\build\cef.redist.x64.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B33296F1-F207-443E-99F3-4F2DE30A2435}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>EasyVideoWin</RootNamespace>
+    <AssemblyName>HexMeetHJT</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>logo.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\Release\</OutputPath>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AutoTest|x64'">
+    <OutputPath>bin\x64\AutoTest\</OutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AutoTest|AnyCPU'">
+    <OutputPath>bin\AutoTest\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS;AUTOTEST</DefineConstants>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'AutoTest|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;AUTOTEST</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Aliyun.OSS, Version=2.5.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Aliyun.OSS.SDK.2.5.1\lib\Aliyun.OSS.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CefSharp, Version=69.0.0.0, Culture=neutral, PublicKeyToken=40c4b6fc221f4138, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\CefSharp.Common.69.0.0\CefSharp\x86\CefSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="CefSharp.Core, Version=69.0.0.0, Culture=neutral, PublicKeyToken=40c4b6fc221f4138, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\CefSharp.Common.69.0.0\CefSharp\x86\CefSharp.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="CefSharp.WinForms, Version=69.0.0.0, Culture=neutral, PublicKeyToken=40c4b6fc221f4138, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\CefSharp.WinForms.69.0.0\CefSharp\x86\CefSharp.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="CefSharp.Wpf, Version=69.0.0.0, Culture=neutral, PublicKeyToken=40c4b6fc221f4138, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\CefSharp.Wpf.69.0.0\CefSharp\x86\CefSharp.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip.Reduced, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.Reduced.1.9.1.8\lib\net20\Ionic.Zip.Reduced.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ManagedEVSdk, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\ManagedEVSdk.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Antiforgery, Version=1.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Antiforgery.1.1.3\lib\net451\Microsoft.AspNetCore.Antiforgery.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Authorization, Version=1.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Authorization.1.1.3\lib\net451\Microsoft.AspNetCore.Authorization.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Cors, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Cors.1.1.2\lib\net451\Microsoft.AspNetCore.Cors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Cryptography.Internal, Version=1.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Cryptography.Internal.1.1.3\lib\net451\Microsoft.AspNetCore.Cryptography.Internal.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.DataProtection, Version=1.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.DataProtection.1.1.3\lib\net451\Microsoft.AspNetCore.DataProtection.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.DataProtection.Abstractions, Version=1.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.DataProtection.Abstractions.1.1.3\lib\net451\Microsoft.AspNetCore.DataProtection.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Diagnostics.Abstractions, Version=1.1.6.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Diagnostics.Abstractions.1.1.6\lib\netstandard1.0\Microsoft.AspNetCore.Diagnostics.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Hosting, Version=1.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Hosting.1.1.3\lib\net451\Microsoft.AspNetCore.Hosting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Hosting.Abstractions, Version=1.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Hosting.Abstractions.1.1.3\lib\net451\Microsoft.AspNetCore.Hosting.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Hosting.Server.Abstractions, Version=1.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Hosting.Server.Abstractions.1.1.3\lib\net451\Microsoft.AspNetCore.Hosting.Server.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Html.Abstractions, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Html.Abstractions.1.1.2\lib\netstandard1.0\Microsoft.AspNetCore.Html.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Http.1.1.2\lib\net451\Microsoft.AspNetCore.Http.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Abstractions, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Http.Abstractions.1.1.2\lib\net451\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Extensions, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Http.Extensions.1.1.2\lib\net451\Microsoft.AspNetCore.Http.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Features, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Http.Features.1.1.2\lib\net451\Microsoft.AspNetCore.Http.Features.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.JsonPatch, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.JsonPatch.1.1.2\lib\net451\Microsoft.AspNetCore.JsonPatch.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Localization, Version=1.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Localization.1.1.3\lib\net451\Microsoft.AspNetCore.Localization.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc, Version=1.1.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Mvc.1.1.8\lib\net451\Microsoft.AspNetCore.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc.Abstractions, Version=1.1.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Mvc.Abstractions.1.1.8\lib\net451\Microsoft.AspNetCore.Mvc.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc.ApiExplorer, Version=1.1.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Mvc.ApiExplorer.1.1.8\lib\net451\Microsoft.AspNetCore.Mvc.ApiExplorer.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc.Core, Version=1.1.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Mvc.Core.1.1.8\lib\net451\Microsoft.AspNetCore.Mvc.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc.Cors, Version=1.1.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Mvc.Cors.1.1.8\lib\net451\Microsoft.AspNetCore.Mvc.Cors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc.DataAnnotations, Version=1.1.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Mvc.DataAnnotations.1.1.8\lib\net451\Microsoft.AspNetCore.Mvc.DataAnnotations.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc.Formatters.Json, Version=1.1.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Mvc.Formatters.Json.1.1.8\lib\net451\Microsoft.AspNetCore.Mvc.Formatters.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc.Localization, Version=1.1.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Mvc.Localization.1.1.8\lib\net451\Microsoft.AspNetCore.Mvc.Localization.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc.Razor, Version=1.1.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Mvc.Razor.1.1.8\lib\net451\Microsoft.AspNetCore.Mvc.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc.Razor.Host, Version=1.1.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Mvc.Razor.Host.1.1.8\lib\net451\Microsoft.AspNetCore.Mvc.Razor.Host.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc.TagHelpers, Version=1.1.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Mvc.TagHelpers.1.1.8\lib\net451\Microsoft.AspNetCore.Mvc.TagHelpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc.ViewFeatures, Version=1.1.8.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Mvc.ViewFeatures.1.1.8\lib\net451\Microsoft.AspNetCore.Mvc.ViewFeatures.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Razor, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Razor.1.1.2\lib\net451\Microsoft.AspNetCore.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Razor.Runtime, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Razor.Runtime.1.1.2\lib\net451\Microsoft.AspNetCore.Razor.Runtime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.ResponseCaching.Abstractions, Version=1.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.ResponseCaching.Abstractions.1.1.3\lib\net451\Microsoft.AspNetCore.ResponseCaching.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Routing, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Routing.1.1.2\lib\net451\Microsoft.AspNetCore.Routing.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Routing.Abstractions, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Routing.Abstractions.1.1.2\lib\net451\Microsoft.AspNetCore.Routing.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Server.Kestrel, Version=1.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.Server.Kestrel.1.1.3\lib\net451\Microsoft.AspNetCore.Server.Kestrel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.WebUtilities, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNetCore.WebUtilities.1.1.2\lib\net451\Microsoft.AspNetCore.WebUtilities.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.1.3.0\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.1.3.0\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.DotNet.PlatformAbstractions, Version=1.1.9.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.DotNet.PlatformAbstractions.1.1.9\lib\net451\Microsoft.DotNet.PlatformAbstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Caching.Abstractions, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Caching.Abstractions.1.1.2\lib\netstandard1.0\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Caching.Memory, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Caching.Memory.1.1.2\lib\net451\Microsoft.Extensions.Caching.Memory.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Configuration.1.1.2\lib\netstandard1.1\Microsoft.Extensions.Configuration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration.Abstractions, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Configuration.Abstractions.1.1.2\lib\netstandard1.0\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration.EnvironmentVariables, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Configuration.EnvironmentVariables.1.1.2\lib\net451\Microsoft.Extensions.Configuration.EnvironmentVariables.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.1.1.1\lib\netstandard1.1\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.1.1.1\lib\netstandard1.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyModel, Version=1.1.9.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.DependencyModel.1.1.9\lib\net451\Microsoft.Extensions.DependencyModel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.FileProviders.Abstractions, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.FileProviders.Abstractions.1.1.1\lib\netstandard1.0\Microsoft.Extensions.FileProviders.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.FileProviders.Composite, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.FileProviders.Composite.1.1.1\lib\netstandard1.0\Microsoft.Extensions.FileProviders.Composite.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.FileProviders.Physical, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.FileProviders.Physical.1.1.1\lib\net451\Microsoft.Extensions.FileProviders.Physical.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.FileSystemGlobbing, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.FileSystemGlobbing.1.1.1\lib\net45\Microsoft.Extensions.FileSystemGlobbing.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Globalization.CultureInfoCache, Version=1.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Globalization.CultureInfoCache.1.1.3\lib\netstandard1.1\Microsoft.Extensions.Globalization.CultureInfoCache.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Localization, Version=1.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Localization.1.1.3\lib\net451\Microsoft.Extensions.Localization.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Localization.Abstractions, Version=1.1.3.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Localization.Abstractions.1.1.3\lib\netstandard1.0\Microsoft.Extensions.Localization.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.1.1.2\lib\netstandard1.1\Microsoft.Extensions.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.1.1.2\lib\netstandard1.1\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.ObjectPool, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.ObjectPool.1.1.1\lib\net451\Microsoft.Extensions.ObjectPool.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Options, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Options.1.1.2\lib\netstandard1.0\Microsoft.Extensions.Options.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.PlatformAbstractions, Version=1.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.PlatformAbstractions.1.1.0\lib\net451\Microsoft.Extensions.PlatformAbstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Primitives, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Primitives.1.1.1\lib\netstandard1.0\Microsoft.Extensions.Primitives.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.WebEncoders, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.WebEncoders.1.1.2\lib\netstandard1.0\Microsoft.Extensions.WebEncoders.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Net.Http.Headers, Version=1.1.2.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Net.Http.Headers.1.1.2\lib\netstandard1.1\Microsoft.Net.Http.Headers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Shell.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NAudio">
+      <HintPath>..\packages\NAudio.1.8.0\lib\net35\NAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.3.0\lib\netstandard1.1\System.Buffers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Collections.Immutable, Version=1.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.1.3.0\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.3.1\lib\portable-net45+win8+wpa81\System.Diagnostics.DiagnosticSource.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.3.0\lib\portable-net45+win8+wp8+wpa81\System.Numerics.Vectors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Reflection.Metadata, Version=1.4.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reflection.Metadata.1.4.1\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.3.0\lib\netstandard1.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security" />
+    <Reference Include="System.Text.Encodings.Web, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.4.3.1\lib\netstandard1.0\System.Text.Encodings.Web.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.3.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="XamlAnimatedGif, Version=1.1.10.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\XamlAnimatedGif.1.1.10\lib\net45\XamlAnimatedGif.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="CustomControls\ArrowButton.xaml.cs">
+      <DependentUpon>ArrowButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\BrowserLoadFailedPanel.xaml.cs">
+      <DependentUpon>BrowserLoadFailedPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\BrowserLoadingPanel.xaml.cs">
+      <DependentUpon>BrowserLoadingPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\FullScreenBaseWindow.cs" />
+    <Compile Include="CustomControls\GeneralOperationButton.xaml.cs">
+      <DependentUpon>GeneralOperationButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\ResumePipButton.xaml.cs">
+      <DependentUpon>ResumePipButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\SettingOperationButton.xaml.cs" />
+    <Compile Include="CustomControls\TextButton.xaml.cs">
+      <DependentUpon>TextButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\LayoutOperationbarArrowButton.xaml.cs">
+      <DependentUpon>LayoutOperationbarArrowButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\LayoutOperationbarHorizontalButton.xaml.cs">
+      <DependentUpon>LayoutOperationbarHorizontalButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\LayoutOperationbarVerticalButton.xaml.cs">
+      <DependentUpon>LayoutOperationbarVerticalButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\BottomButton.xaml.cs">
+      <DependentUpon>BottomButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\CircularProgressBar.xaml.cs">
+      <DependentUpon>CircularProgressBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\CustomShowHideBaseWindow.cs" />
+    <Compile Include="CustomControls\LoadingPanel.xaml.cs">
+      <DependentUpon>LoadingPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\MessageBoxTip.xaml.cs">
+      <DependentUpon>MessageBoxTip.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\MessageBoxConfirm.xaml.cs">
+      <DependentUpon>MessageBoxConfirm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\MessageBoxUtil.cs" />
+    <Compile Include="CustomControls\PulseButton.cs" />
+    <Compile Include="CustomControls\LoginTypeButton.xaml.cs">
+      <DependentUpon>LoginTypeButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\MainViewMenuButton.xaml.cs">
+      <DependentUpon>MainViewMenuButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\SimpleImageButton.xaml.cs">
+      <DependentUpon>SimpleImageButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\WpfImageButton.xaml.cs">
+      <DependentUpon>WpfImageButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\CefSharpUtil.cs" />
+    <Compile Include="Helpers\DbtUtil.cs" />
+    <Compile Include="Helpers\DpiUtil.cs" />
+    <Compile Include="Helpers\FlashWindow.cs" />
+    <Compile Include="Helpers\InkCanvasEditingModes.cs" />
+    <Compile Include="Helpers\IMasterDisplayWindow.cs" />
+    <Compile Include="Helpers\LogFileCollector.cs" />
+    <Compile Include="Helpers\MonitorCaptureUtil.cs" />
+    <Compile Include="Helpers\CryptoUtil.cs" />
+    <Compile Include="Helpers\HttpUtils.cs" />
+    <Compile Include="Helpers\LanguageUtil.cs" />
+    <Compile Include="Helpers\DisplayUtil.cs" />
+    <Compile Include="Helpers\PasswordBoxHelper.cs" />
+    <Compile Include="Helpers\SystemMonitorUtil.cs" />
+    <Compile Include="Helpers\ToolWindowSwitchHelper.cs" />
+    <Compile Include="Helpers\Utils.cs" />
+    <Compile Include="Helpers\WindowExtensions.cs" />
+    <Compile Include="Helpers\WorkerThreadManager.cs" />
+    <Compile Include="Model\CallController.cs" />
+    <Compile Include="Model\CloudModel\CloudApiManager.cs" />
+    <Compile Include="Model\CloudModel\CloudRest\AcsRest.cs" />
+    <Compile Include="Model\CloudModel\CloudRest\RestPartNameInfo.cs" />
+    <Compile Include="Model\EVSdkManager.cs" />
+    <Compile Include="Model\LoginManager.cs" />
+    <Compile Include="Model\SettingManager.cs" />
+    <Compile Include="Rest\SoftwareUpdateRest\AppInfoRest.cs" />
+    <Compile Include="ViewModel\AnonymousJoinConfViewModel.cs" />
+    <Compile Include="ViewModel\AudioDeviceModel.cs" />
+    <Compile Include="ViewModel\AudioDeviceSelectorWindowModel.cs" />
+    <Compile Include="ViewModel\CalllingViewModel.cs" />
+    <Compile Include="ViewModel\CameraSelectorViewModel.cs" />
+    <Compile Include="ViewModel\AudioSettingViewModel.cs" />
+    <Compile Include="ViewModel\LayoutTitlebarWindowViewModel.cs" />
+    <Compile Include="ViewModel\SoftwareUpdateWindowModel.cs" />
+    <Compile Include="ViewModel\VideoPeopleWindowViewModel.cs" />
+    <Compile Include="ViewModel\VideoSettingViewModel.cs" />
+    <Compile Include="ViewModel\GeneralViewModel.cs" />
+    <Compile Include="ViewModel\LogoViewModel.cs" />
+    <Compile Include="ViewModel\LoginInfoViewModel.cs" />
+    <Compile Include="ViewModel\LoginOptionsViewModel.cs" />
+    <Compile Include="ViewModel\LoginTypeViewModel.cs" />
+    <Compile Include="ViewModel\LoginWindowModel.cs" />
+    <Compile Include="ViewModel\JoinConfWindowModel.cs" />
+    <Compile Include="ViewModel\MyInfoWindowViewModel.cs" />
+    <Compile Include="ViewModel\SettingViewModel.cs" />
+    <Compile Include="ViewModel\WaitingCollectLogViewModel.cs" />
+    <Compile Include="ViewModel\SelectShareContentModeWindowViewModel.cs" />
+    <Compile Include="ViewModel\ContentControlViewModel.cs" />
+    <Compile Include="ViewModel\DialOutModelBase.cs" />
+    <Compile Include="ViewModel\IHandleDpiChange.cs" />
+    <Compile Include="ViewModel\DialingViewModel.cs" />
+    <Compile Include="ViewModel\LoudspeakerViewModel.cs" />
+    <Compile Include="ViewModel\MainViewViewModel.cs" />
+    <Compile Include="ViewModel\MainWindowViewModel.cs" />
+    <Compile Include="ViewModel\MediaStatisticsViewModel.cs" />
+    <Compile Include="ViewModel\MicrophoneViewModel.cs" />
+    <Compile Include="ViewModel\ViewModelBase.cs" />
+    <Compile Include="View\AboutView.xaml.cs" />
+    <Compile Include="View\AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\AudioDeviceSelectorWindow.xaml.cs">
+      <DependentUpon>AudioDeviceSelectorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\BackScreenColorSelectWindow.xaml.cs">
+      <DependentUpon>BackScreenColorSelectWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\BrushHighlighterWindow.xaml.cs">
+      <DependentUpon>BrushHighlighterWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\BrushSelectWindow.xaml.cs">
+      <DependentUpon>BrushSelectWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\CallingView.xaml.cs">
+      <DependentUpon>CallingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\CameraSelectorView.xaml.cs">
+      <DependentUpon>CameraSelectorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SoftwareUpdateWindow.xaml.cs">
+      <DependentUpon>SoftwareUpdateWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ConferenceView.xaml.cs">
+      <DependentUpon>ConferenceView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ConfirmWin.xaml.cs">
+      <DependentUpon>ConfirmWin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ContentControlToolBarView.xaml.cs">
+      <DependentUpon>ContentControlToolBarView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ContentControlView.xaml.cs">
+      <DependentUpon>ContentControlView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ContentWhiteboard.xaml.cs">
+      <DependentUpon>ContentWhiteboard.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ContentWhiteboardPopup.xaml.cs">
+      <DependentUpon>ContentWhiteboardPopup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\AudioSettingView.xaml.cs">
+      <DependentUpon>AudioSettingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\EmailClientNotSupportPrompt.xaml.cs">
+      <DependentUpon>EmailClientNotSupportPrompt.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LayoutRecordingIndicationWindow.xaml.cs">
+      <DependentUpon>LayoutRecordingIndicationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\VideoPeopleWindow.xaml.cs">
+      <DependentUpon>VideoPeopleWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\VideoSettingView.xaml.cs">
+      <DependentUpon>VideoSettingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\GeneralView.xaml.cs" />
+    <Compile Include="View\LogoView.xaml.cs">
+      <DependentUpon>LogoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DialingView.xaml.cs">
+      <DependentUpon>DialingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\InputConfPasswordPromptDialog.xaml.cs">
+      <DependentUpon>InputConfPasswordPromptDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LayoutBackgroundWindow.xaml.cs">
+      <DependentUpon>LayoutBackgroundWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LayoutCancelFocusVideoWindow.xaml.cs">
+      <DependentUpon>LayoutCancelFocusVideoWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LoginAdvancedSettingView.xaml.cs">
+      <DependentUpon>LoginAdvancedSettingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\MessageOverlayWindow.xaml.cs">
+      <DependentUpon>MessageOverlayWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LayoutCellOperationbarWindow.xaml.cs">
+      <DependentUpon>LayoutCellOperationbarWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LayoutCellWindow.xaml.cs">
+      <DependentUpon>LayoutCellWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LayoutNormalCellsSectionWindow.xaml.cs">
+      <DependentUpon>LayoutNormalCellsSectionWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LayoutOperationbarWindow.xaml.cs">
+      <DependentUpon>LayoutOperationbarWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LayoutTitlebarWindow.xaml.cs">
+      <DependentUpon>LayoutTitlebarWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LoginTypeView.xaml.cs">
+      <DependentUpon>LoginTypeView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LoginWindow.xaml.cs">
+      <DependentUpon>LoginWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LoudspeakerSelectorView.xaml.cs">
+      <DependentUpon>LoudspeakerSelectorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\MainView.xaml.cs">
+      <DependentUpon>MainView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\MediaStatisticsView.xaml.cs">
+      <DependentUpon>MediaStatisticsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\MicSelectorView.xaml.cs">
+      <DependentUpon>MicSelectorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ChangePasswordWindow.xaml.cs">
+      <DependentUpon>ChangePasswordWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\MyInfoWindow.xaml.cs">
+      <DependentUpon>MyInfoWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\PopUpHeaderSelectWindow.xaml.cs">
+      <DependentUpon>PopUpHeaderSelectWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ProgressDialog.xaml.cs">
+      <DependentUpon>ProgressDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ProgressDialogLogin.xaml.cs">
+      <DependentUpon>ProgressDialogLogin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\PromptWindow.xaml.cs">
+      <DependentUpon>PromptWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\PromptWindowEx.xaml.cs">
+      <DependentUpon>PromptWindowEx.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ScreenSelectionView.xaml.cs">
+      <DependentUpon>ScreenSelectionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SelectShareContentModeWindow.xaml.cs">
+      <DependentUpon>SelectShareContentModeWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SettingView.xaml.cs" />
+    <Compile Include="View\SpeakingPrompt.xaml.cs">
+      <DependentUpon>SpeakingPrompt.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\IncomingCallPromptDialog.xaml.cs">
+      <DependentUpon>IncomingCallPromptDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LoginInfoView.xaml.cs">
+      <DependentUpon>LoginInfoView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\AnonymousJoinConfView.xaml.cs">
+      <DependentUpon>AnonymousJoinConfView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LoginOptionsView.xaml.cs">
+      <DependentUpon>LoginOptionsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\JoinConfWindow.xaml.cs">
+      <DependentUpon>JoinConfWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ConfManagementWindow.xaml.cs">
+      <DependentUpon>ConfManagementWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\VideoContentWindow.xaml.cs">
+      <DependentUpon>VideoContentWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\WaitingWindow.xaml.cs">
+      <DependentUpon>WaitingWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\WaitingCollectLogView.xaml.cs">
+      <DependentUpon>WaitingCollectLogView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WinForms\WhiteBoardControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="WinForms\WhiteBoardControl.Designer.cs">
+      <DependentUpon>WhiteBoardControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WinForms\WhiteBoardForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="WinForms\WhiteBoardForm.Designer.cs">
+      <DependentUpon>WhiteBoardForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Www\Api\Rest\DataStruct\AnonymousJoinConfRequest.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\AudioMute.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\SvcMeetingInfo.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\LayoutInfo.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\SvcLayoutMode.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\StatisticsInfo.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\MediaStatistics.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\CallStatistics.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\SignalStatistics.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\StreamStatus.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\SvcSetting.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\CallSetting.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\Constants.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\ErrorInfo.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\CallRequest.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\LoginRequest.cs" />
+    <Compile Include="Www\Api\Rest\DataStruct\LoginResult.cs" />
+    <Compile Include="Www\Api\Rest\Resource\StatusController.cs" />
+    <Compile Include="Www\Api\Rest\Resource\SettingController.cs" />
+    <Compile Include="Www\Api\Rest\Resource\AuthenticationController.cs" />
+    <Compile Include="Www\Api\Rest\Resource\BaseApiController.cs" />
+    <Compile Include="Www\Api\Rest\Resource\ConfController.cs" />
+    <Compile Include="Www\Utils\EnumUtil.cs" />
+    <Compile Include="Www\WwwServer.cs" />
+    <Page Include="CustomControls\ArrowButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControls\BrowserLoadFailedPanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControls\BrowserLoadingPanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControls\GeneralOperationButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControls\ResumePipButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControls\SettingOperationButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControls\TextButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControls\LayoutOperationbarArrowButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControls\LayoutOperationbarHorizontalButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControls\LayoutOperationbarVerticalButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControls\BottomButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CustomControls\CircularProgressBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CustomControls\LoadingPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CustomControls\MessageBoxTip.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControls\MessageBoxConfirm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CustomControls\LoginTypeButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControls\MainViewMenuButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControls\SimpleImageButton.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControls\WpfImageButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Helpers\RelayCommand.cs" />
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Resources\Languages\en-US.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\Languages\zh-CN.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\Styles\Main.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\AboutView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\AudioDeviceSelectorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\BackScreenColorSelectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\BrushHighlighterWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\BrushSelectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CallingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\CameraSelectorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\SoftwareUpdateWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\ConferenceView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ConfirmWin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ContentControlToolBarView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ContentControlView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ContentWhiteboard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ContentWhiteboardPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\AudioSettingView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\EmailClientNotSupportPrompt.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LayoutRecordingIndicationWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\VideoPeopleWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\VideoSettingView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\GeneralView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\LogoView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\DialingView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\InputConfPasswordPromptDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\LayoutBackgroundWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LayoutCancelFocusVideoWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\LoginAdvancedSettingView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\MessageOverlayWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\LayoutCellOperationbarWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LayoutCellWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LayoutNormalCellsSectionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LayoutOperationbarWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LayoutTitlebarWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LoudspeakerSelectorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\MainView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\MediaStatisticsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\MicSelectorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ChangePasswordWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\MyInfoWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\PopUpHeaderSelectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ProgressDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ProgressDialogLogin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\PromptWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\PromptWindowEx.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ScreenSelectionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\SelectShareContentModeWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\SettingView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\SpeakingPrompt.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\IncomingCallPromptDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LoginInfoView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\AnonymousJoinConfView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LoginOptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LoginTypeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\JoinConfWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\ConfManagementWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\LoginWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\VideoContentWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\WaitingWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\WaitingCollectLogView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\WhiteBoardControl.resx">
+      <DependentUpon>WhiteBoardControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WinForms\WhiteBoardForm.resx">
+      <DependentUpon>WhiteBoardForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\Content\bg_local.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Size\default_1.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Size\default_2.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Size\default_3.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Size\default_4.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Size\selected_1.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Size\selected_2.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Size\selected_3.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Size\selected_4.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\lake_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\lake_selected.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\light_blue_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\light_blue_selected.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\light_green_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\light_green_selected.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\pink_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\pink_selected.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Draw\highlighter.cur" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\black_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\black_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\blue_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\blue_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\white_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\white_default.png" />
+    <Resource Include="Resources\Icons\Content\icon_eraser_click.png" />
+    <Resource Include="Resources\Icons\Content\icon_eraser_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\green_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\green_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_green_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_green_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_lake_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_lake_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_light-blue_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_light-blue_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_light-green_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_light-green_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_orange_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_orange_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_pink_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_pink_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_purple_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_purple_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_yellow_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_yellow_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\orange_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\orange_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\purple_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\purple_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\red_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\red_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\yellow_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\yellow_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\black_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\blue_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\green_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_green_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_lake_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_light-blue_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_light-green_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_orange_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_pink_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_purple_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\h_yellow_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\orange_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\purple_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\red_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\white_left_click.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Type\yellow_left_click.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_close_click.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_close_default.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_close_hover.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_minimize_click.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_minimize_default.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_minimize_hover.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_player_exit_fullscreen_click.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_player_exit_fullscreen_default.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_player_exit_fullscreen_hover.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_player_fullscreen_click.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_player_fullscreen_default.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_player_fullscreen_hover.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_player_maximize_click.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_player_maximize_default.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_player_maximize_hover.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_player_minimize_click.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_player_minimize_default.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_player_minimize_hover.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_player_restore_click.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_player_restore_default.png" />
+    <Resource Include="Resources\Icons\TitleBar\icon_player_restore_hover.png" />
+    <Resource Include="Resources\Icons\icon_camera2_default.png" />
+    <Resource Include="Resources\Icons\icon_camera2_hover.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_detail.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_gallery.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_hang-up.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_mute.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_resume-camera.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_setting.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_share.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_show-share.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_speaker.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_speaking.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_suspend-camera.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_unmute.png" />
+    <Resource Include="Resources\Icons\Arrow\arrow_down_click.png" />
+    <Resource Include="Resources\Icons\Arrow\arrow_down_hover.png" />
+    <Resource Include="Resources\Icons\Arrow\arrow_down_normal.png" />
+    <Resource Include="Resources\Icons\Arrow\arrow_left_click.png" />
+    <Resource Include="Resources\Icons\Arrow\arrow_left_hover.png" />
+    <Resource Include="Resources\Icons\Arrow\arrow_left_normal.png" />
+    <Resource Include="Resources\Icons\Arrow\arrow_right_click.png" />
+    <Resource Include="Resources\Icons\Arrow\arrow_right_hover.png" />
+    <Resource Include="Resources\Icons\Arrow\arrow_right_normal.png" />
+    <Resource Include="Resources\Icons\Arrow\arrow_up_click.png" />
+    <Resource Include="Resources\Icons\Arrow\arrow_up_hover.png" />
+    <Resource Include="Resources\Icons\Arrow\arrow_up_normal.png" />
+    <Resource Include="Resources\Icons\ConfManagement\btn_invite.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_cancel-focus-video_hover.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_cancel-focusvideo_normal.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_cancel-selectedvideo_hover.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_cancel-selectedvideo_normal.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_del_hover.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_del_normal.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_focusvideo_hover.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_focusvideo_normal.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_help.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_mute-camera.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_mute.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_selectedvideo_hover.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_selectedvideo_normal.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_speaker_hover.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_speaker_normal.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_unmute-camera_hover.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_unmute-camera_nomral.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_unmute_hover.png" />
+    <Resource Include="Resources\Icons\ConfManagement\icon_unmute_normal.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\closed_click.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\closed_hover.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\closed_normal.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\exit-fullscreen_click.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\exit-fullscreen_hover.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\exit-fullscreen_normal.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\fullscreen_click.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\fullscreen_hover.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\fullscreen_normal.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\maximize_click.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\maximize_hover.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\maximize_normal.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\minimize_click.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\minimize_hover.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\minimize_normal.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\restore_click.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\restore_hover.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\restore_normal.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\small_maximize_click.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\small_maximize_hover.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\small_maximize_normal.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\small_minimize_click.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\small_minimize_hover.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\small_minimize_normal.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\btn_back.png" />
+    <Resource Include="Resources\Icons\login\img_login_b.png" />
+    <Resource Include="Resources\Icons\login\img_login_c.png" />
+    <Resource Include="Resources\Icons\MainView\icon_appointment.png" />
+    <Resource Include="Resources\Icons\MainView\icon_contact_click.png" />
+    <Resource Include="Resources\Icons\MainView\icon_contact_normal.png" />
+    <Resource Include="Resources\Icons\MainView\icon_join.png" />
+    <Resource Include="Resources\Icons\MainView\icon_meeting_click.png" />
+    <Resource Include="Resources\Icons\MainView\icon_meeting_normal.png" />
+    <Resource Include="Resources\Icons\MainView\icon_mymeeting.png" />
+    <Resource Include="Resources\Icons\MainView\icon_notice.png" />
+    <Resource Include="Resources\Icons\MainView\icon_setting_click.png" />
+    <Resource Include="Resources\Icons\MainView\icon_setting_normal.png" />
+    <Resource Include="Resources\Icons\MainView\default_user_photo.png" />
+    <Resource Include="Resources\Icons\History\btn_delete_hover.png" />
+    <Resource Include="Resources\Icons\History\btn_delete_normal.png" />
+    <Resource Include="Resources\Icons\History\btn_drop-down_click.png" />
+    <Resource Include="Resources\Icons\History\btn_drop-down_normal.png" />
+    <Resource Include="Resources\Icons\logo_home.png" />
+    <Resource Include="Resources\Icons\logo_login.png" />
+    <Resource Include="Resources\Icons\logo_preview.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_resume_pip_normal.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_resume_pip_click.png" />
+    <Resource Include="Resources\Icons\about_image.png" />
+    <Resource Include="Resources\Icons\default_user_header.jpg" />
+    <Resource Include="Resources\Icons\logo_home_en.png" />
+    <Resource Include="Resources\Icons\logo_login_en.png" />
+    <Resource Include="Resources\Icons\loading.gif" />
+    <Resource Include="Resources\Icons\default_page_nonetwork.png" />
+    <Resource Include="Resources\Icons\icon_done.png" />
+    <Resource Include="Resources\Icons\icon_edit.png" />
+    <Resource Include="Resources\Icons\icon_audio.png" />
+    <Resource Include="Resources\Icons\icon_general.png" />
+    <Resource Include="Resources\Icons\icon_video.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\more_click.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\more_hover.png" />
+    <Resource Include="Resources\Icons\WindowTitlebar\more_normal.png" />
+    <Content Include="Resources\sounds\camera.wav" />
+    <Content Include="Resources\sounds\speaker.wav" />
+    <Resource Include="Resources\Icons\icon_me_click.png" />
+    <Resource Include="Resources\Icons\icon_me_default.png" />
+    <Resource Include="Resources\Icons\icon_me_hover.png" />
+    <Resource Include="Resources\Icons\background_default.png" />
+    <Resource Include="Resources\Icons\btn_hang_up_click.png" />
+    <Resource Include="Resources\Icons\btn_hang_up_default.png" />
+    <Resource Include="Resources\Icons\btn_hang_up_hover.png" />
+    <Resource Include="Resources\Icons\icon_call_quality_level1.png" />
+    <Resource Include="Resources\Icons\icon_call_quality_level2.png" />
+    <Resource Include="Resources\Icons\icon_call_quality_level3.png" />
+    <Resource Include="Resources\Icons\icon_call_quality_level4.png" />
+    <Resource Include="Resources\Icons\icon_call_quality_level5.png" />
+    <Resource Include="logo.ico" />
+    <Resource Include="Resources\Icons\icon_about.png" />
+    <Resource Include="Resources\Icons\icon_setting.png" />
+    <Resource Include="Resources\Icons\arrow_right.png" />
+    <Resource Include="Resources\Icons\uploadHeaderBackGround.jpg" />
+    <Resource Include="Resources\Icons\icon_reverse_click.png" />
+    <Resource Include="Resources\Icons\icon_reverse_default.png" />
+    <Resource Include="Resources\Icons\icon_content_send_status.png" />
+    <Resource Include="Resources\Icons\Loading\loading1.png" />
+    <Resource Include="Resources\Icons\Loading\loading10.png" />
+    <Resource Include="Resources\Icons\Loading\loading11.png" />
+    <Resource Include="Resources\Icons\Loading\loading12.png" />
+    <Resource Include="Resources\Icons\Loading\loading13.png" />
+    <Resource Include="Resources\Icons\Loading\loading14.png" />
+    <Resource Include="Resources\Icons\Loading\loading2.png" />
+    <Resource Include="Resources\Icons\Loading\loading3.png" />
+    <Resource Include="Resources\Icons\Loading\loading4.png" />
+    <Resource Include="Resources\Icons\Loading\loading5.png" />
+    <Resource Include="Resources\Icons\Loading\loading6.png" />
+    <Resource Include="Resources\Icons\Loading\loading7.png" />
+    <Resource Include="Resources\Icons\Loading\loading8.png" />
+    <Resource Include="Resources\Icons\Loading\loading9.png" />
+    <Resource Include="Resources\Icons\checkbox_selected.png" />
+    <Resource Include="Resources\Icons\icon_screen.png" />
+    <Resource Include="Resources\Icons\Content\bg_black.png" />
+    <Resource Include="Resources\Icons\Content\bg_transparent.png" />
+    <Resource Include="Resources\Icons\Content\bg_white.png" />
+    <Resource Include="Resources\Icons\Content\btn_click.png" />
+    <Resource Include="Resources\Icons\Content\btn_hover.png" />
+    <Resource Include="Resources\Icons\Content\image_spotlight.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\black_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\black_selected.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\blue_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\blue_selected.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\green_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\green_selected.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\orange_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\orange_selected.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\purple_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\purple_selected.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\red_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\red_selected.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\white_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\white_selected.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\yellow_default.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Color\yellow_selected.png" />
+    <Resource Include="Resources\Icons\Content\image_spotlight.cur" />
+    <Resource Include="Resources\Icons\Content\icon_mute_click.png" />
+    <Resource Include="Resources\Icons\Content\icon_mute_default.png" />
+    <Resource Include="Resources\Icons\Content\icon_mute_hover.png" />
+    <Resource Include="Resources\Icons\Content\icon_unmute_click.png" />
+    <Resource Include="Resources\Icons\Content\icon_unmute_default.png" />
+    <Resource Include="Resources\Icons\Content\icon_unmute_hover.png" />
+    <Resource Include="Resources\Icons\Content\icon_camera_click.png" />
+    <Resource Include="Resources\Icons\Content\icon_camera_default.png" />
+    <Resource Include="Resources\Icons\Content\icon_camera_hover.png" />
+    <Resource Include="Resources\Icons\Content\icon_camera_off_click.png" />
+    <Resource Include="Resources\Icons\Content\icon_camera_off_default.png" />
+    <Resource Include="Resources\Icons\Content\icon_camera_off_hover.png" />
+    <Resource Include="Resources\Icons\logo_about.png" />
+    <Resource Include="Resources\Icons\logo_menu.png" />
+    <Resource Include="Resources\Icons\icon_setting_click.png" />
+    <Resource Include="Resources\Icons\icon_setting_default.png" />
+    <Resource Include="Resources\Icons\icon_setting_hover.png" />
+    <Resource Include="Resources\Icons\btn_triangle_down.png" />
+    <Resource Include="Resources\Icons\Content\icon_eraser.cur" />
+    <Resource Include="Resources\Icons\Content\icon_start.png" />
+    <Resource Include="Resources\Icons\Content\icon_stop.png" />
+    <Resource Include="Resources\Icons\Content\Pen\Draw\draw.cur" />
+    <Resource Include="Resources\Icons\icon_speaker_default.png" />
+    <Resource Include="Resources\Icons\icon_speaker_hover.png" />
+    <Resource Include="Resources\Icons\icon_unmute2_default.png" />
+    <Resource Include="Resources\Icons\icon_unmute2_hover.png" />
+    <Resource Include="Resources\Icons\chevron-left_default.png" />
+    <Resource Include="Resources\Icons\chevron-right_default.png" />
+    <Resource Include="Resources\Icons\chevron-left_click.png" />
+    <Resource Include="Resources\Icons\chevron-right_click.png" />
+    <Resource Include="Resources\Icons\chevron-left_disable.png" />
+    <Resource Include="Resources\Icons\chevron-right_disable.png" />
+    <Resource Include="Resources\Icons\Content\icon_background.png" />
+    <Resource Include="Resources\Icons\Content\icon_clear.png" />
+    <Resource Include="Resources\Icons\Content\icon_eraser.png" />
+    <Resource Include="Resources\Icons\Content\icon_exit.png" />
+    <Resource Include="Resources\Icons\Content\icon_revoke.png" />
+    <Resource Include="Resources\Icons\Content\icon_save.png" />
+    <Resource Include="Resources\Icons\icon_register_failure.png" />
+    <Resource Include="Resources\Icons\icon_register_success.png" />
+    <Content Include="Resources\sounds\ringtone.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\Button\btn-red-long-click.png" />
+    <Resource Include="Resources\Icons\Button\btn-red-long-disabled.png" />
+    <Resource Include="Resources\Icons\Button\btn-red-long-hover.png" />
+    <Resource Include="Resources\Icons\Button\btn-red-long-normal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\checkbox_select.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Icons\Button\btn_del%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5.2 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(ProjectDir)\Resources\sounds\speaker.wav $(TargetDir)\\Resources\sounds\ /Y
+
+xcopy $(ProjectDir)\Resources\sounds\ringtone.wav $(TargetDir)\\Resources\sounds\ /Y
+
+xcopy $(ProjectDir)\Resources\sounds\camera.wav $(TargetDir)\\Resources\sounds\ /Y
+
+xcopy $(ProjectDir)\Resources\Icons\background.jpg $(TargetDir)\\Resources\Icons\ /Y
+
+xcopy $(ProjectDir)\Resources\Icons\default_user_header.jpg $(TargetDir)\\Resources\Icons\ /Y
+if "$(ConfigurationName)"=="Release" (
+    del $(TargetDir)\*.xml
+    del $(TargetDir)\Microsoft.Asp*
+    del $(TargetDir)\Microsoft.Extension*
+    del $(TargetDir)\Microsoft.CodeAnalysis*
+    del $(TargetDir)\Microsoft.DotNet.*
+    rmdir /s /q $(TargetDir)\de $(TargetDir)\es $(TargetDir)\fr $(TargetDir)\it $(TargetDir)\ja $(TargetDir)\ko $(TargetDir)\ru $(TargetDir)\swiftshader
+    rmdir /s /q $(TargetDir)\en $(TargetDir)\zh-Hans $(TargetDir)\zh-Hant
+    move *.pdb ..\
+)</PostBuildEvent>
+  </PropertyGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\cef.redist.x64.3.3578.1863\build\cef.redist.x64.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cef.redist.x64.3.3578.1863\build\cef.redist.x64.props'))" />
+    <Error Condition="!Exists('..\packages\cef.redist.x86.3.3578.1863\build\cef.redist.x86.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cef.redist.x86.3.3578.1863\build\cef.redist.x86.props'))" />
+    <Error Condition="!Exists('..\packages\CefSharp.Common.71.0.0\build\CefSharp.Common.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Common.71.0.0\build\CefSharp.Common.props'))" />
+    <Error Condition="!Exists('..\packages\CefSharp.Common.71.0.0\build\CefSharp.Common.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Common.71.0.0\build\CefSharp.Common.targets'))" />
+    <Error Condition="!Exists('..\packages\CefSharp.WinForms.71.0.0\build\CefSharp.WinForms.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.WinForms.71.0.0\build\CefSharp.WinForms.props'))" />
+    <Error Condition="!Exists('..\packages\CefSharp.WinForms.71.0.0\build\CefSharp.WinForms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.WinForms.71.0.0\build\CefSharp.WinForms.targets'))" />
+    <Error Condition="!Exists('..\packages\CefSharp.Wpf.71.0.0\build\CefSharp.Wpf.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Wpf.71.0.0\build\CefSharp.Wpf.props'))" />
+    <Error Condition="!Exists('..\packages\CefSharp.Wpf.71.0.0\build\CefSharp.Wpf.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Wpf.71.0.0\build\CefSharp.Wpf.targets'))" />
+  </Target>
+  <Import Project="..\packages\CefSharp.Common.71.0.0\build\CefSharp.Common.targets" Condition="Exists('..\packages\CefSharp.Common.71.0.0\build\CefSharp.Common.targets')" />
+  <Import Project="..\packages\CefSharp.WinForms.71.0.0\build\CefSharp.WinForms.targets" Condition="Exists('..\packages\CefSharp.WinForms.71.0.0\build\CefSharp.WinForms.targets')" />
+  <Import Project="..\packages\CefSharp.Wpf.71.0.0\build\CefSharp.Wpf.targets" Condition="Exists('..\packages\CefSharp.Wpf.71.0.0\build\CefSharp.Wpf.targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

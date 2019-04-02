@@ -1,0 +1,69 @@
+﻿<UserControl x:Class="EasyVideoWin.View.AnonymousJoinConfView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EasyVideoWin.View"
+             xmlns:ViewModel="clr-namespace:EasyVideoWin.ViewModel"
+             xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
+             mc:Ignorable="d" 
+             Width="281" Height="240">
+    <UserControl.DataContext>
+        <ViewModel:AnonymousJoinConfViewModel/>
+    </UserControl.DataContext>
+    
+    <Grid>
+        <StackPanel Orientation="Vertical">
+
+            <TextBox x:Name="textBoxServerAddress" Style="{StaticResource SvcLoginInfoTextBoxStyle}"  Tag="{DynamicResource SERVER}" Visibility="{Binding ServerVisibility}"
+                     LostFocus="ServerAddress_LostFocus"
+                         Background="Transparent"  VerticalContentAlignment="Center" HorizontalAlignment="Left" BorderThickness="1" FontSize="14" Width="280" Height="34" Margin="0, 20, 0, 0"/>
+
+            <ComboBox x:FieldModifier="public" x:Name="comboBoxConfId" 
+                      Width="280" Height="34" IsEditable="True"
+                      FontSize="14" TextSearch.TextPath="ConfId"
+                      Tag="{DynamicResource INPUT_CONFERENCE_ID}"
+                      Margin="0, 6, 0, 0" Style="{StaticResource HistoryListKey}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Width="260" Height="24" x:Name="itemGrid">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="247"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" VerticalAlignment="Center" Text="{Binding Path=ConfId}" />
+                            <!--<Button Grid.Column="1" VerticalAlignment="Center" VerticalContentAlignment="Center" Width="20" Height="20" Tag="{Binding Path=ConfId}" Click="DeleteButton_Click" Content="x" />-->
+                            <CustomControls:WpfImageButton ImageWidth="13" ImageHeight="13" Grid.Column="1"
+                                                           Width="13"
+                                                           VerticalAlignment="Center" VerticalContentAlignment="Center"
+                                                   TextVisibility="Collapsed"
+                                                           Tag="{Binding Path=ConfId}"
+                                        NormalImage="pack://application:,,,/Resources/Icons/History/btn_delete_normal.png"
+                                        PressedImage="pack://application:,,,/Resources/Icons/History/btn_delete_hover.png"
+                                        MouseOverImage="pack://application:,,,/Resources/Icons/History/btn_delete_hover.png"
+                                        Cursor="Hand" Click="DeleteButton_Click"/>
+                        </Grid>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <TextBox x:Name="textBoxNameDisplayedInConf" Style="{StaticResource SvcLoginInfoTextBoxStyle}"  Tag="{DynamicResource NAME_DISPLAYED_IN_CONF}"
+                     LostFocus="NameDisplayedInConf_LostFocus"
+                         Background="Transparent"  VerticalContentAlignment="Center" HorizontalAlignment="Left" BorderThickness="1" FontSize="14"  Width="280" Height="34" Margin="0, 6, 0, 0"/>
+
+            <CustomControls:TextButton
+                    ButtonWidth="280"
+                    ButtonHeight="34"
+                    NormalForegroundColor="#FFFFFF"
+                    FontSize="12"
+                    Margin="0, 10, 0, 0"
+                    IsDefault="True"
+                    Click="Join_Click"
+                    ButtonContent="{DynamicResource JOIN}" NormalBackgroundColor="#4381FF" HoverBackgroundColor="#5F94FF" ClickBackgroundColor="#3C74E5" />
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Width="280" Margin="0, 10, 0, 0">
+                <CheckBox Name="turnOffCamera" Content="{DynamicResource TURN_OFF_CAMERA}"></CheckBox>
+                <CheckBox Name="turnOffMicrophone" Content="{DynamicResource TURN_OFF_MICROPHONE}" Margin="0, 10, 0, 0"></CheckBox>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

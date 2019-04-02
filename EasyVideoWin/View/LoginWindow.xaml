@@ -1,0 +1,84 @@
+﻿<Window x:Class="EasyVideoWin.View.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EasyVideoWin.View"
+        xmlns:ViewModel="clr-namespace:EasyVideoWin.ViewModel"
+        xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
+        mc:Ignorable="d"
+        Title="Login Window" Height="320" Width="530" FontFamily="Arial, Microsoft YaHei"
+        WindowStyle="None" BorderThickness="1" ResizeMode="NoResize" MouseLeftButtonDown="BackGround_MouseMove" WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <ViewModel:LoginWindowModel/>
+    </Window.DataContext>
+    <Viewbox>
+        <Grid Height="320" Width="530">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="28" />
+                <RowDefinition Height="52" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Grid.Column="0">
+                <DockPanel HorizontalAlignment="Left">
+                    <CustomControls:WpfImageButton ImageWidth="12" ImageHeight="12" Cursor="Hand" Margin="8, 0, 0, 0"
+                                                   NormalImage="pack://application:,,,/Resources/Icons/WindowTitlebar/btn_back.png"
+                                                   PressedImage="pack://application:,,,/Resources/Icons/WindowTitlebar/btn_back.png"
+                                                   MouseOverImage="pack://application:,,,/Resources/Icons/WindowTitlebar/btn_back.png"
+                                                   TextOrientation="Horizontal"
+                                                   TitleText="{DynamicResource BACK}"
+                                                   TextFontSize="12"
+                                                   TextForeground="#4381FF"
+                                                   Visibility="{Binding BackVisibility}"
+                                                   Command="{Binding BackCommand}"
+                                                   />
+                </DockPanel>
+                <DockPanel HorizontalAlignment="Right" Margin="0, 0, 0, 0">
+                    <TextBlock Text="{DynamicResource ADVANCED_SETTING}"
+                               Visibility="{Binding AdvancedSettingVisibility}"
+                               MouseLeftButtonDown="AdvancedSetting_MouseLeftButtonDown"
+                               VerticalAlignment="Center" Foreground="#c1c1c1" FontSize="12" Cursor="Hand"/>
+
+                    <CustomControls:WpfImageButton x:Name="moreMenuBtn" ImageWidth="28" ImageHeight="28"
+                                                   TextVisibility="Collapsed"
+                                        NormalImage="pack://application:,,,/Resources/Icons/WindowTitlebar/more_normal.png"
+                                        PressedImage="pack://application:,,,/Resources/Icons/WindowTitlebar/more_click.png"
+                                        MouseOverImage="pack://application:,,,/Resources/Icons/WindowTitlebar/more_hover.png"
+                                        Cursor="Hand" Click="MoreBtn_Click" Initialized="MoreBtn_SourceInitialized">
+                        <CustomControls:WpfImageButton.ContextMenu>
+                            <ContextMenu Width="120" Background="White" Style="{StaticResource TextMenu}">
+                                <MenuItem Style="{StaticResource TextMenuItem}" Header="{DynamicResource START_DIAGNOSTICS}"
+                                          Foreground="#919191" FontSize="14" Click="SendDiagnostics_Click" Cursor="Hand" />
+                                <MenuItem Style="{StaticResource TextMenuItem}" Header="{DynamicResource ABOUT}"
+                                          Foreground="#919191" FontSize="14" Click="About_Click" Cursor="Hand"/>
+                            </ContextMenu>
+                        </CustomControls:WpfImageButton.ContextMenu>
+                    </CustomControls:WpfImageButton>
+                    <CustomControls:WpfImageButton ImageWidth="28" ImageHeight="28"
+                                                   TextVisibility="Collapsed"
+                                        NormalImage="pack://application:,,,/Resources/Icons/WindowTitlebar/minimize_normal.png"
+                                        PressedImage="pack://application:,,,/Resources/Icons/WindowTitlebar/minimize_click.png"
+                                        MouseOverImage="pack://application:,,,/Resources/Icons/WindowTitlebar/minimize_hover.png"
+                                        Cursor="Hand" Click="MinBtn_Click"/>
+                    <CustomControls:WpfImageButton ImageWidth="28" ImageHeight="28"
+                                                   TextVisibility="Collapsed"
+                                        NormalImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_normal.png"
+                                        PressedImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_click.png"
+                                        MouseOverImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_hover.png"
+                                        Cursor="Hand" Click="CloseBtn_Click"/>
+                </DockPanel>
+            </Grid>
+            <Grid Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                <Label Content="{Binding CurrentTitle}" Visibility="{Binding TitleVisibility}" HorizontalAlignment="Center" FontSize="26" Foreground="{Binding TitleColor}" Padding="0" FontWeight="Medium"></Label>
+                <Image x:Name="imgLogoLogin" Visibility="{Binding LogoVisibility}" Height="26" Source="pack://application:,,,/Resources/Icons/logo_login.png"/>
+            </Grid>
+            <Grid Grid.Row="2" Grid.Column="0">
+                <Border Padding="25, 0">
+                    <ContentPresenter Content="{Binding CurrentView}"/>
+                </Border>
+            </Grid>
+            
+        </Grid>
+    </Viewbox>
+    
+</Window>

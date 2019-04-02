@@ -1,0 +1,95 @@
+﻿<UserControl x:Class="EasyVideoWin.View.AudioSettingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ViewModel="clr-namespace:EasyVideoWin.ViewModel"
+             xmlns:local="clr-namespace:EasyVideoWin.View"
+             xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
+             mc:Ignorable="d" 
+            d:DesignHeight="600" d:DesignWidth="815">
+    <UserControl.DataContext>
+        <ViewModel:AudioSettingViewModel/>
+    </UserControl.DataContext>
+    <UserControl.Resources>
+        <Style TargetType="Button" x:Key="TabButton">
+            <Setter Property="Foreground" Value="#313131"></Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="3" Background="#ededed" >
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center" Margin="8,0,8,0"></ContentPresenter>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="Border" x:Key="MicrophoneFlag">
+            <Setter Property="BorderThickness" Value="1"></Setter>
+            <Setter Property="Width" Value="8"></Setter>
+            <Setter Property="Height" Value="15"></Setter>
+            <Setter Property="CornerRadius" Value="3,3,3,3"></Setter>
+            <Setter Property="Margin" Value="2,0,6,0"></Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="20" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+            <Label Content="{DynamicResource MICROPHONE}" FontSize="12" Foreground="#313131" Margin="20, 0, 0, 10" Padding="0"></Label>
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <ComboBox Width="440" Height="28" Style="{StaticResource ComboBoxKey}" ItemsSource="{Binding MicrophoneValues}"
+                      Margin="20, 0, 0, 0" SelectedItem="{Binding MicrophoneSelectedValue, Mode=TwoWay}" FontSize="14" Foreground="#FF313131"></ComboBox>
+        </Grid>
+        <Grid Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
+                <Border x:Name="microphone1" Background="{Binding MicrophoneVolume1}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone2" Background="{Binding MicrophoneVolume2}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone3" Background="{Binding MicrophoneVolume3}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone4" Background="{Binding MicrophoneVolume4}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone5" Background="{Binding MicrophoneVolume5}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone6" Background="{Binding MicrophoneVolume6}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone7" Background="{Binding MicrophoneVolume7}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone8" Background="{Binding MicrophoneVolume8}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone9" Background="{Binding MicrophoneVolume9}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone10" Background="{Binding MicrophoneVolume10}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone11" Background="{Binding MicrophoneVolume11}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone12" Background="{Binding MicrophoneVolume12}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone13" Background="{Binding MicrophoneVolume13}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone14" Background="{Binding MicrophoneVolume14}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone15" Background="{Binding MicrophoneVolume15}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone16" Background="{Binding MicrophoneVolume16}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone17" Background="{Binding MicrophoneVolume17}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone18" Background="{Binding MicrophoneVolume18}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone19" Background="{Binding MicrophoneVolume19}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone20" Background="{Binding MicrophoneVolume20}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone21" Background="{Binding MicrophoneVolume21}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone22" Background="{Binding MicrophoneVolume22}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone23" Background="{Binding MicrophoneVolume23}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone24" Background="{Binding MicrophoneVolume24}" Style="{StaticResource MicrophoneFlag}"></Border>
+                <Border x:Name="microphone25" Background="{Binding MicrophoneVolume25}" Style="{StaticResource MicrophoneFlag}"></Border>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="3" Grid.Column="0" VerticalAlignment="Bottom">
+            <Label Content="{DynamicResource LOUDSPEAKER}" FontSize="12" Foreground="#313131" Margin="20, 0, 0, 10" Padding="0"></Label>
+        </Grid>
+        <Grid Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left">
+            <ComboBox Width="440" Height="28" Style="{StaticResource ComboBoxKey}" ItemsSource="{Binding SpeakerValues}"
+                      Margin="20, 0, 0, 0" SelectedItem="{Binding SpeakerSelectedValue, Mode=TwoWay}" FontSize="14" Foreground="#FF313131"></ComboBox>
+        </Grid>
+        <Grid Grid.Row="5" Grid.Column="0" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal" Margin="20, 10, 0, 0" VerticalAlignment="Center">
+                <Button FontSize="14" Height="25" Style="{StaticResource TabButton}" Content="{DynamicResource PLAY_TEST_SOUND}" Click="OpenLoudspeaker_Click"></Button>
+                <TextBlock FontSize="14" Foreground="#919191" Margin="10,0,0,0" Text="{DynamicResource PLAY_TEST_SOUND_LABEL}" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBlock>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

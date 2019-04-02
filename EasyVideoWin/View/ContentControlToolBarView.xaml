@@ -1,0 +1,87 @@
+﻿<Window x:Class="EasyVideoWin.View.ContentControlToolBarView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
+        xmlns:local="clr-namespace:EasyVideoWin.View"
+        mc:Ignorable="d"
+        Title="ContentControlToolBarView" Height="70" Width="520" WindowStartupLocation="Manual" ShowInTaskbar="False"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent" OpacityMask="White"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown" BorderThickness="6,6,6,6" Panel.ZIndex="200"
+        SizeToContent="Manual" >
+    <Viewbox>
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="SizeAll">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0">
+            <Border CornerRadius="5" Background="Black">
+                <Border>
+                    <StackPanel Name="ToolbarPanel" Margin="10,0,10,0" Orientation="Horizontal"  HorizontalAlignment="Center"  VerticalAlignment="Top" Background="Black">
+                        <CustomControls:WpfImageButton x:Name="StartCursor" Visibility="Visible" Cursor="Hand" ImageWidth="36" ImageHeight="33" Margin="8,3,8,3"
+                                                           Click="StartCursor_Click" TitleText="{DynamicResource START_CURSOR}" TextFontSize="14" TextForeground="#919191"
+                                                           NormalImage="pack://application:,,,/Resources/Icons/Content/icon_start.png"
+                                                           MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_start.png"
+                                                        />
+
+                        <CustomControls:WpfImageButton x:Name="StopCursor" Visibility="Collapsed" Cursor="Hand" ImageWidth="36" ImageHeight="33" Margin="8,3,8,3"
+                                                           Click="StopCursor_Click" TitleText="{DynamicResource STOP_CURSOR}" TextFontSize="14" TextForeground="#919191"
+                                                           NormalImage="pack://application:,,,/Resources/Icons/Content/icon_stop.png"
+                                                           MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_stop.png"
+                                                        />
+
+                        <CustomControls:WpfImageButton x:Name="PenSetting" Visibility="Collapsed" Cursor="Hand" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
+                                                           Click="PenSetting_Click" TitleText="{DynamicResource BRUSH}" TextFontSize="14" TextForeground="#919191"
+                                                           NormalImage="pack://application:,,,/Resources/Icons/Content/Pen/Type/black_default.png"
+                                                           MouseOverImage="pack://application:,,,/Resources/Icons/Content/Pen/Type/black_default.png"
+                                                        />
+                        
+                        <CustomControls:WpfImageButton x:Name="Highlighter" Visibility="Collapsed" Cursor="Hand" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
+                                                           Click="Highlighter_Click" TitleText="{DynamicResource HIGHLIGHTER}" TextFontSize="14" TextForeground="#919191"
+                                                           NormalImage="pack://application:,,,/Resources/Icons/Content/Pen/Type/h_yellow_default.png"
+                                                           MouseOverImage="pack://application:,,,/Resources/Icons/Content/Pen/Type/h_yellow_default.png"
+                                                        />
+
+                            <CustomControls:WpfImageButton x:Name="Erase" Visibility="Collapsed" Cursor="Hand" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
+                                                           Click="Erase_Click" TitleText="{DynamicResource ERASER}" TextFontSize="14" TextForeground="#919191"
+                                                           NormalImage="pack://application:,,,/Resources/Icons/Content/icon_eraser.png"
+                                                           MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_eraser.png"
+                                                        />
+
+                            <CustomControls:WpfImageButton x:Name="Revoke" Visibility="Collapsed" Cursor="Hand" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
+                                                           Click="Revoke_Click" TitleText="{DynamicResource REVERT}" TextFontSize="14" TextForeground="#919191"
+                                                           NormalImage="pack://application:,,,/Resources/Icons/Content/icon_revoke.png"
+                                                           MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_revoke.png"
+                                                        />
+
+                        <CustomControls:WpfImageButton x:Name="Wallpaper" Visibility="Collapsed" Cursor="Hand" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
+                                                           Click="Wallpaper_Click" TitleText="{DynamicResource BACKGROUND}" TextFontSize="14" TextForeground="#919191"
+                                                           NormalImage="pack://application:,,,/Resources/Icons/Content/icon_background.png"
+                                                           MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_background.png"
+                                                        />
+
+                        <CustomControls:WpfImageButton x:Name="Clear" Visibility="Collapsed" Cursor="Hand" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
+                                                           Click="Clear_Click" TitleText="{DynamicResource CLEAR}" TextFontSize="14" TextForeground="#919191"
+                                                           NormalImage="pack://application:,,,/Resources/Icons/Content/icon_clear.png"
+                                                           MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_clear.png"
+                                                        />
+                        <CustomControls:WpfImageButton Cursor="Hand" Visibility="Visible" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
+                                                           Click="Snap_Click" TitleText="{DynamicResource SAVE}" TextFontSize="14" TextForeground="#919191"
+                                                           NormalImage="pack://application:,,,/Resources/Icons/Content/icon_save.png"
+                                                           MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_save.png"
+                                                        />
+
+                        <CustomControls:WpfImageButton x:Name="Exit" Cursor="Hand" Visibility="Visible" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
+                                                           Click="Exit_Click" TitleText="{DynamicResource STOP_SHARE}" TextFontSize="14" TextForeground="#919191"
+                                                           NormalImage="pack://application:,,,/Resources/Icons/Content/icon_exit.png"
+                                                           MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_exit.png"
+                                                        />
+                    </StackPanel>
+                </Border>
+            </Border>
+        </Grid>
+    </Grid>
+    </Viewbox>
+</Window>

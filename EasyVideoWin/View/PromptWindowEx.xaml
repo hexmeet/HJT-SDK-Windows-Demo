@@ -1,0 +1,24 @@
+﻿<Window x:Class="EasyVideoWin.View.PromptWindowEx"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EasyVideoWin.View"
+        mc:Ignorable="d"
+        Title="PromptWindowEx" Height="40" Width="300" ShowInTaskbar="False" ResizeMode="NoResize"
+        SizeToContent="Height" WindowStyle="None" AllowsTransparency="True" Background="Transparent" WindowStartupLocation="CenterOwner">
+    <Viewbox>
+        <Grid>
+            <Border CornerRadius="5, 5, 5, 5" Background="#99000000" Height="40" Width="300">
+                <Label x:Name="label" FontSize="16" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <Border Margin="200,50,200,0">
+                <Polygon Points="0,0 5,10 10,0" StrokeThickness="0">
+                    <Polygon.Fill>
+                        <SolidColorBrush Color="#99000000"/>
+                    </Polygon.Fill>
+                </Polygon>
+            </Border>
+        </Grid>
+    </Viewbox>
+</Window>

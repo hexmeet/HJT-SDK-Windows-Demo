@@ -1,0 +1,14 @@
+﻿<Window x:Class="EasyVideoWin.View.PromptWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EasyVideoWin.View"
+        mc:Ignorable="d"
+        FontFamily="Arial, Microsoft YaHei"
+        Title="PromptWindow" Height="70" Width="1280" ShowInTaskbar="False" ResizeMode="NoResize"
+        SizeToContent="Height" WindowStyle="None" AllowsTransparency="True" Background="Transparent">
+    <Border Name="PromptWindowBorder" CornerRadius="5, 5, 5, 5" Background="#99000000" Height="70">
+        <Label x:Name="label" FontSize="24" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20, 0"/>
+    </Border>
+</Window>

@@ -1,0 +1,56 @@
+﻿<CustomControls:CustomShowHideBaseWindow x:Class="EasyVideoWin.View.LayoutNormalCellsSectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EasyVideoWin.View"
+        xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
+        mc:Ignorable="d"
+        Title="LayoutNormalCellsSectionWindow" Height="458" Width="180" WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False"
+        AllowsTransparency="True" Background="Transparent">
+    <Viewbox VerticalAlignment="Top">
+        <StackPanel Name="sectionStackPanel" Width="180">
+            <Grid Name="sectionGrid" Height="458" VerticalAlignment="Top">
+                <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition x:Name="topBar" Height="26"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition x:Name="bottomBar" Height="26"/>
+                    </Grid.RowDefinitions>
+                    <Grid x:Name="topToolbarGrid" Grid.Row="0" Grid.Column="0" Background="Transparent">
+                        <DockPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <CustomControls:ArrowButton x:Name="btnCellsNavigateUp" Cursor="Hand" Click="BtnCellsNavigateUp_Click"
+                                                        Width="14" Height="14"
+                                            NormalImage="pack://application:,,,/Resources/Icons/Arrow/arrow_up_normal.png"
+                                            HoverImage="pack://application:,,,/Resources/Icons/Arrow/arrow_up_hover.png"
+                                            PressedImage="pack://application:,,,/Resources/Icons/Arrow/arrow_up_click.png"/>
+                        </DockPanel>
+                        <DockPanel HorizontalAlignment="Right" Margin="0, 0, 10, 0">
+                            <!--<Image Width="25" Height="25" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                                Source="pack://application:,,,/Resources/Icons/WindowTitlebar/small_maximize_normal.png"/>-->
+                            <CustomControls:ArrowButton x:Name="btnMinWindow" Cursor="Hand" Click="BtnMinWindow_Click"
+                                                        Width="14" Height="14"
+                                            NormalImage="pack://application:,,,/Resources/Icons/WindowTitlebar/small_minimize_normal.png"
+                                            HoverImage="pack://application:,,,/Resources/Icons/WindowTitlebar/small_minimize_hover.png"
+                                            PressedImage="pack://application:,,,/Resources/Icons/WindowTitlebar/small_minimize_click.png"/>
+                        </DockPanel>
+
+                    </Grid>
+                    <Grid Grid.Row="1" Grid.Column="0" Background="#313131">
+                        
+                    </Grid>
+                    <Grid x:Name="bottomToolbarGrid" Grid.Row="2" Grid.Column="0" Background="Transparent">
+                        <DockPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <CustomControls:ArrowButton x:Name="btnCellsNavigateDown" Cursor="Hand" Click="BtnCellsNavigateDown_Click"
+                                                        Width="14" Height="14"
+                                            NormalImage="pack://application:,,,/Resources/Icons/Arrow/arrow_down_normal.png"
+                                            HoverImage="pack://application:,,,/Resources/Icons/Arrow/arrow_down_hover.png"
+                                            PressedImage="pack://application:,,,/Resources/Icons/Arrow/arrow_down_click.png"/>
+                        </DockPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </StackPanel>
+    </Viewbox>
+    
+</CustomControls:CustomShowHideBaseWindow>

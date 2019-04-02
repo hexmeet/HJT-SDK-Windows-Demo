@@ -1,0 +1,110 @@
+﻿<CustomControls:CustomShowHideBaseWindow x:Class="EasyVideoWin.View.LayoutOperationbarWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EasyVideoWin.View"
+        xmlns:ViewModel="clr-namespace:EasyVideoWin.ViewModel"
+        xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
+        mc:Ignorable="d"
+        FontFamily="Arial, Microsoft YaHei"
+        Title="LayoutOperationbarWindow" d:DesignHeight="68" d:DesignWidth="1280"
+        Background="Transparent" AllowsTransparency="True" WindowStyle="None" ShowInTaskbar="False">
+    <StackPanel Orientation="Vertical">
+        <Grid Background="#313131" Height="68">
+            <DockPanel HorizontalAlignment="Left" Margin="20, 0, 0, 0">
+                <!--<Button Name="showNormalCellsBtn" Click="ShowNormalCellsBtn_Click" Background="#313131" Height="40" Width="40" Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="40"/>
+                                                </Grid.RowDefinitions>
+                                                <Grid Grid.Row="0" Grid.Column="0">
+                                                    <Ellipse Name="showNormalCellsEllipse" Width="40" Height="40"/>
+                                                    <Image Width="28" Height="28" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                            Source="pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_detail.png"/>
+                                                </Grid>
+                                            </Grid>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="showNormalCellsEllipse" Property="Fill" Value="#4381ff"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>-->
+
+
+                <CustomControls:ResumePipButton x:Name="showNormalCellsBtn" ButtonText="{DynamicResource RESUME_PIP}"
+                                            NormalImage="pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_resume_pip_normal.png"
+                                                    MouseOverImage="pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_resume_pip_click.png"
+                                                    NormalTextForeground="#ffffff"
+                                                    MouseOverTextForeground="#4381ff"
+                                                    FontSize="14"
+                                            Cursor="Hand"
+                                            Click="ShowNormalCellsBtn_Click"/>
+
+            </DockPanel>
+            <DockPanel x:Name="normalButtonsDockPanel" HorizontalAlignment="Center">
+                <CustomControls:LayoutOperationbarVerticalButton x:Name="unmuteAudioBtn" ButtonText="{DynamicResource BOTTOM_BAR_MUTE}"
+                                            NormalImage="pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_unmute.png"
+                                            Cursor="Hand"
+                                            Click="UnmuteAudioBtn_Click"/>
+                <CustomControls:LayoutOperationbarVerticalButton x:Name="muteAudioBtn" ButtonText="{DynamicResource BOTTOM_BAR_UNMUTE}" 
+                                            NormalImage="pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_mute.png"
+                                            Cursor="Hand"
+                                            Click="MuteAudioBtn_Click"/>
+                <CustomControls:LayoutOperationbarVerticalButton x:Name="resumeVideoBtn" ButtonText="{DynamicResource BOTTOM_BAR_VIDEO_OFF}" 
+                                            NormalImage="pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_resume-camera.png"
+                                            Cursor="Hand"
+                                            Click="ResumeVideoBtn_Click"/>
+                <CustomControls:LayoutOperationbarVerticalButton x:Name="suspendVideoBtn" ButtonText="{DynamicResource BOTTOM_BAR_VIDEO_ON}" 
+                                            NormalImage="pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_suspend-camera.png"
+                                            Cursor="Hand"
+                                            Click="SuspendVideoBtn_Click"/>
+
+
+                <CustomControls:LayoutOperationbarVerticalButton x:Name="shareModeBtn" ButtonText="{DynamicResource BOTTOM_BAR_SHARE}" Cursor="Hand"
+                                            NormalImage="pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_share.png"
+                                            Click="ShareMode_Click"/>
+                <CustomControls:LayoutOperationbarVerticalButton x:Name="settingBtn" ButtonText="{DynamicResource BOTTOM_BAR_SETTING}" 
+                                            NormalImage="pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_setting.png"
+                                            Click="SettingBtn_Click"/>
+                <CustomControls:LayoutOperationbarVerticalButton x:Name="confManagementBtn" ButtonText="{DynamicResource CONFERENCE_MANAGEMENT}"
+                                                 Cursor="Hand" ExtraInfoText=""
+                                            NormalImage="pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_detail.png"
+                                            Click="ConfManagementBtn_Click"/>
+                <CustomControls:LayoutOperationbarVerticalButton x:Name="galleryViewBtn" ButtonText="{DynamicResource GALLERY_VIEW}"
+                                                 Cursor="Hand"
+                                            NormalImage="pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_gallery.png"
+                                            Click="GalleryViewBtn_Click"/>
+                <CustomControls:LayoutOperationbarVerticalButton x:Name="speakerViewBtn" ButtonText="{DynamicResource SPEAKER_VIEW}" 
+                                                 Cursor="Hand"
+                                            NormalImage="pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_speaker.png"
+                                            Click="SpeakerViewBtn_Click"/>
+
+                <CustomControls:LayoutOperationbarVerticalButton x:Name="requestSpeakBtn" ButtonText="{DynamicResource BOTTOM_BAR_REQUEST}" 
+                                                 Cursor="Hand"
+                                            NormalImage="pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_speaking.png"
+                                            Click="RequestSpeak_Click"/>
+                <CustomControls:LayoutOperationbarVerticalButton x:Name="showShareBtn" ButtonText="{DynamicResource BOTTOM_BAR_SHOW_WINDOW}" 
+                                                 Cursor="Hand"
+                                            NormalImage="pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_show-share.png"
+                                            Click="ShowShare_Click"/>
+            </DockPanel>
+            <DockPanel HorizontalAlignment="Right" Margin="0, 0, 20, 0">
+                <CustomControls:LayoutOperationbarHorizontalButton x:Name="hangupBtn" ButtonText="{DynamicResource BOTTOM_BAR_HANGUP}" 
+                                                 Cursor="Hand"
+                                            NormalImage="pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_hang-up.png"
+                                            Click="HangupBtn_Click" PreviewKeyDown="HangupBtn_PreviewKeyDown" />
+            </DockPanel>
+        </Grid>
+    </StackPanel>
+</CustomControls:CustomShowHideBaseWindow>

@@ -1,0 +1,52 @@
+﻿<UserControl x:Class="EasyVideoWin.View.AboutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EasyVideoWin.View"
+             xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
+             mc:Ignorable="d"
+             d:DesignHeight="400" d:DesignWidth="433">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="4*" />
+            <RowDefinition Height="200" />
+            <RowDefinition Height="6*" />
+            <RowDefinition Height="25" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0"></Grid>
+        <Grid x:Name="logoLine" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="50" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Image Width="70" Height="70" Source="pack://application:,,,/Resources/Icons/logo_about.png"/>
+            </Grid>
+            <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="{DynamicResource PRODUCT_NAME}" FontSize="16" Foreground="#313131" FontWeight="Bold"/>
+            </Grid>
+            <Grid Grid.Row="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="{DynamicResource COPY_RIGHT}" FontSize="12" Foreground="#919191" TextAlignment="Center" />
+            </Grid>
+            <Grid Grid.Row="3" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <CustomControls:TextButton
+                        ButtonWidth="120"
+                        ButtonHeight="28"
+                        Style="{StaticResource ConfirmButton}"
+                        ButtonContent="{DynamicResource CHECK_UPDATE}"
+                        Click="CheckUpdate_Click" />
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="3">
+            <Grid HorizontalAlignment="Center"  VerticalAlignment="Top" >
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"  VerticalAlignment="Top">
+                    <TextBlock x:Name="versionTag" Text ="{DynamicResource VERSION_TITLE}" Foreground="#c1c1c1" FontSize="12px"  />
+                    <TextBlock x:Name="versionNumber" Foreground="#c1c1c1" FontSize="12px"  HorizontalAlignment="Center"  VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

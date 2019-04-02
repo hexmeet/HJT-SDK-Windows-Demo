@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="EasyVideoWin.CustomControls.TextButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EasyVideoWin.CustomControls"
+             mc:Ignorable="d">
+    <Button Name="btn" Click="button_Click" Background="#313131" MouseEnter="Btn_MouseEnter" PreviewMouseDown="Btn_MouseDown" MouseLeave="Btn_MouseLeave"
+            Height="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TextButton}}, Path=ButtonHeight}"
+            Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TextButton}}, Path=ButtonWidth}"
+            Cursor="Hand"
+            IsDefault="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TextButton}}, Path=IsDefault}"
+            Foreground="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TextButton}}, Path=NormalForegroundColor}"
+            Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TextButton}}, Path=ButtonContent}"
+            Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TextButton}}, Path=Command}"
+            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TextButton}}, Path=CommandParameter}">
+
+        <Button.Style>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="btnBorder" Background="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TextButton}}, Path=NormalBackgroundColor}" CornerRadius="4">
+                                <ContentPresenter Content="{TemplateBinding ContentControl.Content}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="btnBorder" Property="Background" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TextButton}}, Path=HoverBackgroundColor}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="btnBorder" Property="Background" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:TextButton}}, Path=ClickBackgroundColor}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Button.Style>
+    </Button>
+</UserControl>

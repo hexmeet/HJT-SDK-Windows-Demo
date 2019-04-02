@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="EasyVideoWin.View.LoginAdvancedSettingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EasyVideoWin.View"
+             xmlns:ViewModel="clr-namespace:EasyVideoWin.ViewModel"
+             xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
+             mc:Ignorable="d" 
+             Width="281" Height="240">
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <TextBox x:Name="textBoxPort" Style="{StaticResource SvcLoginInfoTextBoxStyle}"  Tag="{DynamicResource PORT_OPTIONAL}"
+                     LostFocus="Port_LostFocus"
+                         Background="Transparent"  VerticalContentAlignment="Center" HorizontalAlignment="Left" BorderThickness="1" FontSize="14"  Width="280" Height="34" Margin="0, 36, 0, 0"/>
+
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Width="280" Margin="0, 20, 0, 0">
+                <CheckBox Name="checkBoxUseHttps" Content="HTTPS" Click="UseHttps_Click"></CheckBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="280" Margin="0, 10, 0, 0">
+                <CustomControls:TextButton
+                    ButtonWidth="136"
+                    ButtonHeight="34"
+                    NormalForegroundColor="#FFFFFF"
+                    FontSize="12"
+                    Margin="0, 10, 0, 0"
+                    Click="Ok_Click"
+                    IsDefault="True"
+                    HorizontalAlignment="Left"
+                    ButtonContent="{DynamicResource CONFIRM}" NormalBackgroundColor="#4381FF" HoverBackgroundColor="#5F94FF" ClickBackgroundColor="#3C74E5" />
+                <CustomControls:TextButton
+                    ButtonWidth="136"
+                    ButtonHeight="34"
+                    NormalForegroundColor="#313131"
+                    FontSize="12"
+                    Margin="8, 10, 0, 0"
+                    Click="Cancel_Click"
+                    IsDefault="True"
+                    HorizontalAlignment="Right"
+                    ButtonContent="{DynamicResource CANCEL}" NormalBackgroundColor="#f7f7f7" HoverBackgroundColor="#FFFFFF" ClickBackgroundColor="#F1F1F1" />
+
+            </StackPanel>
+                
+            
+        </StackPanel>
+    </Grid>
+</UserControl>

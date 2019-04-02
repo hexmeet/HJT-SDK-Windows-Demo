@@ -1,0 +1,71 @@
+﻿<Window x:Class="EasyVideoWin.View.SoftwareUpdateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EasyVideoWin.View"
+        mc:Ignorable="d"
+        xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
+        xmlns:ViewModel="clr-namespace:EasyVideoWin.ViewModel"
+        ShowInTaskbar="False"
+        Title="SoftwareUpdateWindow" Height="160" Width="370" WindowStartupLocation="CenterOwner" WindowStyle="None">
+    <Window.DataContext>
+        <ViewModel:SoftwareUpdateWindowModel/>
+    </Window.DataContext>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="28"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="44"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Background="#f7f7f7" Margin="10, 0, 0, 0">
+            <DockPanel HorizontalAlignment="Left" VerticalAlignment="Center">
+                <TextBlock Text="{DynamicResource SOFTWARE_UPDATE}" Style="{StaticResource ChangePasswordTitle}"></TextBlock>
+            </DockPanel>
+            <DockPanel HorizontalAlignment="Right" Margin="0, 0, 0, 0">
+                <CustomControls:WpfImageButton ImageWidth="28" ImageHeight="28"
+                                                   TextVisibility="Collapsed"
+                                        NormalImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_normal.png"
+                                        PressedImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_click.png"
+                                        MouseOverImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_hover.png"
+                                        Cursor="Hand" Click="CloseBtn_Click"/>
+            </DockPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="10, 0, 10, 0" VerticalAlignment="Center">
+            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                <Image Width="36" Height="36" Source="pack://application:,,,/Resources/Icons/logo_about.png"/>
+                <StackPanel Margin="6, 0, 0, 0" Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding PromptContent}" FontSize="14" Foreground="#313131" Margin="0, 0, 0, 5"/>
+                    <ProgressBar Value="{Binding DownloadPercent}" Height="6" Width="280" Foreground="#4381ff" Visibility="{Binding DownloadPercentVisibility}"/>
+                    <TextBlock Text="{Binding DownloadCount}" FontSize="14" Foreground="#313131" Margin="0, 5, 0, 0" Visibility="{Binding DownloadCountVisibility}"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="2" VerticalAlignment="Center" Background="#f7f7f7">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Height="44">
+                <DockPanel HorizontalAlignment="Right">
+                    <CustomControls:TextButton
+                        ButtonWidth="80"
+                        ButtonHeight="28"
+                        Style="{StaticResource CancelButton}"
+                        ButtonContent="{Binding CloseButtonText}"
+                        Click="CloseBtn_Click" />
+                </DockPanel>
+
+                <DockPanel HorizontalAlignment="Right" Margin="10, 0, 20, 0">
+                    <CustomControls:TextButton
+                        ButtonWidth="80"
+                        ButtonHeight="28"
+                        Style="{StaticResource ConfirmButton}"
+                        ButtonContent="{Binding ConfirmButtonText}"
+                        Visibility="{Binding ConfirmButtonVisibility}"
+                        Click="ConfirmBtn_Click" />
+                </DockPanel>
+            </StackPanel>
+        </Grid>
+        
+    </Grid>
+</Window>

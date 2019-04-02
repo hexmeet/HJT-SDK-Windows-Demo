@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="EasyVideoWin.View.LogoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EasyVideoWin.View"
+             xmlns:ViewModel="clr-namespace:EasyVideoWin.ViewModel"
+             xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="720" d:DesignWidth="1280" Background="White">
+    <UserControl.DataContext>
+        <ViewModel:LogoViewModel />
+    </UserControl.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <StackPanel Orientation="Vertical">
+                <StackPanel x:Name="bgDecoration" Height="0" Background="Black">
+
+                </StackPanel>
+                <StackPanel Width="1280" Height="720" Background="Transparent">
+                    <TextBlock Cursor="Hand" FontSize="32" Foreground="#FFFFFF" Margin="0, 440, 0, 0" Text="{Binding ConferenceNumber, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"></TextBlock>
+                </StackPanel>
+            </StackPanel>
+            
+        </Grid>
+    </Grid>
+</UserControl>

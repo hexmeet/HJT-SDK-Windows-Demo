@@ -1,0 +1,23 @@
+﻿<CustomControls:FullScreenBaseWindow
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EasyVideoWin"
+        xmlns:ViewModel="clr-namespace:EasyVideoWin.ViewModel" x:Class="EasyVideoWin.MainWindow"
+        xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
+        mc:Ignorable="d"
+        Title="HexMeet" Height="520" Width="720" WindowStartupLocation="CenterScreen" FontFamily="Arial, Microsoft YaHei"
+        WindowStyle="None" x:Name="win" Background="Black" Loaded="Window_Loaded" ResizeMode="NoResize">
+    <Window.DataContext>
+        <ViewModel:MainWindowViewModel/>
+    </Window.DataContext>
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="0" GlassFrameThickness="1" ResizeBorderThickness="5" CornerRadius="0"/>
+    </WindowChrome.WindowChrome>
+
+    <StackPanel Orientation="Vertical">
+        <ContentPresenter x:Name="ContentArea" Content="{Binding CurrentView}"/>
+    </StackPanel>
+
+</CustomControls:FullScreenBaseWindow>

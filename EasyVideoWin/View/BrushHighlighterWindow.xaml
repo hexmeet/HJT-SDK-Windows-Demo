@@ -1,0 +1,186 @@
+﻿<Window x:Class="EasyVideoWin.View.BrushHighlighterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EasyVideoWin.View"
+        mc:Ignorable="d"
+        Title="BrushHighlighterWindow" Height="200" Width="200" WindowStyle="None" BorderThickness="1" ResizeMode="NoResize" ShowInTaskbar="False"
+        Background="Black" Opacity="0.9" BorderBrush="#313131" AllowsTransparency="True">
+    <Viewbox>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="10"/>
+                <RowDefinition Height="40"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="40"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Row="0" Grid.Column="0"  MouseLeftButtonDown="Color_Click" Name="yellow">
+                    <Image x:Name="color_yellow" Width="30" Height="30" VerticalAlignment="Center">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/yellow_default.png"/>
+                        </Image.Source>
+                    </Image>
+                    <Image x:Name="colorSelect_yellow" Width="30" Height="30" VerticalAlignment="Center" Visibility="Collapsed">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/yellow_selected.png"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+                <Grid Grid.Row="0" Grid.Column="1" MouseLeftButtonDown="Color_Click" Name="green">
+                    <Image x:Name="color_green" Width="30" Height="30" VerticalAlignment="Center">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/green_default.png"/>
+                        </Image.Source>
+                    </Image>
+                    <Image x:Name="colorSelect_green" Width="30" Height="30" VerticalAlignment="Center" Visibility="Collapsed">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/green_selected.png"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+                <Grid Grid.Row="0" Grid.Column="2" MouseLeftButtonDown="Color_Click" Name="lake">
+                    <Image x:Name="color_lake" Width="30" Height="30" VerticalAlignment="Center">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/lake_default.png"/>
+                        </Image.Source>
+                    </Image>
+                    <Image x:Name="colorSelect_lake" Width="30" Height="30" VerticalAlignment="Center" Visibility="Collapsed">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/lake_selected.png"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+                <Grid Grid.Row="0" Grid.Column="3"  MouseLeftButtonDown="Color_Click" Name="purple">
+                    <Image x:Name="color_purple" Width="30" Height="30" VerticalAlignment="Center">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/purple_default.png"/>
+                        </Image.Source>
+                    </Image>
+                    <Image x:Name="colorSelect_purple" Width="30" Height="30" VerticalAlignment="Center" Visibility="Collapsed">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/purple_selected.png"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+                <Grid Grid.Row="1" Grid.Column="0" MouseLeftButtonDown="Color_Click" Name="orange">
+                    <Image x:Name="color_orange" Width="30" Height="30" VerticalAlignment="Center">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/orange_default.png"/>
+                        </Image.Source>
+                    </Image>
+                    <Image x:Name="colorSelect_orange" Width="30" Height="30" VerticalAlignment="Center" Visibility="Collapsed">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/orange_selected.png"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+                <Grid Grid.Row="1" Grid.Column="1" MouseLeftButtonDown="Color_Click" Name="light_green">
+                    <Image x:Name="color_light_green" Width="30" Height="30" VerticalAlignment="Center">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/light_green_default.png"/>
+                        </Image.Source>
+                    </Image>
+                    <Image x:Name="colorSelect_light_green" Width="30" Height="30" VerticalAlignment="Center" Visibility="Collapsed">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/light_green_selected.png"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+                <Grid Grid.Row="1" Grid.Column="2"  MouseLeftButtonDown="Color_Click" Name="light_blue">
+                    <Image x:Name="color_light_blue" Width="30" Height="30" VerticalAlignment="Center">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/light_blue_default.png"/>
+                        </Image.Source>
+                    </Image>
+                    <Image x:Name="colorSelect_light_blue" Width="30" Height="30" VerticalAlignment="Center" Visibility="Collapsed">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/light_blue_selected.png"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+                <Grid Grid.Row="1" Grid.Column="3"  MouseLeftButtonDown="Color_Click" Name="pink">
+                    <Image x:Name="color_pink" Width="30" Height="30" VerticalAlignment="Center">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/pink_default.png"/>
+                        </Image.Source>
+                    </Image>
+                    <Image x:Name="colorSelect_pink" Width="30" Height="30" VerticalAlignment="Center" Visibility="Collapsed">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Color/pink_selected.png"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Row="0" Grid.Column="0" MouseLeftButtonDown="Pensize_Click" Name="size1">
+                    <Image x:Name="size_1" Width="30" Height="30" VerticalAlignment="Center">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Size/default_1.png"/>
+                        </Image.Source>
+                    </Image>
+                    <Image x:Name="sizeSelect_1" Width="30" Height="30" VerticalAlignment="Center" Visibility="Collapsed">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Size/selected_1.png"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+                <Grid Grid.Row="0" Grid.Column="1" MouseLeftButtonDown="Pensize_Click" Name="size2">
+                    <Image x:Name="size_2" Width="30" Height="30" VerticalAlignment="Center">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Size/default_2.png"/>
+                        </Image.Source>
+                    </Image>
+                    <Image x:Name="sizeSelect_2" Width="30" Height="30" VerticalAlignment="Center" Visibility="Collapsed">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Size/selected_2.png"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+                <Grid Grid.Row="0" Grid.Column="2" MouseLeftButtonDown="Pensize_Click" Name="size3">
+                    <Image x:Name="size_3" Width="30" Height="30" VerticalAlignment="Center">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Size/default_3.png"/>
+                        </Image.Source>
+                    </Image>
+                    <Image x:Name="sizeSelect_3" Width="30" Height="30" VerticalAlignment="Center" Visibility="Collapsed">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Size/selected_3.png"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+                <Grid Grid.Row="0" Grid.Column="3" MouseLeftButtonDown="Pensize_Click" Name="size4">
+                    <Image x:Name="size_4" Width="30" Height="30" VerticalAlignment="Center">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Size/default_4.png"/>
+                        </Image.Source>
+                    </Image>
+                    <Image x:Name="sizeSelect_4" Width="30" Height="30" VerticalAlignment="Center" Visibility="Collapsed">
+                        <Image.Source>
+                            <BitmapImage UriSource="pack://application:,,,/Resources/Icons/Content/Pen/Size/selected_4.png"/>
+                        </Image.Source>
+                    </Image>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Viewbox>
+</Window>

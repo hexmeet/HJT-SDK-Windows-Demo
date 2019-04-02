@@ -1,0 +1,138 @@
+﻿<UserControl x:Class="EasyVideoWin.View.GeneralView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EasyVideoWin.View"
+             xmlns:ViewModel="clr-namespace:EasyVideoWin.ViewModel"
+             xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="715">
+    <UserControl.DataContext>
+        <ViewModel:GeneralViewModel />
+    </UserControl.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70" />
+            <RowDefinition Height="70" />
+            <RowDefinition Height="70" />
+            <RowDefinition Height="70" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="30" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom">
+                <StackPanel Orientation="Horizontal" Width="460" HorizontalAlignment="Left">
+                    <Grid Width="460">
+                        <DockPanel HorizontalAlignment="Left">
+                            <Label Content="{DynamicResource CALL_RATE}" FontSize="12" Foreground="#313131" Margin="20, 0, 0, 10" Padding="0"></Label>
+                        </DockPanel>
+                    </Grid>
+                    
+                </StackPanel>
+                
+            </Grid>
+            <Grid Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left">
+                <ComboBox Width="440" Height="28" Style="{StaticResource ComboBoxKey}"
+                          ItemsSource="{Binding CallRateSource}"
+                          SelectedValuePath="Key"
+                          DisplayMemberPath="Text"
+                          SelectedItem="{Binding SelectedCallRate, Mode=TwoWay}"
+                          Margin="20, 0, 0, 0" FontSize="14" Foreground="#FF313131"></ComboBox>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="30" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom">
+                <Label Content="{DynamicResource LANGUAGE}" FontSize="12" Foreground="#313131" Margin="20, 0, 0, 10" Padding="0"></Label>
+            </Grid>
+            <Grid Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left">
+                <ComboBox Width="440" Height="28" Style="{StaticResource ComboBoxKey}"
+                          ItemsSource="{Binding LanguageSource}"
+                          SelectedValuePath="Key"
+                          DisplayMemberPath="Text"
+                          SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
+                          Margin="20, 0, 0, 0" FontSize="14" Foreground="#FF313131"></ComboBox>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="30" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom">
+                <Label Content="{DynamicResource SET_FILE_PATH}" FontSize="12" Foreground="#313131" Margin="20, 0, 0, 10" Padding="0"></Label>
+            </Grid>
+            <Grid Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="364"/>
+                    <ColumnDefinition Width="96"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0" HorizontalAlignment="Left">
+                    <TextBox x:Name="ScreenPicPathText" FontSize="14" Height="28" Width="344" Margin="20,0,0,0" Padding="10,0,0,0" Text="{Binding ScreenPciPath}" Background="#f1f1f1" Foreground="#919191" VerticalContentAlignment="Center" IsReadOnly="True" BorderThickness="0"/>
+                </Grid>
+                <Grid Grid.Column="1" HorizontalAlignment="Right">
+                    <!--<TextBlock x:Name="ButtonText2" FontSize="12" Foreground="#ffffff" Text="{DynamicResource CHANGE_FILE_POSITION}" VerticalAlignment="Center" HorizontalAlignment="Center"/>-->
+                    <CustomControls:TextButton
+                        ButtonWidth="90"
+                        ButtonHeight="28"
+                        Style="{StaticResource ConfirmButton}"
+                        FontSize="14"
+                        ButtonContent="{DynamicResource CHANGE_FILE_POSITION}"
+                        Click="ChangeScreenPicPath" />
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="30" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom">
+                <Label Content="{DynamicResource DIAGNOSTICS}" FontSize="12" Foreground="#313131" Margin="20, 0, 0, 10" Padding="0"></Label>
+            </Grid>
+            <Grid Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Left">
+                <CustomControls:TextButton
+                        ButtonWidth="115"
+                        ButtonHeight="28"
+                    Margin="20, 0, 0, 0"
+                        Style="{StaticResource CancelButton}"
+                        FontSize="14"
+                        ButtonContent="{DynamicResource START_DIAGNOSTICS}"
+                        Command="{Binding DiagnosticCommand}" />
+            </Grid>
+        </Grid>
+        
+        <Grid Grid.Row="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom">
+                <Label Content="{DynamicResource APPLICATION}" FontSize="12" Foreground="#313131" Margin="20, 0, 0, 10" Padding="0"></Label>
+            </Grid>
+            <Grid Grid.Row="1">
+                <StackPanel>
+                    <CheckBox Content="{DynamicResource AUTO_LOGIN}" Margin="20,5,0,5" IsChecked="{Binding AutoLogin}" FontSize="14" Foreground="#313131"/>
+                    <CheckBox Content="{DynamicResource AUTO_ANSWER}" Margin="20,5,0,5" IsChecked="{Binding AutoAnswer}" FontSize="14" Foreground="#313131" />
+                    <!--<CheckBox Content="{DynamicResource FULL_SCREEN_MODE}" Margin="20,5,0,5" IsChecked="{Binding FullScreenAfterStartup}" FontSize="14" Foreground="#313131" />-->
+                    <!--<CheckBox Content="{DynamicResource AUTO_STARTUP}" Margin="20,5,0,5" IsChecked="{Binding AutoStartup}" FontSize="14" Foreground="#313131"/>-->
+                    <CheckBox Content="{DynamicResource AUTO_CAPTURE}" Margin="20,5,0,5" IsChecked="{Binding AutoCapture}" FontSize="14" Foreground="#313131"/>
+                    <CheckBox Content="{DynamicResource OPEN_HIGH_FRAME_RATE_VIDEO}" Margin="20,5,0,5" IsChecked="{Binding OpenHighFrameRateVideo}" FontSize="14" Foreground="#313131"/>
+                    <CheckBox Content="{DynamicResource AUTO_HIDE_PARTY_NAME}" Margin="20,5,0,5" IsChecked="{Binding AutoHidePartyName}" FontSize="14" Foreground="#313131"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

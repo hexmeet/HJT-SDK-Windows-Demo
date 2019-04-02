@@ -1,0 +1,41 @@
+﻿<Window x:Class="EasyVideoWin.View.SelectShareContentModeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EasyVideoWin.View"
+        xmlns:ViewModel="clr-namespace:EasyVideoWin.ViewModel"
+        mc:Ignorable="d"
+        Title="SelectShareContentModeWindow" Height="100" Width="136" SizeToContent="Manual" ShowInTaskbar="False"
+        WindowStyle="None" ResizeMode="NoResize" Background="Transparent" AllowsTransparency="True" 
+        VerticalAlignment="Bottom" >
+    <Window.DataContext>
+        <ViewModel:SelectShareContentModeWindowViewModel/>
+    </Window.DataContext>
+    <Viewbox VerticalAlignment="Bottom">
+        <!--<Grid Width="130">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="2" />
+                <RowDefinition Height="50" />
+                <RowDefinition Height="2" />
+            </Grid.RowDefinitions>-->
+            <!--<Grid Grid.Row="1">-->
+        <StackPanel VerticalAlignment="Bottom" >
+
+            <Grid Visibility="{Binding InteractionWhiteboardBtnVisibility}" Background="#313131" Opacity="0.9" VerticalAlignment="Bottom" >
+            <Label  Width="120" Height="40"  x:Name="InteractionWhiteboard" Content="{DynamicResource WHITEBOARD}" Foreground="#ffffff" FontSize="14"
+                       VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Center"  VerticalAlignment="Center"
+                       MouseLeftButtonDown="InteractionWhiteboardBtn_Click" Cursor="Hand" MouseMove="Window_MouseMove_Whiteboard" MouseLeave="Window_MouseLeave_Whiteboard"/>
+            </Grid>
+            <Grid Visibility="{Binding ScreenShareBtnVisibility}" Background="#313131" Opacity="0.9" VerticalAlignment="Bottom" >
+            <Label Width="120" Height="40" x:Name="ScreenShare" Content="{DynamicResource SHARESCREEN}" Foreground="#ffffff" FontSize="14"
+                       VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                       MouseLeftButtonDown="ScreenShareBtn_Click" Cursor="Hand" MouseMove="Window_MouseMove_ScreenShare" MouseLeave="Window_MouseLeave_ScreenShare"/>
+            </Grid>         
+            
+        </StackPanel>
+        <!--</Grid>-->
+    </Viewbox>
+</Window>

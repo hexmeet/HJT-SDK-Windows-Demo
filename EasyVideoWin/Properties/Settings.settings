@@ -1,0 +1,39 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="EasyVideoWin.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Language" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ConfInfoAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ConfManagementAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="URLProtocol" Type="System.String" Scope="User">
+      <Value Profile="(Default)">hexmeethjt</Value>
+    </Setting>
+    <Setting Name="CloudServerAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)">cloud.hexmeet.com</Value>
+    </Setting>
+    <Setting Name="CloudLocationServerAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://cloudcenter.hexmeet.com</Value>
+    </Setting>
+    <Setting Name="SoftwareUpdateAddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://swinfo.cninnovatel.com</Value>
+    </Setting>
+    <Setting Name="SoftwareUpdateFlag" Type="System.String" Scope="User">
+      <Value Profile="(Default)">windows</Value>
+    </Setting>
+    <Setting Name="SoftwareUpdateBundleId" Type="System.String" Scope="User">
+      <Value Profile="(Default)">com.hexmeet.hjt</Value>
+    </Setting>
+    <Setting Name="SoftwareUpdateAppInfo" Type="System.String" Scope="User">
+      <Value Profile="(Default)">appinfo.json</Value>
+    </Setting>
+    <Setting Name="SoftwareUpdateAppInfoPrefix" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+  </Settings>
+</SettingsFile>
