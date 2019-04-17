@@ -44,12 +44,13 @@ namespace EasyVideoWin.View
         public InputConfPasswordPromptDialog()
         {
             InitializeComponent();
+            this.IsVisibleChanged += InputConfPasswordPromptDialog_IsVisibleChanged;
         }
-
+        
         #endregion
 
         #region -- Public Methods --
-        
+
         #endregion
 
         #region -- Private Methods --
@@ -63,6 +64,14 @@ namespace EasyVideoWin.View
         private void Close_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = false;
+        }
+
+        private void InputConfPasswordPromptDialog_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (Visibility.Visible == this.Visibility)
+            {
+                this.textBoxPassword.Focus();
+            }
         }
 
         #endregion

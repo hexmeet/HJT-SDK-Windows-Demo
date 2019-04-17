@@ -1,0 +1,44 @@
+﻿<Window x:Class="EasyVideoWin.View.ModalPromptDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EasyVideoWin.View"
+        mc:Ignorable="d"
+        xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
+        Title="ModalPromptDlg" Width="370" ShowInTaskbar="False" WindowStyle="None" SizeToContent="Height">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="28" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="38" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Background="#F7F7F7">
+            <Label x:Name="TitleLabel" FontSize="14" Foreground="#313131" Margin="5,0,0,0"></Label>
+            <DockPanel HorizontalAlignment="Right" Margin="0, 0, 0, 0">
+                <CustomControls:WpfImageButton ImageWidth="28" ImageHeight="28"
+                                                   TextVisibility="Collapsed"
+                                        NormalImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_normal.png"
+                                        PressedImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_click.png"
+                                        MouseOverImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_hover.png"
+                                        Cursor="Hand" Click="CloseButton_Click"/>
+            </DockPanel>
+        </Grid>
+        <Grid Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock x:Name="ContentTextBlock" TextWrapping="Wrap" Padding="10,15" FontSize="14" Foreground="#313131" LineHeight="30"></TextBlock>
+        </Grid>
+        <Grid Grid.Row="2" Background="#F7F7F7">
+            <CustomControls:TextButton
+                    x:Name="OkTextButton"
+                    ButtonWidth="80"
+                    ButtonHeight="28"
+                    Margin="0,0,10,0"
+                    NormalForegroundColor="#FFFFFF"
+                    FontSize="12"
+                    Click="Ok_Click"
+                    IsDefault="True"
+                    HorizontalAlignment="Right"
+                    ButtonContent="{DynamicResource CONFIRM}" NormalBackgroundColor="#4381FF" HoverBackgroundColor="#5F94FF" ClickBackgroundColor="#3C74E5" />
+        </Grid>
+    </Grid>
+</Window>

@@ -61,23 +61,21 @@ namespace EasyVideoWin
             log.Info("OnCallStatusChanged start.");
             App.Current.Dispatcher.InvokeAsync(() => {
                 log.Info("Begin to handle call status in UI thread.");
-                switch (status)
-                {
-                    case CallStatus.Connected:
-                        StopFlashWindow();
-                        //this.ResizeMode = ResizeMode.NoResize;
-                        break;
-                    default:
-                        StopFlashWindow();
-                        //this.ResizeMode = ResizeMode.CanResize;
-                        break;
-                }
-
                 if (CallStatus.Connected == status)
                 {
+                    StopFlashWindow();
                     if (null != _incomingCallPromptDialog)
                     {
                         _incomingCallPromptDialog.Visibility = Visibility.Collapsed;
+                    }
+                    SystemSleepManager.PreventSleep();
+                }
+                else
+                {
+                    StopFlashWindow();
+                    if (CallStatus.Ended == status)
+                    {
+                        SystemSleepManager.ResumeSleep();
                     }
                 }
 
@@ -171,6 +169,30 @@ namespace EasyVideoWin
 
             log.Info("No visible window currently.");
             return null;
+        }
+
+        public void ShowPromptTip(string prompt)
+        {
+            IMasterDisplayWindow masterWindow = GetCurrentMainDisplayWindow();
+            if (null == masterWindow)
+            {
+                log.Info("Can not show error message for master window is null");
+                return;
+            }
+            MessageBoxTip tip = new MessageBoxTip();
+            Window tipOwner = null;
+            if (
+                   null != (masterWindow as VideoPeopleWindow)
+                && LayoutBackgroundWindow.Instance.IsLoaded
+                && LayoutBackgroundWindow.Instance.LayoutOperationbarWindow.IsLoaded
+            )
+            {
+                tipOwner = LayoutBackgroundWindow.Instance.LayoutOperationbarWindow;
+            }
+            log.InfoFormat("Show error prompt, tipOwner is null:{0}", null == tipOwner);
+            DisplayUtil.SetWindowCenterAndOwner(tip, masterWindow, tipOwner);
+            tip.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), prompt, LanguageUtil.Instance.GetValueByKey("CONFIRM"));
+            tip.ShowDialog();
         }
 
         protected override void OnClosed(EventArgs e)

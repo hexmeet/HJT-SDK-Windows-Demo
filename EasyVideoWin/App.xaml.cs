@@ -312,7 +312,7 @@ namespace EasyVideoWin
             {
                 string joinConfRegex = string.Format(JOIN_CONF_REGEX, EasyVideoWin.Properties.Settings.Default.URLProtocol);
                 Match mat = Regex.Match(args[0], joinConfRegex);
-                if (4 == mat.Groups.Count)
+                if (mat.Success)
                 {
                     logger.Info("The args[0] is the join conf url and parse the arg.");
                     _anonymousJoinConfServerAddress = mat.Groups[1].Value;

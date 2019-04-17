@@ -48,6 +48,8 @@ namespace EasyVideoWin.Helpers
         public static System.Windows.Media.Brush DefaultBackGround = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#313131"));
         public static System.Windows.Media.Brush SelectedBackGround = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#4c4b49"));
 
+        private static string _screenPicturePath = null;
+
         [DllImport("kernel32")]
         private static extern bool WritePrivateProfileString(string section, string key, string val, string filePath);
         [DllImport("kernel32")]
@@ -72,6 +74,11 @@ namespace EasyVideoWin.Helpers
         private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
         [DllImport("user32.dll")]
         private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        private const string DOWNLOAD_FOLDER_GUID = "{374DE290-123F-4565-9164-39C4925E467B}";
+        private const uint KNOWN_FOLDER_FLAGS_DONT_VERIFY = 0x00004000;
+        [DllImport("Shell32.dll")]
+        private static extern int SHGetKnownFolderPath([MarshalAs(UnmanagedType.LPStruct)]Guid rfid, uint dwFlags, IntPtr hToken, out IntPtr ppszPath);
 
         public const uint SWP_NOMOVE = 0x0002;
         protected const uint SWP_NOZORDER = 0x0004;
@@ -449,12 +456,12 @@ namespace EasyVideoWin.Helpers
         public static string HexMeetTime()
         {
             DateTime now = DateTime.Now;
-            string formatTime =  now.ToString("yyyy-MM-dd_HH.mm.ss");
-
-            string finalTime = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name 
-                                    + "_屏幕截图_" + formatTime;
-
-            return finalTime;
+            string formatTime = now.ToString("yyyy-MM-dd_hh.mm.ss");
+            StringBuilder sb = new StringBuilder();
+            sb.Append(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name).Append("_");
+            sb.Append(LanguageUtil.Instance.GetValueByKey("SCREEN_SHOT"));
+            sb.Append("_").Append(formatTime);
+            return sb.ToString();
         }
         
         #endregion
@@ -1228,25 +1235,40 @@ namespace EasyVideoWin.Helpers
 
         public static string GetScreenPicPath()
         {
-            string value = Utils.IniReadValue(Utils.CONFIG_TITLE, "ScreenPicPath", Utils.GetCurConfigFile());
-            if(value == null || value.Equals(""))
+            if (!string.IsNullOrEmpty(_screenPicturePath))
             {
-                value = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                return _screenPicturePath;
             }
-            return value;
+
+            _screenPicturePath = Utils.IniReadValue(Utils.CONFIG_TITLE, "ScreenPicPath", Utils.GetCurConfigFile());
+            if (string.IsNullOrEmpty(_screenPicturePath))
+            {
+                IntPtr outPath;
+                int result = SHGetKnownFolderPath(new Guid(DOWNLOAD_FOLDER_GUID), KNOWN_FOLDER_FLAGS_DONT_VERIFY, new IntPtr(0), out outPath);
+                if (result >= 0)
+                {
+                    _screenPicturePath = Marshal.PtrToStringUni(outPath);
+                    Marshal.FreeCoTaskMem(outPath);
+                }
+                else
+                {
+                    log.Info("Failed to get folder download and set the default screen folder to desktop.");
+                    _screenPicturePath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+                }
+
+            }
+            return _screenPicturePath;
         }
 
         public static void SetScreenPicPath(string path)
         {
-            if(path != null && !path.Equals(""))
+            if (string.IsNullOrEmpty(path))
             {
-                Utils.IniWriteValue(Utils.CONFIG_TITLE, "ScreenPicPath", path, Utils.GetCurConfigFile());
+                path = "";
             }
-            else
-            {
-                path = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-                Utils.IniWriteValue(Utils.CONFIG_TITLE, "ScreenPicPath", path, Utils.GetCurConfigFile());
-            }
+
+            Utils.IniWriteValue(Utils.CONFIG_TITLE, "ScreenPicPath", path, Utils.GetCurConfigFile());
+            _screenPicturePath = path;
         }
 
         public static string GetFileNameFromPath(string strPathFile)
@@ -1284,9 +1306,9 @@ namespace EasyVideoWin.Helpers
             return 0;
         }
         
-        public static string GenerateDesktopScreenName()
+        public static string GenerateScreenPictureName()
         {
-            string finalPath = GetScreenPicPath() + "\\" + HexMeetTime() + ".png";
+            string finalPath = Path.Combine(GetScreenPicPath(), HexMeetTime() + ".png");
             return finalPath;
         }
 

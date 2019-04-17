@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.Windows.Forms;
 using System.Windows;
 using log4net;
+using System.IO;
 
 namespace EasyVideoWin.Helpers
 {
@@ -68,6 +69,16 @@ namespace EasyVideoWin.Helpers
 
         public static int SaveWindowPicByHandle(Window win, IntPtr hWnd, String path)
         {
+            log.InfoFormat("Save snap window picture to path:{0}", path);
+            string dir = Path.GetDirectoryName(path);
+            if (!Directory.Exists(dir))
+            {
+                log.Info("The snap window picture for the specified path is not existed.");
+            }
+            if (File.Exists(path))
+            {
+                log.Info("The snap window picture for the file is existed.");
+            }
             IntPtr hscrdc = GetWindowDC(hWnd);
             Control control = Control.FromChildHandle(hWnd);
             IntPtr hbitmap;
@@ -87,10 +98,10 @@ namespace EasyVideoWin.Helpers
                 {
 
                 }
-                
-                hbitmap = CreateCompatibleBitmap(hscrdc, Convert.ToInt32(win.ActualWidth * primaryDpiX/96), Convert.ToInt32(win.ActualHeight * primaryDpiY/96));
+
+                hbitmap = CreateCompatibleBitmap(hscrdc, Convert.ToInt32(win.ActualWidth * primaryDpiX / 96), Convert.ToInt32(win.ActualHeight * primaryDpiY / 96));
             }
-            
+
             IntPtr hmemdc = CreateCompatibleDC(hscrdc);
             SelectObject(hmemdc, hbitmap);
 
@@ -100,16 +111,51 @@ namespace EasyVideoWin.Helpers
                 systemFlag = 2;
             }
 
+            log.InfoFormat("OS Version, major:{0}, minor:{1}, system flag:{2}", System.Environment.OSVersion.Version.Major, System.Environment.OSVersion.Version.Minor, systemFlag);
             bool re = PrintWindow(hWnd, hmemdc, systemFlag);
-            Bitmap bmp = null;
             if (re)
             {
-                bmp = Bitmap.FromHbitmap(hbitmap);
+                //using(Bitmap bmp = Bitmap.FromHbitmap(hbitmap))
+                //{
+                //    DeleteObject(hbitmap);
+                //    DeleteDC(hmemdc);
+                //    ReleaseDC(hWnd, hscrdc);
+                //    bmp.Save(path, ImageFormat.Png);
+                //}
+
+                var nImage = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                                hbitmap, IntPtr.Zero, System.Windows.Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+                log.InfoFormat("Snapped image, PixelWidth:{0}, PixelHeight:{1}, Width:{2}, Height:{3}", nImage.PixelWidth, nImage.PixelHeight, nImage.Width, nImage.Height);
+                var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
+                encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(nImage));
+                try
+                {
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        encoder.Save(stream);
+                    }
+                }
+                catch (FileNotFoundException e)
+                {
+                    log.InfoFormat("Failed to save screen picture, exception:{0}", e);
+                    return -2;
+                }
+                finally
+                {
+                    log.Info("Save picture successfully and release resource.");
+                    DeleteObject(hbitmap);
+                    DeleteDC(hmemdc);
+                    ReleaseDC(hWnd, hscrdc);
+                }
             }
-            DeleteObject(hbitmap);
-            DeleteDC(hmemdc);
-            ReleaseDC(hWnd, hscrdc);
-            bmp.Save(path, ImageFormat.Png);
+            else
+            {
+                log.Info("Failed to print window by handle");
+                DeleteObject(hbitmap);
+                DeleteDC(hmemdc);
+                ReleaseDC(hWnd, hscrdc);
+                return -1;
+            }
             return 0;
         }
     }

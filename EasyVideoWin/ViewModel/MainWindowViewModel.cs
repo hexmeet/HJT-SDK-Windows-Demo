@@ -319,6 +319,7 @@ namespace EasyVideoWin.ViewModel
                 }
             }
 
+            var loginStatus = LoginManager.Instance.CurrentLoginStatus;
             if (LoginStatus.LoggingIn == LoginManager.Instance.CurrentLoginStatus || LoginStatus.AnonymousLoggingIn == LoginManager.Instance.CurrentLoginStatus)
             {
                 log.InfoFormat("Current login status:{0}. Login failed.", LoginManager.Instance.CurrentLoginStatus);
@@ -341,7 +342,25 @@ namespace EasyVideoWin.ViewModel
                     }
                     else
                     {
-                        errPrompt = string.Format(LanguageUtil.Instance.GetValueByKey("LOCATION_FAILED_LOG_IN"), err.code);
+                        if (10009 == err.code)
+                        {
+                            if (LoginStatus.AnonymousLoggingIn == loginStatus)
+                            {
+                                errPrompt = LanguageUtil.Instance.GetValueByKey("INVALID_MEETING_ID");
+                            }
+                            else if (LoginStatus.LoggingIn == loginStatus)
+                            {
+                                errPrompt = LanguageUtil.Instance.GetValueByKey("INVALID_USER");
+                            }
+                            else
+                            {
+                                errPrompt = string.Format(LanguageUtil.Instance.GetValueByKey("LOCATION_FAILED_LOG_IN"), err.code);
+                            }
+                        }
+                        else
+                        {
+                            errPrompt = string.Format(LanguageUtil.Instance.GetValueByKey("LOCATION_FAILED_LOG_IN"), err.code);
+                        }
                     }
                     break;
                 case ManagedEVSdk.ErrorInfo.EV_ERROR_TYPE_CLI.EV_ERROR_TYPE_CALL:
@@ -386,26 +405,7 @@ namespace EasyVideoWin.ViewModel
                         log.Info("Can not show error message for main window is null");
                         return;
                     }
-                    IMasterDisplayWindow masterWindow = mainWindow.GetCurrentMainDisplayWindow();
-                    if (null == masterWindow)
-                    {
-                        log.Info("Can not show error message for master window is null");
-                        return;
-                    }
-                    MessageBoxTip tip = new MessageBoxTip();
-                    Window tipOwner = null;
-                    if (
-                           null != (masterWindow as VideoPeopleWindow)
-                        && LayoutBackgroundWindow.Instance.IsLoaded
-                        && LayoutBackgroundWindow.Instance.LayoutOperationbarWindow.IsLoaded
-                    )
-                    {
-                        tipOwner = LayoutBackgroundWindow.Instance.LayoutOperationbarWindow;
-                    }
-                    log.InfoFormat("Show error prompt, tipOwner is null:{0}", null == tipOwner);
-                    DisplayUtil.SetWindowCenterAndOwner(tip, masterWindow, tipOwner);
-                    tip.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), errPrompt, LanguageUtil.Instance.GetValueByKey("CONFIRM"));
-                    tip.ShowDialog();
+                    mainWindow.ShowPromptTip(errPrompt);
                 });
             }
             else
