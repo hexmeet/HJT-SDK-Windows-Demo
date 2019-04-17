@@ -52,7 +52,7 @@ public:
     event System::Action<Structs::EVLayoutIndicationCli^>^ EventLayoutIndication;
     event System::Action<Structs::EVSiteCli^>^ EventLayoutSiteIndication;
     event System::Action<Structs::EVLayoutSpeakerIndicationCli^>^ EventLayoutSpeakerIndication;
-    //event System::Action^ EventMuteSpeakingDetected;
+    event System::Action^ EventMuteSpeakingDetected;
     event System::Action<Structs::EVCallInfoCli^>^ EventJoinConferenceIndication;
     //event System::Action<int>^ EventConferenceEndIndication;
     event System::Action<Structs::EVRecordingInfoCli^>^ EventRecordingIndication;

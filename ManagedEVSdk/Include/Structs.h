@@ -72,10 +72,11 @@ public ref struct EVErrorCli
 [System::Serializable]
 [System::FlagsAttribute]
 public enum class EV_WARN_CLI {
-    EV_WARN_NETWORK_POOR = 0
-    , EV_WARN_NETWORK_VERY_POOR = 1
-    , EV_WARN_BANDWIDTH_INSUFFICIENT = 2
-    , EV_WARN_BANDWIDTH_VERY_INSUFFICIENT = 3
+    EV_WARN_NETWORK_POOR                    = 0
+    , EV_WARN_NETWORK_VERY_POOR             = 1
+    , EV_WARN_BANDWIDTH_INSUFFICIENT        = 2
+    , EV_WARN_BANDWIDTH_VERY_INSUFFICIENT   = 3
+    , EV_WARN_NO_AUDIO_CAPTURE_CARD         = 4
 };
 
 [System::Serializable]

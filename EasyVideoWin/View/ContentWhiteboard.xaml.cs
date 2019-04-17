@@ -990,7 +990,7 @@ namespace EasyVideoWin.View
         {
             log.Debug("Whiteboard Snap_Click");
             HidePopupWindow(true, true, true);
-            string savePicPath = Utils.GenerateDesktopScreenName();
+            string savePicPath = Utils.GenerateScreenPictureName();
             //System.Windows.Forms.Screen s = System.Windows.Forms.Screen.AllScreens[0];
             //int result = MonitorCapture.SaveMonitorPic(s, savePicPath);
             int result = MonitorCapture.SaveWindowPicByHandle(this, Handle, savePicPath);
@@ -999,6 +999,10 @@ namespace EasyVideoWin.View
             {
                 //msgBox.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), LanguageUtil.Instance.GetValueByKey("THE_FILE_IS_SAVED_TO") + ":\n" + Utils.GetScreenPicPath());
                 alert.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), LanguageUtil.Instance.GetValueByKey("THE_FILE_IS_SAVED_TO") + ":\n" + Utils.GetScreenPicPath(), LanguageUtil.Instance.GetValueByKey("CONFIRM"));
+            }
+            else if (-2 == result)
+            {
+                alert.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), LanguageUtil.Instance.GetValueByKey("PATH_PERMISSION_FOR_SNAP_PICTURE"), LanguageUtil.Instance.GetValueByKey("CONFIRM"));
             }
             else
             {
@@ -1273,7 +1277,7 @@ namespace EasyVideoWin.View
                     }
                 });
                 
-                string savePicPath = Utils.GenerateDesktopScreenName();
+                string savePicPath = Utils.GenerateScreenPictureName();
                 try
                 {
                     Application.Current.Dispatcher.Invoke(() => {

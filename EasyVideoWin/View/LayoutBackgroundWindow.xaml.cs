@@ -109,6 +109,7 @@ namespace EasyVideoWin.View
         private IntPtr m_hNotifyDevNode = IntPtr.Zero;
         private System.Timers.Timer _updateAudioDevicesTimer;
         private IntPtr _handle;
+        private ModalPromptDlg _modalPromptDlg = null;
 
         #endregion
 
@@ -456,11 +457,18 @@ namespace EasyVideoWin.View
                 _confManagermentWindow.Dispose();
                 _confManagermentWindow = null;
             }
+            if (null != _modalPromptDlg && Visibility.Visible == _modalPromptDlg.Visibility)
+            {
+                _modalPromptDlg.Owner = null;
+                _modalPromptDlg.Visibility = Visibility.Collapsed;
+            }
             log.InfoFormat("Before hide layout cells, window visibility:{0}", this.Visibility);
             for (var i = 0; i < _layoutCells.Length; ++i)
             {
+                log.InfoFormat("hide layout cell:{0}, visibility:{1}", i, _layoutCells[i].Visibility);
                 _layoutCells[i].Owner = null;
                 _layoutCells[i].HideWindow();
+                //clear the layout cell to avoid to see the last frame when reconnect
                 _layoutCells[i].Hide();
                 _layoutCells[i].Show();
             }
@@ -552,10 +560,20 @@ namespace EasyVideoWin.View
             EVSdkManager.Instance.EventLayoutSiteIndication += EVSdkWrapper_EventLayoutSiteIndication;
             EVSdkManager.Instance.EventWarn += EVSdkWrapper_EventWarn;
             EVSdkManager.Instance.EventContent += EVSdkWrapper_EventContent;
+            EVSdkManager.Instance.EventMuteSpeakingDetected += EVSdkWrapper_EventMuteSpeakingDetected;
 
             HwndSource hwndSource = (HwndSource)HwndSource.FromVisual((Window)sender);
             hwndSource.AddHook(DragHook);
             RegisterNotification(new Guid(DbtUtil.GUID_DEVINTERFACE_AUDIO_DEVICE));
+        }
+
+        private void EVSdkWrapper_EventMuteSpeakingDetected()
+        {
+            Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                string prompt = LanguageUtil.Instance.GetValueByKey("MIC_MUTED");
+                ShowPromptWindow(prompt, 3000);
+            });
         }
 
         private void EVSdkWrapper_EventContent(ManagedEVSdk.Structs.EVContentInfoCli contentInfo)
@@ -565,18 +583,6 @@ namespace EasyVideoWin.View
             {
                 Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    if (WindowState.Minimized == VideoPeopleWindow.Instance.WindowState)
-                    {
-                        log.Info("Do not show sending content denied for video people window is minimized. EventContent end");
-                        return;
-                    }
-
-                    if (CallStatus.Connected != CallController.Instance.CurrentCallStatus)
-                    {
-                        log.Info("Do not show sending content denied for call status is not connected. EventContent end");
-                        return;
-                    }
-
                     string prompt = LanguageUtil.Instance.GetValueByKey("SEND_CONTENT_DENIED");
                     ShowPromptWindow(prompt, 5000);
                 });
@@ -2066,6 +2072,18 @@ namespace EasyVideoWin.View
 
         private void ShowPromptWindow(string promptContent, int duration)
         {
+            if (WindowState.Minimized == VideoPeopleWindow.Instance.WindowState)
+            {
+                log.Info("Do not show prompt window for video people window is minimized.");
+                return;
+            }
+
+            if (CallStatus.Connected != CallController.Instance.CurrentCallStatus)
+            {
+                log.Info("Do not show prompt window for call status is not connected.");
+                return;
+            }
+
             PromptWindow promptWindow = PromptWindow.Instance;
             SaveIndependenetActiveWindow();
             promptWindow.Owner = this;
@@ -2140,42 +2158,61 @@ namespace EasyVideoWin.View
             log.InfoFormat("EventWarn, code:{0}, msg:{1}", warn.code, warn.msg);
             Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                if (WindowState.Minimized == VideoPeopleWindow.Instance.WindowState)
+                if (ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_NO_AUDIO_CAPTURE_CARD == warn.code)
                 {
-                    log.Info("Do not show networ warn for video people window is minimized. EventWarn end");
-                    return;
-                }
+                    if (CallStatus.Connected != CallController.Instance.CurrentCallStatus)
+                    {
+                        log.Info("Do not show no mic window for call status is not connected.");
+                        return;
+                    }
 
-                if (CallStatus.Connected != CallController.Instance.CurrentCallStatus)
+                    if (null == _modalPromptDlg)
+                    {
+                        _modalPromptDlg = new ModalPromptDlg();
+                    }
+                    if (Visibility.Visible == _modalPromptDlg.Visibility)
+                    {
+                        return;
+                    }
+                    _modalPromptDlg.Owner = _layoutOperationbar;
+                    _modalPromptDlg.ShowDialog(
+                        VideoPeopleWindow.Instance
+                        , LanguageUtil.Instance.GetValueByKey("PROMPT")
+                        , LanguageUtil.Instance.GetValueByKey("NO_MICROPHONE")
+                        , LanguageUtil.Instance.GetValueByKey("GOT_IT")
+                    );
+                    if (null != _modalPromptDlg)
+                    {
+                        _modalPromptDlg.Owner = null;
+                    }
+                }
+                else
                 {
-                    log.Info("Do not show networ warn for call status is not connected. EventWarn end");
-                    return;
-                }
+                    string prompt = null;
+                    switch (warn.code)
+                    {
+                        case ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_NETWORK_POOR:
+                            prompt = LanguageUtil.Instance.GetValueByKey("NETWORK_POOR");
+                            break;
+                        case ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_NETWORK_VERY_POOR:
+                            prompt = LanguageUtil.Instance.GetValueByKey("NETWORK_VERY_POOR");
+                            break;
+                        case ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_BANDWIDTH_INSUFFICIENT:
+                            prompt = LanguageUtil.Instance.GetValueByKey("BANDWIDTH_INSUFFICIENT");
+                            break;
+                        case ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_BANDWIDTH_VERY_INSUFFICIENT:
+                            prompt = LanguageUtil.Instance.GetValueByKey("BANDWIDTH_VERY_INSUFFICIENT");
+                            break;
+                    }
 
-                string prompt = null;
-                switch (warn.code)
-                {
-                    case ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_NETWORK_POOR:
-                        prompt = LanguageUtil.Instance.GetValueByKey("NETWORK_POOR");
-                        break;
-                    case ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_NETWORK_VERY_POOR:
-                        prompt = LanguageUtil.Instance.GetValueByKey("NETWORK_VERY_POOR");
-                        break;
-                    case ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_BANDWIDTH_INSUFFICIENT:
-                        prompt = LanguageUtil.Instance.GetValueByKey("BANDWIDTH_INSUFFICIENT");
-                        break;
-                    case ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_BANDWIDTH_VERY_INSUFFICIENT:
-                        prompt = LanguageUtil.Instance.GetValueByKey("BANDWIDTH_VERY_INSUFFICIENT");
-                        break;
-                }
+                    if (string.IsNullOrEmpty(prompt))
+                    {
+                        log.Info("Empty prompt. EventWarn end");
+                        return;
+                    }
 
-                if (string.IsNullOrEmpty(prompt))
-                {
-                    log.Info("Empty prompt. EventWarn end");
-                    return;
+                    ShowPromptWindow(prompt, 10000);
                 }
-
-                ShowPromptWindow(prompt, 10000);
             });
             log.Info("EventWarn end");
         }

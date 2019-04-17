@@ -1,4 +1,7 @@
-﻿using EasyVideoWin.Model;
+﻿using EasyVideoWin.CustomControls;
+using EasyVideoWin.Helpers;
+using EasyVideoWin.Model;
+using log4net;
 using NAudio.Wave;
 using System;
 using System.Windows;
@@ -14,6 +17,8 @@ namespace EasyVideoWin.View
     /// </summary>
     public partial class AudioSettingView : UserControl
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private EasyVideoWin.ViewModel.AudioSettingViewModel _audioSettingViewModel;
         private WaveOutEvent _waveOut = null;
 
@@ -62,6 +67,7 @@ namespace EasyVideoWin.View
                     if (selectedSpeaker.Contains(cap.ProductName))
                     {
                         _waveOut.DeviceNumber = i;
+                        log.InfoFormat("Detected speaker, device number:{0}, name:{1}", i, selectedSpeaker);
                         return;
                     }
                 }
@@ -78,8 +84,18 @@ namespace EasyVideoWin.View
             //sound file
             string filePath = @AppDomain.CurrentDomain.BaseDirectory + "Resources\\sounds\\speaker.wav";
             WaveFileReader reader = new WaveFileReader(filePath);
-            _waveOut.Init(reader);
-            _waveOut.Play();
+            try
+            {
+                _waveOut.Init(reader);
+                _waveOut.Play();
+            }
+            catch (NAudio.MmException ex)
+            {
+                log.Info("Speaker may be occupied by other app exclusively.");
+                MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+                mainWindow.ShowPromptTip(LanguageUtil.Instance.GetValueByKey("FAILED_PLAY_TEST_MUSIC_FOR_SPEAKER_OCCUPIED"));
+            }
+            
         }
 
         private void DisposeWave()
@@ -89,9 +105,9 @@ namespace EasyVideoWin.View
                 if (_waveOut.PlaybackState == NAudio.Wave.PlaybackState.Playing)
                 {
                     _waveOut.Stop();
-                    _waveOut.Dispose();
-                    _waveOut = null;
                 }
+                _waveOut.Dispose();
+                _waveOut = null;
             }
         }
         #endregion

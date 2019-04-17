@@ -51,32 +51,8 @@ namespace EasyVideoWin.View
             this.SizeChanged += PromptWindow_SizeChanged;
             this.SizeToContent = SizeToContent.Width;
             this.Owner = owner;
-            CallController.Instance.CallStatusChanged += OnCallStatusChanged;
         }
         
-        private void OnCallStatusChanged(object sender, CallStatus status)
-        {
-            log.Info("OnCallStatusChanged start.");
-            if (status == CallStatus.Ended)
-            {
-                App.Current.Dispatcher.InvokeAsync(() =>
-                {
-                    if (_hideWindowOnTimeUp)
-                    {
-                        if (Visibility.Collapsed != this.Visibility)
-                        {
-                            this.Visibility = Visibility.Collapsed;
-                        }
-                    }
-                    else
-                    {
-                        this.Close();
-                    }
-                });
-            }
-            log.Info("OnCallStatusChanged end.");
-        }
-
         private void StartAutoCloseTimer(int duration)
         {
             if (null == _autoCloseTimer)
@@ -99,27 +75,26 @@ namespace EasyVideoWin.View
 
         private void CloseWindow(object sender, ElapsedEventArgs e)
         {
-            CloseWindow();
+            Application.Current.Dispatcher.InvokeAsync(() => {
+                CloseWindow();
+            });
         }
 
         public void CloseWindow()
         {
-            Application.Current.Dispatcher.InvokeAsync(() =>
+            if (_hideWindowOnTimeUp)
             {
-                if (_hideWindowOnTimeUp)
+                if (Visibility.Visible != this.Visibility)
                 {
-                    if (Visibility.Collapsed == this.Visibility)
-                    {
-                        return;
-                    }
+                    return;
+                }
 
-                    this.Visibility = Visibility.Collapsed;
-                }
-                else
-                {
-                    this.Close();
-                }
-            });
+                this.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                this.Close();
+            }
         }
         
         public void ShowPromptByTime(string content, int duration)
@@ -169,8 +144,6 @@ namespace EasyVideoWin.View
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-
-            CallController.Instance.CallStatusChanged -= OnCallStatusChanged;
         }
     }
 }

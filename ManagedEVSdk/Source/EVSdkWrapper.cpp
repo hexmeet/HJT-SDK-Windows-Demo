@@ -484,7 +484,7 @@ void EVSdkWrapper::OnLayoutSpeakerIndication(ev::engine::EVLayoutSpeakerIndicati
 
 void EVSdkWrapper::OnMuteSpeakingDetected()
 {
-    //EventMuteSpeakingDetected();
+    EventMuteSpeakingDetected();
 }
 
 void EVSdkWrapper::OnJoinConferenceIndication(ev::engine::EVCallInfo& info)

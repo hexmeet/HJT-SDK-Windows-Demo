@@ -544,6 +544,7 @@
     <Compile Include="Helpers\DisplayUtil.cs" />
     <Compile Include="Helpers\PasswordBoxHelper.cs" />
     <Compile Include="Helpers\SystemMonitorUtil.cs" />
+    <Compile Include="Helpers\SystemSleepManager.cs" />
     <Compile Include="Helpers\ToolWindowSwitchHelper.cs" />
     <Compile Include="Helpers\Utils.cs" />
     <Compile Include="Helpers\WindowExtensions.cs" />
@@ -608,6 +609,9 @@
     </Compile>
     <Compile Include="View\CameraSelectorView.xaml.cs">
       <DependentUpon>CameraSelectorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ModalPromptDlg.xaml.cs">
+      <DependentUpon>ModalPromptDlg.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\SoftwareUpdateWindow.xaml.cs">
       <DependentUpon>SoftwareUpdateWindow.xaml</DependentUpon>
@@ -924,6 +928,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\CameraSelectorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ModalPromptDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -670,13 +670,17 @@ namespace EasyVideoWin.View
         {
             log.Debug("ContentControlView Snap_Click");
             HidePopupWindow(true, true, true);
-            string savePicPath = Utils.GenerateDesktopScreenName();
+            string savePicPath = Utils.GenerateScreenPictureName();
             int result = MonitorCapture.SaveMonitorPic(_selScreen, savePicPath);
             MessageBoxTip alert = new MessageBoxTip(this);
             if (result == 0)
             {
                 //msgBox.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), LanguageUtil.Instance.GetValueByKey("THE_FILE_IS_SAVED_TO") + ":\n" + Utils.GetScreenPicPath());
                 alert.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), LanguageUtil.Instance.GetValueByKey("THE_FILE_IS_SAVED_TO") + ":\n" + Utils.GetScreenPicPath(), LanguageUtil.Instance.GetValueByKey("CONFIRM"));
+            }
+            else if (-2 == result)
+            {
+                alert.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), LanguageUtil.Instance.GetValueByKey("PATH_PERMISSION_FOR_SNAP_PICTURE"), LanguageUtil.Instance.GetValueByKey("CONFIRM"));
             }
             else
             {

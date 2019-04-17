@@ -43,7 +43,7 @@ namespace EasyVideoWin.Model
         public event Action<EVLayoutIndicationCli> EventLayoutIndication;
         public event Action<EVSiteCli> EventLayoutSiteIndication;
         public event Action<EVLayoutSpeakerIndicationCli> EventLayoutSpeakerIndication;
-        //public event Action EventMuteSpeakingDetected;
+        public event Action EventMuteSpeakingDetected;
         public event Action<EVCallInfoCli> EventJoinConferenceIndication;
         //public event Action<int> EventConferenceEndIndication;
         public event Action<EVRecordingInfoCli> EventRecordingIndication;
@@ -96,7 +96,7 @@ namespace EasyVideoWin.Model
             this.EVSdkWrapper.EventLayoutIndication += EVSdkWrapper_EventLayoutIndication;
             this.EVSdkWrapper.EventLayoutSiteIndication += EVSdkWrapper_EventLayoutSiteIndication;
             this.EVSdkWrapper.EventLayoutSpeakerIndication += EVSdkWrapper_EventLayoutSpeakerIndication;
-            //this.EVSdkWrapper.EventMuteSpeakingDetected += EVSdkWrapper_EventMuteSpeakingDetected;
+            this.EVSdkWrapper.EventMuteSpeakingDetected += EVSdkWrapper_EventMuteSpeakingDetected;
             this.EVSdkWrapper.EventJoinConferenceIndication += EVSdkWrapper_EventJoinConferenceIndication;
             //this.EVSdkWrapper.EventConferenceEndIndication += EVSdkWrapper_EventConferenceEndIndication;
             this.EVSdkWrapper.EventRecordingIndication += EVSdkWrapper_EventRecordingIndication;
@@ -774,12 +774,13 @@ namespace EasyVideoWin.Model
             });
         }
 
-        //private void EVSdkWrapper_EventMuteSpeakingDetected()
-        //{
-        //    WorkerThreadManager.Instance.EVSdkWorkDispatcher.InvokeAsync(() => {
-        //        EventMuteSpeakingDetected?.Invoke();
-        //    });
-        //}
+        private void EVSdkWrapper_EventMuteSpeakingDetected()
+        {
+            WorkerThreadManager.Instance.EVSdkWorkDispatcher.InvokeAsync(() =>
+            {
+                EventMuteSpeakingDetected?.Invoke();
+            });
+        }
 
         private void EVSdkWrapper_EventJoinConferenceIndication(EVCallInfoCli callInfo)
         {

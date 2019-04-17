@@ -472,4 +472,11 @@
     <sys:String x:Key="SDK_INTERNAL_ERROR">Sdk 发生内部错误。</sys:String>
 
     <sys:String x:Key="SEND_CONTENT_DENIED">由于没有权限，发送内容被拒绝</sys:String>
+    <sys:String x:Key="NO_MICROPHONE">没有发现可以使用的麦克风，您的声音无法被他人听见，请检查麦克风设备</sys:String>
+    <sys:String x:Key="INVALID_USER">无效的用户</sys:String>
+    <sys:String x:Key="INVALID_MEETING_ID">无效的会议室号码</sys:String>
+    <sys:String x:Key="GOT_IT">知道了</sys:String>
+    <sys:String x:Key="FAILED_PLAY_TEST_MUSIC_FOR_SPEAKER_OCCUPIED">由于扬声器被其他应用独占，不能播放测试声音</sys:String>
+    <sys:String x:Key="SCREEN_SHOT">屏幕截图</sys:String>
+    <sys:String x:Key="PATH_PERMISSION_FOR_SNAP_PICTURE">不能保存屏幕截图到指定的路径，请检查路径是否存在并且对该路径有合适的操作权限。</sys:String>
 </ResourceDictionary>
