@@ -70,6 +70,7 @@ namespace EasyVideoWin.View
             _viewModel = this.DataContext as VideoPeopleWindowViewModel;
             
             this.IsVisibleChanged += VideoPeopleWindow_IsVisibleChanged;
+            this.SizeChanged += VideoPeopleWindow_SizeChanged;
         }
         
         #endregion
@@ -168,7 +169,12 @@ namespace EasyVideoWin.View
                 VideoPeopleWindow_StateChanged(null, null);
             }
         }
-        
+
+        private void VideoPeopleWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            log.InfoFormat("SizeChanged, new:{0}x{1}, previous:{2}x{3}", e.NewSize.Width, e.NewSize.Height, e.PreviousSize.Width, e.PreviousSize.Height);
+        }
+
         #endregion
     }
 }
