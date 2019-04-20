@@ -42,7 +42,10 @@ typedef enum _EV_ERROR {
     EV_REGISTER_FAILED = 6,
     EV_INTERNAL_ERROR = 7,
     EV_SERVER_UNREACHABLE = 8,
-    EV_SERVER_INVALID = 9
+    EV_SERVER_INVALID = 9,
+    EV_CALL_DECLINED = 10,
+    EV_CALL_BUSY = 11,
+    EV_CALL_IO_ERROR = 12
 } EV_ERROR;
 
 }
@@ -70,10 +73,10 @@ typedef enum _EV_CALL_DIR {
 } EV_CALL_DIR;
 
 typedef enum _EV_CALL_STATUS {
-	EV_CALL_SUCCESS = 0,
-	EV_CALL_ABORTED = 1,
-	EV_CALL_MISSED = 2,
-	EV_CALL_DECLINED = 3
+	EV_CALL_STATUS_SUCCESS = 0,
+	EV_CALL_STATUS_ABORTED = 1,
+	EV_CALL_STATUS_MISSED = 2,
+	EV_CALL_STATUS_DECLINED = 3
 } EV_CALL_STATUS;
 
 typedef enum _EV_STREAM_TYPE {
@@ -242,6 +245,7 @@ public:
     std::string doradoVersion;
     std::string specifiedUpgradingServerAddress;
     uint64_t serverTime;
+    std::string callNumber;
 };
 
 class EV_CLASS_API EVCallInfo {
@@ -257,6 +261,8 @@ public:
         conference_number.clear();
         password.clear();
         err.clear();
+        isBigConference = FALSE;
+        isRemoteMuted = FALSE;
     }
 
     bool isAudioOnly;
@@ -265,6 +271,8 @@ public:
     std::string conference_number;
     std::string password;
     EVError err;
+    bool isBigConference;
+    bool isRemoteMuted;
 };
 
 class EV_CLASS_API EVContentInfo {
@@ -278,12 +286,16 @@ public:
         dir = EV_STREAM_DOWNLOAD;
         type = EV_STREAM_CONTENT;
         status = EV_CONTENT_UNKNOWN;
+        isBigConference = FALSE;
+        isRemoteMuted = FALSE;
     }
 
     bool enabled;
     EV_STREAM_DIR dir;
     EV_STREAM_TYPE type;
     EV_CONTENT_STATUS status;
+    bool isBigConference;
+    bool isRemoteMuted;
 };
 
 class EV_CLASS_API EVWhiteBoardInfo {
