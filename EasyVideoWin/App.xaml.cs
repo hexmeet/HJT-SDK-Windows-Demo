@@ -127,8 +127,10 @@ namespace EasyVideoWin
             {
                 log.Info("Not login and need anonymous join conf");
                 Application.Current.Dispatcher.InvokeAsync(() => {
-                    LoginManager.Instance.ServiceType = Utils.ServiceTypeEnum.Enterprise;
-                    LoginManager.Instance.LoginProgress = LoginProgressEnum.EnterpriseJoinConf;
+                    //LoginManager.Instance.ServiceType = Utils.ServiceTypeEnum.Enterprise;
+                    //LoginManager.Instance.LoginProgress = LoginProgressEnum.EnterpriseJoinConf;
+                    LoginManager.Instance.ServiceType = Utils.ServiceTypeEnum.None;
+                    LoginManager.Instance.LoginProgress = LoginProgressEnum.Idle;
                     LoginManager.Instance.IsNeedAnonymousJoinConf = true;
                 });
             }

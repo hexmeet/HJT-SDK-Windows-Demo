@@ -434,6 +434,10 @@ namespace EasyVideoWin.ViewModel
                     SystemMonitorUtil.Instance.CollectGarbage();
                     
                     break;
+                case CallStatus.Dialing:
+                case CallStatus.Connected:
+                    JoinConfDisplayNameWindow.Instance.CloseWindow();
+                    break;
             }
 
             log.Info("OnCallStatusChanged end.");
