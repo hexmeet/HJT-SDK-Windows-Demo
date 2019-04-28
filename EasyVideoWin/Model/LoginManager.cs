@@ -55,8 +55,9 @@ namespace EasyVideoWin.Model
             if (!string.IsNullOrEmpty(joinConfAddress))
             {
                 // anonymous join conf
-                ServiceType = Utils.ServiceTypeEnum.Enterprise;
-                LoginProgress = LoginProgressEnum.EnterpriseJoinConf;
+                //ServiceType = Utils.ServiceTypeEnum.Enterprise;
+                //LoginProgress = LoginProgressEnum.EnterpriseJoinConf;
+                ServiceType = Utils.ServiceTypeEnum.None;
                 IsNeedAnonymousJoinConf = true;
             }
             else

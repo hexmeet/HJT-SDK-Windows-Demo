@@ -42,7 +42,9 @@ namespace EasyVideoWin.Helpers
         public static readonly string AES_KEY = "JA56!*?>afa%^fgFACD$#$<:'F$&klac";
         public static readonly string AES_IV = ";lGFF56?>{]')*}A";
         public static readonly string LANGUAGE = "language";
-        
+        public static readonly string INVALID_DISPLAY_NAME_CHAR = "[\"<>]+";
+        public static readonly int DISPLAY_NAME_MAX_LENGTH = 16;
+
         public static System.Windows.Media.Brush DefaultForeGround = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#919191"));
         public static System.Windows.Media.Brush SelectedForeGround = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#ffffff"));
         public static System.Windows.Media.Brush DefaultBackGround = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#313131"));

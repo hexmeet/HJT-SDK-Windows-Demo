@@ -33,7 +33,6 @@ namespace EasyVideoWin.View
 
         private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private AnonymousJoinConfViewModel _viewModel = new AnonymousJoinConfViewModel();
-        private const string INVALID_DISPLAY_NAME_CHAR = "[\"<>]+";
         private const string VALID_CONF_ID = "^(\\d)+$";
         private string _confPassword;
 
@@ -75,7 +74,7 @@ namespace EasyVideoWin.View
         private void SvcLoginJoinConfView_Loaded(object sender, RoutedEventArgs e)
         {
             RefreshControlValue();
-            TryAnonymousJoinConf();
+            //TryAnonymousJoinConf();
             LoginManager.Instance.PropertyChanged += LoginManager_PropertyChanged;
         }
 
@@ -163,7 +162,7 @@ namespace EasyVideoWin.View
                 return;
             }
 
-            if (szNameDisplayedInConf.Length > 16)
+            if (szNameDisplayedInConf.Length > Utils.DISPLAY_NAME_MAX_LENGTH)
             {
                 log.Info("The lenght of name exceeds 16.");
                 MessageBoxTip tip = new MessageBoxTip(ownerWindow);
@@ -176,7 +175,7 @@ namespace EasyVideoWin.View
                 return;
             }
             
-            if (Regex.IsMatch(szNameDisplayedInConf, INVALID_DISPLAY_NAME_CHAR))
+            if (Regex.IsMatch(szNameDisplayedInConf, Utils.INVALID_DISPLAY_NAME_CHAR))
             {
                 log.Info("Invalid char in name.");
                 MessageBoxTip tip = new MessageBoxTip(ownerWindow);
@@ -262,49 +261,48 @@ namespace EasyVideoWin.View
                         break;
                 }
             }
-            else if ("IsNeedAnonymousJoinConf" == e.PropertyName)
-            {
-                TryAnonymousJoinConf();
-            }
-
+            //else if ("IsNeedAnonymousJoinConf" == e.PropertyName)
+            //{
+            //    TryAnonymousJoinConf();
+            //}
         }
 
-        private void TryAnonymousJoinConf()
-        {
-            log.InfoFormat("Need anonymous join conf:{0}", LoginManager.Instance.IsNeedAnonymousJoinConf);
-            if (!LoginManager.Instance.IsNeedAnonymousJoinConf)
-            {
-                return;
-            }
+        //private void TryAnonymousJoinConf()
+        //{
+        //    log.InfoFormat("Need anonymous join conf:{0}", LoginManager.Instance.IsNeedAnonymousJoinConf);
+        //    if (!LoginManager.Instance.IsNeedAnonymousJoinConf)
+        //    {
+        //        return;
+        //    }
 
-            bool enableCamera = null == this.turnOffCamera.IsChecked || !this.turnOffCamera.IsChecked.Value;
-            bool enableMicrophone = null == this.turnOffMicrophone.IsChecked || !this.turnOffMicrophone.IsChecked.Value;
-            bool isJoinDirectly = "join" == Utils.GetAnonymousJoinConfType();
-            string protocol = Utils.GetAnonymousJoinConfServerProtocol();
-            string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
-            int port = Utils.GetAnonymousJoinConfServerPort();
-            string confId = Utils.GetAnonymousJoinConfId();
-            string confPassword = Utils.GetAnonymousJoinConfPassword();
-            Utils.SetAnonymousJoinConfType("");
-            Utils.SetAnonymousJoinConfServerProtocol("");
-            Utils.SetAnonymousJoinConfServerAddress("");
-            Utils.SetAnonymousJoinConfId("");
-            Utils.SetAnonymousJoinConfPassword("");
-            Utils.SetAnonymousJoinConfServerPort(0);
-            Application.Current.Dispatcher.InvokeAsync(() => {
-                LoginManager.Instance.AnonymousJoinConference(
-                    isJoinDirectly
-                    , ("https" == protocol.ToLower())
-                    , joinConfAddress
-                    , (uint)port
-                    , confId
-                    , confPassword
-                    , enableCamera
-                    , enableMicrophone
-                );
-            });
-            LoginManager.Instance.IsNeedAnonymousJoinConf = false;
-        }
+        //    bool enableCamera = null == this.turnOffCamera.IsChecked || !this.turnOffCamera.IsChecked.Value;
+        //    bool enableMicrophone = null == this.turnOffMicrophone.IsChecked || !this.turnOffMicrophone.IsChecked.Value;
+        //    bool isJoinDirectly = "join" == Utils.GetAnonymousJoinConfType();
+        //    string protocol = Utils.GetAnonymousJoinConfServerProtocol();
+        //    string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
+        //    int port = Utils.GetAnonymousJoinConfServerPort();
+        //    string confId = Utils.GetAnonymousJoinConfId();
+        //    string confPassword = Utils.GetAnonymousJoinConfPassword();
+        //    Utils.SetAnonymousJoinConfType("");
+        //    Utils.SetAnonymousJoinConfServerProtocol("");
+        //    Utils.SetAnonymousJoinConfServerAddress("");
+        //    Utils.SetAnonymousJoinConfId("");
+        //    Utils.SetAnonymousJoinConfPassword("");
+        //    Utils.SetAnonymousJoinConfServerPort(0);
+        //    Application.Current.Dispatcher.InvokeAsync(() => {
+        //        LoginManager.Instance.AnonymousJoinConference(
+        //            isJoinDirectly
+        //            , ("https" == protocol.ToLower())
+        //            , joinConfAddress
+        //            , (uint)port
+        //            , confId
+        //            , confPassword
+        //            , enableCamera
+        //            , enableMicrophone
+        //        );
+        //    });
+        //    LoginManager.Instance.IsNeedAnonymousJoinConf = false;
+        //}
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {

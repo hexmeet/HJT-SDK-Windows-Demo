@@ -643,6 +643,9 @@
     <Compile Include="View\LayoutRecordingIndicationWindow.xaml.cs">
       <DependentUpon>LayoutRecordingIndicationWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\JoinConfDisplayNameWindow.xaml.cs">
+      <DependentUpon>JoinConfDisplayNameWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\VideoPeopleWindow.xaml.cs">
       <DependentUpon>VideoPeopleWindow.xaml</DependentUpon>
     </Compile>
@@ -974,6 +977,10 @@
     <Page Include="View\LayoutRecordingIndicationWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\JoinConfDisplayNameWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\VideoPeopleWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
