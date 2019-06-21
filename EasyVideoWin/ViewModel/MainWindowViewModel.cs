@@ -81,6 +81,8 @@ namespace EasyVideoWin.ViewModel
             , {2029,    "EXCEEDED_GATEWAY_VIDEO_PORT_COUNT_IN_LICENSE"}
             , {2031,    "ONLY_ROOM_OWNER_CAN_ACTIVATE_ROOM"}
             , {2033,    "NOT_ALLOWED_ANONYMOUS_PARTY"}
+            //, {2043,    "LOCAL_ZONE_NOT_STARTED"} do not prompt the error
+            //, {2045,    "LOCAL_ZONE_STOPPED"} do not prompt the error
         };
 
         public static readonly int SERVER_ERROR_LOGIN_FAILED_MORE_THAN_5_TIMES = 1101;
@@ -98,7 +100,8 @@ namespace EasyVideoWin.ViewModel
             , {1009,    "GET_FAILED"}
             , {1010,    "NOT_SUPPORTED"}
             , {1011,    "REDIS_LOCK_TIMEOUT"}
-            , {1100,    "INVALID_USER_NAME_PASSWORD"}
+            //, {1019,    "LOCAL_ZONE_STOPPED"} do not prompt the error
+            , {1100,    "INVALID_USER"}
             , {1101,    "LOGIN_FAILED_MORE_THAN_5_TIMES"}
             , {1102,    "ACCOUNT_TEMPORARILY_LOCKED"}
             , {1103,    "ACCOUNT_DISABLED"}
@@ -405,7 +408,7 @@ namespace EasyVideoWin.ViewModel
                         log.Info("Can not show error message for main window is null");
                         return;
                     }
-                    mainWindow.ShowPromptTip(errPrompt);
+                    mainWindow.ShowPromptTip(errPrompt, string.Format("SDK error, type:{0}, code:{1}", err.type, err.code));
                 });
             }
             else
@@ -572,15 +575,31 @@ namespace EasyVideoWin.ViewModel
                     Visibility visibility = isVideoPeopleWindowVisible ? Visibility.Visible : Visibility.Collapsed;
                     if (visibility != VideoPeopleWindow.Instance.Visibility)
                     {
+                        log.InfoFormat(
+                            "Update VideoPeopleWindow visible, FirstShow:{0}, ActualWidth:{1}, ActualHeight:{2}, WindowState: {3}"
+                            , VideoPeopleWindow.Instance.FirstShow
+                            , VideoPeopleWindow.Instance.ActualWidth
+                            , VideoPeopleWindow.Instance.ActualHeight
+                            , VideoPeopleWindow.Instance.WindowState
+                        );
                         Visibility currentStatus = VideoPeopleWindow.Instance.Visibility;
-                        if (isVideoPeopleWindowVisible && VideoPeopleWindow.Instance.FirstShow)
+                        if (Visibility.Visible == currentStatus && !isVideoPeopleWindowVisible && WindowState.Minimized == VideoPeopleWindow.Instance.WindowState)
                         {
+                            // in the case: sending content and the window is minimized, then disconnect it in remote. it should be resume to preseting state and then hidden.
+                            VideoPeopleWindow.Instance.Set2PresettingState();
+                        }
+                        VideoPeopleWindow.Instance.Visibility = isVideoPeopleWindowVisible ? Visibility.Visible : Visibility.Collapsed;
+                        if (   isVideoPeopleWindowVisible
+                            && (VideoPeopleWindow.Instance.FirstShow || 0 == VideoPeopleWindow.Instance.ActualWidth || 0 == VideoPeopleWindow.Instance.ActualHeight)
+                        )
+                        {
+                            log.Info("Reset initial size for VideoPeopleWindow");
                             // resume window size and center the screen on first show
                             VideoPeopleWindow.Instance.FirstShow = false;
                             VideoPeopleWindow.Instance.ResetInitialSize();
                             DisplayUtil.CenterWindowOnMasterWindowScreen(View.VideoPeopleWindow.Instance, LoginManager.Instance.LoginWindow as LoginWindow);
                         }
-                        VideoPeopleWindow.Instance.Visibility = isVideoPeopleWindowVisible ? Visibility.Visible : Visibility.Collapsed;
+                        //VideoPeopleWindow.Instance.Visibility = isVideoPeopleWindowVisible ? Visibility.Visible : Visibility.Collapsed;
                         if (Visibility.Visible == VideoPeopleWindow.Instance.Visibility && currentStatus != Visibility.Visible)
                         {
                             VideoPeopleWindow.Instance.AdjustWindowSize();

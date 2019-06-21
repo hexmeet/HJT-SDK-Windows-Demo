@@ -307,6 +307,14 @@ namespace EasyVideoWin.Model
             _log.Info("GetUserInfo done");
         }
 
+        public string GetDisplayName()
+        {
+            _log.Info("GetDisplayName");
+            string displayName = this.EVSdkWrapper.EVEngineGetDisplayName();
+            _log.Info("GetDisplayName done");
+            return displayName;
+        }
+
         //Device
         public ManagedEVSdk.Structs.EVDeviceCli[] GetDevices(ManagedEVSdk.Structs.EV_DEVICE_TYPE_CLI type)
         {

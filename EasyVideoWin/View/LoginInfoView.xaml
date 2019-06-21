@@ -43,6 +43,15 @@
                     </DockPanel>
                 </Grid>
             </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="280" Margin="0, 10, 0, 0" Visibility="{Binding MoreVisibility}">
+                <Grid Width="280">
+                    <DockPanel HorizontalAlignment="Right">
+                        <TextBlock Text="{DynamicResource MORE}"
+                               MouseLeftButtonDown="More_MouseLeftButtonDown"
+                               VerticalAlignment="Center" Foreground="#4381FF" FontSize="12" Cursor="Hand"/>
+                    </DockPanel>
+                </Grid>
+            </StackPanel>
         </StackPanel>
 
     </Grid>

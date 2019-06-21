@@ -105,7 +105,10 @@ namespace EasyVideoWin
                     if (Utils.GetAnonymousLogoutAndAnonymousJoinConf())
                     {
                         log.Info("Logout and prepare to join conf anonymously.");
-                        LoginManager.Instance.Logout();
+                        Application.Current.Dispatcher.InvokeAsync(() => {
+                            CloseMessageTip();
+                            LoginManager.Instance.Logout();
+                        });
                     }
                     else
                     {
@@ -114,6 +117,7 @@ namespace EasyVideoWin
                         Utils.SetAnonymousJoinConfPassword("");
                         log.Info("Dial out to conf.");
                         Application.Current.Dispatcher.InvokeAsync(() => {
+                            CloseMessageTip();
                             CallController.Instance.JoinConference(joinConfId, "", joinConfPassword);
                         });
                     }
@@ -127,12 +131,23 @@ namespace EasyVideoWin
             {
                 log.Info("Not login and need anonymous join conf");
                 Application.Current.Dispatcher.InvokeAsync(() => {
+                    CloseMessageTip();
                     //LoginManager.Instance.ServiceType = Utils.ServiceTypeEnum.Enterprise;
                     //LoginManager.Instance.LoginProgress = LoginProgressEnum.EnterpriseJoinConf;
                     LoginManager.Instance.ServiceType = Utils.ServiceTypeEnum.None;
                     LoginManager.Instance.LoginProgress = LoginProgressEnum.Idle;
                     LoginManager.Instance.IsNeedAnonymousJoinConf = true;
                 });
+            }
+        }
+
+        // close message tip to avoid the modal dialog prevent some oprations such as the opration of video bar can not be displayed 
+        private void CloseMessageTip()
+        {
+            MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
+            if (null != mainWindow)
+            {
+                mainWindow.CloseMessageBoxTip();
             }
         }
 

@@ -706,7 +706,7 @@ namespace EasyVideoWin.Model
 
         private void EVSdkWrapper_EventRegister(bool registered)
         {
-            log.Info("EventRegister");
+            log.InfoFormat("EventRegister:{0}", registered);
             IsRegistered = registered;
             log.Info("EventRegister end");
         }

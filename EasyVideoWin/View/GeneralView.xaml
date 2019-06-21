@@ -7,6 +7,7 @@
              xmlns:ViewModel="clr-namespace:EasyVideoWin.ViewModel"
              xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
              mc:Ignorable="d" 
+             x:Name="GeneralViewCtrl"
              d:DesignHeight="600" d:DesignWidth="715">
     <UserControl.DataContext>
         <ViewModel:GeneralViewModel />
@@ -110,27 +111,36 @@
                         Style="{StaticResource CancelButton}"
                         FontSize="14"
                         ButtonContent="{DynamicResource START_DIAGNOSTICS}"
-                        Command="{Binding DiagnosticCommand}" />
+                        Command="{Binding DiagnosticCommand}" CommandParameter="{Binding ElementName=GeneralViewCtrl}" />
             </Grid>
         </Grid>
         
         <Grid Grid.Row="4">
             <Grid.RowDefinitions>
-                <RowDefinition Height="50" />
+                <RowDefinition Height="40" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom">
                 <Label Content="{DynamicResource APPLICATION}" FontSize="12" Foreground="#313131" Margin="20, 0, 0, 10" Padding="0"></Label>
             </Grid>
             <Grid Grid.Row="1">
-                <StackPanel>
-                    <CheckBox Content="{DynamicResource AUTO_LOGIN}" Margin="20,5,0,5" IsChecked="{Binding AutoLogin}" FontSize="14" Foreground="#313131"/>
-                    <CheckBox Content="{DynamicResource AUTO_ANSWER}" Margin="20,5,0,5" IsChecked="{Binding AutoAnswer}" FontSize="14" Foreground="#313131" />
+                <StackPanel Margin="0, 0, 0, 10">
+                    <CheckBox Content="{DynamicResource AUTO_LOGIN}" Margin="20,0,0,5" IsChecked="{Binding AutoLogin}" FontSize="14" Foreground="#313131"/>
+                    <CheckBox Content="{DynamicResource AUTO_ANSWER}" Margin="20,3,0,5" IsChecked="{Binding AutoAnswer}" FontSize="14" Foreground="#313131" />
                     <!--<CheckBox Content="{DynamicResource FULL_SCREEN_MODE}" Margin="20,5,0,5" IsChecked="{Binding FullScreenAfterStartup}" FontSize="14" Foreground="#313131" />-->
                     <!--<CheckBox Content="{DynamicResource AUTO_STARTUP}" Margin="20,5,0,5" IsChecked="{Binding AutoStartup}" FontSize="14" Foreground="#313131"/>-->
-                    <CheckBox Content="{DynamicResource AUTO_CAPTURE}" Margin="20,5,0,5" IsChecked="{Binding AutoCapture}" FontSize="14" Foreground="#313131"/>
-                    <CheckBox Content="{DynamicResource OPEN_HIGH_FRAME_RATE_VIDEO}" Margin="20,5,0,5" IsChecked="{Binding OpenHighFrameRateVideo}" FontSize="14" Foreground="#313131"/>
-                    <CheckBox Content="{DynamicResource AUTO_HIDE_PARTY_NAME}" Margin="20,5,0,5" IsChecked="{Binding AutoHidePartyName}" FontSize="14" Foreground="#313131"/>
+                    <CheckBox Content="{DynamicResource AUTO_CAPTURE}" Margin="20,3,0,5" IsChecked="{Binding AutoCapture}" FontSize="14" Foreground="#313131"/>
+                    <CheckBox Content="{DynamicResource OPEN_HIGH_FRAME_RATE_VIDEO}" Margin="20,3,0,5" IsChecked="{Binding OpenHighFrameRateVideo}" FontSize="14" Foreground="#313131"/>
+                    <TextBlock Text="{DynamicResource HIGH_FRAME_RATE_VIDEO_DESCRIPTION}" Style="{DynamicResource GeneralCheckboxDescription}"/>
+                    <CheckBox Content="{DynamicResource AUTO_HIDE_PARTY_NAME}" Margin="20,3,0,5" IsChecked="{Binding AutoHidePartyName}" FontSize="14" Foreground="#313131"/>
+                    <TextBlock Text="{DynamicResource AUTO_HIDE_PARTY_NAME_DESCRIPTION}" Style="{DynamicResource GeneralCheckboxDescription}"/>
+                    <!--<CheckBox Content="{DynamicResource ENABLE_SILCENCE_MODE}" Margin="20,3,0,5" FontSize="14" Foreground="#313131"/>
+                    <TextBlock Text="{DynamicResource SILCENCE_MODE_DESCRIPTION}" Style="{DynamicResource GeneralCheckboxDescription}"/>-->
+                    <CheckBox Content="{DynamicResource DISABLE_PROMPT}" Margin="20,3,0,5" IsChecked="{Binding DisablePrompt}" FontSize="14" Foreground="#313131"/>
+                    <TextBlock Text="{DynamicResource DISABLE_PROMPT_DESCRIPTION}" Style="{DynamicResource GeneralCheckboxDescription}"/>
+                    <CheckBox Content="{DynamicResource ENABLE_4X4_LAYOUT}" Margin="20,3,0,5" IsChecked="{Binding Enable4x4Layout}" FontSize="14" Foreground="#313131"/>
+                    <TextBlock Text="{DynamicResource LAYOUT_4X4_DESCRIPTION}" Style="{DynamicResource GeneralCheckboxDescription}"/>
+
                 </StackPanel>
             </Grid>
         </Grid>

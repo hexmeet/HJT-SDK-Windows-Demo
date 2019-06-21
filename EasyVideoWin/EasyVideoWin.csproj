@@ -552,6 +552,7 @@
     <Compile Include="Model\CallController.cs" />
     <Compile Include="Model\CloudModel\CloudApiManager.cs" />
     <Compile Include="Model\CloudModel\CloudRest\AcsRest.cs" />
+    <Compile Include="Model\CloudModel\CloudRest\ErrorMessageRest.cs" />
     <Compile Include="Model\CloudModel\CloudRest\RestPartNameInfo.cs" />
     <Compile Include="Model\EVSdkManager.cs" />
     <Compile Include="Model\LoginManager.cs" />
@@ -589,9 +590,6 @@
     <Compile Include="ViewModel\MicrophoneViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="View\AboutView.xaml.cs" />
-    <Compile Include="View\AboutWindow.xaml.cs">
-      <DependentUpon>AboutWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="View\AudioDeviceSelectorWindow.xaml.cs">
       <DependentUpon>AudioDeviceSelectorWindow.xaml</DependentUpon>
     </Compile>
@@ -609,6 +607,9 @@
     </Compile>
     <Compile Include="View\CameraSelectorView.xaml.cs">
       <DependentUpon>CameraSelectorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SettingWindow.xaml.cs">
+      <DependentUpon>SettingWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\ModalPromptDlg.xaml.cs">
       <DependentUpon>ModalPromptDlg.xaml</DependentUpon>
@@ -890,11 +891,19 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Resources\Languages\en-US.xaml">
+    <Page Include="Resources\Languages\en-US-company.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Resources\Languages\zh-CN.xaml">
+    <Page Include="Resources\Languages\en-US-general.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\Languages\zh-CN-company.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\Languages\zh-CN-general.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -905,10 +914,6 @@
     <Page Include="View\AboutView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="View\AboutWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\AudioDeviceSelectorWindow.xaml">
       <SubType>Designer</SubType>
@@ -933,6 +938,10 @@
     <Page Include="View\CameraSelectorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\SettingWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="View\ModalPromptDlg.xaml">
       <SubType>Designer</SubType>

@@ -142,7 +142,6 @@ namespace EasyVideoWin.View
 
             //_window = (MainWindow)Application.Current.MainWindow; ;
             //_window.StateChanged += Window_StateChanged;
-            Microsoft.Win32.SystemEvents.DisplaySettingsChanged += new System.EventHandler(displaySettingChanged);
             
             LanguageUtil.Instance.LanguageChanged += OnLanguageChanged;
             CallController.Instance.CallStatusChanged += OnCallStatusChanged;
@@ -154,18 +153,6 @@ namespace EasyVideoWin.View
             }
         }
         
-        private void displaySettingChanged(object sender, EventArgs e)
-        {
-            if(System.Windows.SystemParameters.PrimaryScreenHeight > System.Windows.SystemParameters.PrimaryScreenWidth)
-            {
-                Console.WriteLine("------------");
-            }
-            else
-            {
-                Console.WriteLine("+++++++++++++");
-            }
-        }
-
         private void MainView_Loaded(object sender, RoutedEventArgs e)
         {
             if (this._firstLoad)

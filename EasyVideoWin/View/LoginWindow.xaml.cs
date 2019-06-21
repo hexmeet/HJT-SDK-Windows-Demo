@@ -32,8 +32,7 @@ namespace EasyVideoWin.View
         private const double WINDOW_DESIGN_WIDTH = 530;
         private LoginManager _loginMgr = LoginManager.Instance;
         private IntPtr _handle;
-        private const uint MAX_RECV_VIDEO_NUMBER = 9;
-
+        
         #endregion
 
         #region -- Properties --
@@ -94,20 +93,7 @@ namespace EasyVideoWin.View
         {
             this.Close();
         }
-
-        private void MoreBtn_SourceInitialized(object sender, EventArgs e)
-        {
-            this.moreMenuBtn.ContextMenu = null;
-        }
-
-        private void MoreBtn_Click(object sender, RoutedEventArgs e)
-        {
-            this.moreMenuBtn.ContextMenu.PlacementTarget = this.moreMenuBtn;
-            this.moreMenuBtn.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
-            this.moreMenuBtn.ContextMenu.HorizontalOffset = this.moreMenuBtn.ImageWidth - this.moreMenuBtn.ContextMenu.Width;
-            this.moreMenuBtn.ContextMenu.IsOpen = true;
-        }
-
+        
         private void MinBtn_Click(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
@@ -146,9 +132,11 @@ namespace EasyVideoWin.View
             }
         }
 
-        private void AdvancedSetting_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void Setting_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            LoginManager.Instance.LoginProgress = LoginProgressEnum.AdvancedSetting;
+            SettingWindow win = new SettingWindow();
+            win.Owner = this;
+            win.ShowDialog();
         }
 
         private void OnLanguageChanged(object sender, LanguageType language)
@@ -162,19 +150,7 @@ namespace EasyVideoWin.View
                 this.imgLogoLogin.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/Icons/logo_login.png"));
             }
         }
-
-        private void SendDiagnostics_Click(object sender, RoutedEventArgs e)
-        {
-            SettingManager.Instance.Diagnostic(this);
-        }
-
-        private void About_Click(object sender, RoutedEventArgs e)
-        {
-            AboutWindow aboutWin = new AboutWindow();
-            aboutWin.Owner = this;
-            aboutWin.ShowDialog();
-        }
-
+        
         private void InitAppParameters()
         {
             log.Info("Init app parameters");
@@ -232,7 +208,7 @@ namespace EasyVideoWin.View
                 string rootCAPath = Utils.GetRootCAPath();
                 EVSdkManager.Instance.SetRootCA(rootCAPath);
                 EVSdkManager.Instance.EnableWhiteBoard(true);
-                CallController.Instance.SetMaxRecvVideo(MAX_RECV_VIDEO_NUMBER);
+                CallController.Instance.SetMaxRecvVideo(Utils.GetEnable4x4Layout() ? (uint)MaxRecvVideoLayout.Layout_4x4 : (uint)MaxRecvVideoLayout.Layout_3x3);
                 CallController.Instance.SetPeopleHighFrameRate(Helpers.Utils.GetOpenHighFrameRateVideo());
 
                 if (first_run)

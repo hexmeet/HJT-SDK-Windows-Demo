@@ -213,6 +213,31 @@ namespace EasyVideoWin.ViewModel
             }
         }
 
+        public bool Enable4x4Layout
+        {
+            get
+            {
+                return Helpers.Utils.GetEnable4x4Layout();
+            }
+            set
+            {
+                CallController.Instance.SetMaxRecvVideo(value ? (uint)MaxRecvVideoLayout.Layout_4x4 : (uint)MaxRecvVideoLayout.Layout_3x3);
+                Helpers.Utils.SetEnable4x4Layout(value);
+            }
+        }
+
+        public bool DisablePrompt
+        {
+            get
+            {
+                return Helpers.Utils.GetDisablePrompt();
+            }
+            set
+            {
+                Helpers.Utils.SetDisablePrompt(value);
+            }
+        }
+
         #endregion
 
         #region -- Constructor --
@@ -249,6 +274,15 @@ namespace EasyVideoWin.ViewModel
                     break;
                 }
             }
+
+            OnPropertyChanged("ScreenPciPath");
+            OnPropertyChanged("AutoLogin");
+            OnPropertyChanged("AutoAnswer");
+            OnPropertyChanged("AutoCapture");
+            OnPropertyChanged("OpenHighFrameRateVideo");
+            OnPropertyChanged("AutoHidePartyName");
+            OnPropertyChanged("Enable4x4Layout");
+            OnPropertyChanged("DisablePrompt");
         }
         
         #endregion
@@ -266,7 +300,9 @@ namespace EasyVideoWin.ViewModel
         
         private void Diagnostic(object parameter)
         {
-            SettingManager.Instance.Diagnostic((MainWindow)System.Windows.Application.Current.MainWindow);
+            System.Windows.Controls.UserControl ctrl = parameter as System.Windows.Controls.UserControl;
+            IMasterDisplayWindow displayWin = Window.GetWindow(ctrl) as IMasterDisplayWindow;
+            SettingManager.Instance.Diagnostic(displayWin);
         }
         
         #endregion

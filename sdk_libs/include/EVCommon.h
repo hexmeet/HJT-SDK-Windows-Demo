@@ -58,13 +58,13 @@ namespace engine {
 //  Common
 //////////////////////////////
 #define EV_LAYOUT_SIZE 16
-#define EV_STREAM_SIZE 20
+#define EV_STREAM_SIZE 32
 
 typedef enum _EV_CALL_TYPE {
-	EV_CALL_SIP = 0,
-	EV_CALL_H323 = 1,
-	EV_CALL_SVC = 2,
-	EV_CALL_UNKNOWN = 3
+	EV_CALL_UNKNOWN = 0,
+	EV_CALL_SIP = 1,
+	EV_CALL_H323 = 2,
+	EV_CALL_SVC = 3
 } EV_CALL_TYPE;
 
 typedef enum _EV_CALL_DIR {
@@ -150,6 +150,11 @@ public:
     int height;
 };
 
+typedef enum _EV_ENCRYPT_TYPE {
+    EV_ENCRYPT_SHA1 = 0,
+    EV_ENCRYPT_AES = 1
+} EV_ENCRYPT_TYPE;
+
 //////////////////////////////
 //  Log
 //////////////////////////////
@@ -212,10 +217,22 @@ public:
 
 class EV_CLASS_API EVCallLog {
 public:
-    int id;
+    EVCallLog() {
+        id.clear();
+        type = EV_CALL_UNKNOWN;
+        dir = EV_CALL_OUTGOING;
+        status = EV_CALL_STATUS_SUCCESS;
+        displayName.clear();
+        peer.clear();
+        startTime = 0;
+        duration = 0;
+        isAudioOnly = FALSE;
+    }
+    std::string id;
     EV_CALL_TYPE type;
     EV_CALL_DIR dir;
     EV_CALL_STATUS status;
+    std::string displayName;
     std::string peer;
     uint64_t startTime;
     uint64_t duration;
@@ -319,6 +336,14 @@ public:
         (void)user;
     }
 
+    virtual void onDownloadUserImageComplete(const char * path) {
+        (void)path;
+    }
+
+    virtual void onUploadUserImageComplete(const char * path) {
+        (void)path;
+    }
+
     virtual void onNetworkState(bool reachable) {
         (void)reachable;
     }
@@ -345,6 +370,10 @@ public:
 
     virtual void onMuteSpeakingDetected() {
     } 
+
+    virtual void onCallLogUpdated(EVCallLog & call_log) {
+        (void)call_log;
+    }
 };
 
 class EV_CLASS_API IEVCommon {
@@ -363,6 +392,7 @@ public:
     virtual int release() = 0;
     virtual int enableSecure(bool enable) = 0;
     virtual std::string encryptPassword(const char * password) = 0;
+    virtual std::string encryptPassword(EV_ENCRYPT_TYPE type, const char * password) = 0;
     virtual std::string getSerialNumber() = 0;
     virtual std::string getPlatform() = 0;
 
@@ -390,9 +420,12 @@ public:
     virtual void * getPreviewVideoWindow() = 0;
 
     //Login
+    virtual int downloadUserImage(const char * path) = 0;
+    virtual int uploadUserImage(const char * path) = 0;
     virtual int changePassword(const char * encrypted_oldpassword, const char * encrypted_newpassword) = 0;
     virtual int changeDisplayName(const char * display_name) = 0;
     virtual int getUserInfo(EVUserInfo & userinfo) = 0;
+    virtual std::string getDisplayName() = 0;
 
     //Conference
     virtual int enablePreview(bool enable) = 0;
@@ -422,8 +455,8 @@ public:
 
     //Call Log
     virtual int setCallLogMaxSize(unsigned int num) = 0;
-    virtual std::vector<EVCallLog> getCalLog() = 0;
-    virtual int removeCallLog(int id) = 0;
+    virtual std::vector<EVCallLog> getCallLog() = 0;
+    virtual int removeCallLog(const char * id) = 0;
 
     //Provision
     virtual int setProvision(const char * server, unsigned int port) = 0;

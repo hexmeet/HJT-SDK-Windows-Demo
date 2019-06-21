@@ -86,8 +86,9 @@ namespace EasyVideoWin.View
             this.IsVisibleChanged += ConfManagementWindow_IsVisibleChanged;
             this.browser.IsBrowserInitializedChanged += Browser_IsBrowserInitializedChanged;
             LoginManager.Instance.PropertyChanged += LoginManager_PropertyChanged;
+            this.StateChanged += ConfManagementWindow_StateChanged;
         }
-
+        
         #endregion
 
         #region -- Public Method --
@@ -195,6 +196,8 @@ namespace EasyVideoWin.View
 
         private void ConfManagementWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            ConfManagementWindow_StateChanged(null, new EventArgs());
+
             if (!this.browser.IsBrowserInitialized)
             {
                 return;
@@ -251,6 +254,35 @@ namespace EasyVideoWin.View
             return IntPtr.Zero;
         }
 
+        private void ConfManagementWindow_StateChanged(object sender, EventArgs e)
+        {
+            if (WindowState.Maximized == WindowState)
+            {
+                this.maxButton.Visibility = Visibility.Collapsed;
+                this.restoreButton.Visibility = Visibility.Visible;
+            }
+            else if (WindowState.Normal == WindowState)
+            {
+                this.maxButton.Visibility = Visibility.Visible;
+                this.restoreButton.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void MinWindow_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void MaxWindow_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Maximized;
+        }
+
+        private void RestoreWindow_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Normal;
+        }
+
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
             this.Visibility = Visibility.Collapsed;
@@ -280,8 +312,14 @@ namespace EasyVideoWin.View
                 {
                     return;
                 }
-
-                _conferenceJsEvent.UpdateToken(LoginManager.Instance.LoginToken);
+                Application.Current.Dispatcher.InvokeAsync(() => {
+                    log.Info("Update login token to browser");
+                    _conferenceJsEvent.UpdateToken(LoginManager.Instance.LoginToken);
+                    if (this.browser.IsBrowserInitialized)
+                    {
+                        this.browser.Load(GetConferenceManagementUrl());
+                    }                        
+                });
             }
         }
 

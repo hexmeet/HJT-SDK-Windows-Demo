@@ -33,7 +33,7 @@ namespace EasyVideoWin.View
     /// <summary>
     /// Interaction logic for ContentWhiteboard.xaml
     /// </summary>
-    public partial class ContentWhiteboard : FullScreenBaseWindow, INotifyPropertyChanged, IDisposable
+    public partial class ContentWhiteboard : FullScreenBaseWindow, INotifyPropertyChanged
     {
         #region -- Members --
 
@@ -89,8 +89,6 @@ namespace EasyVideoWin.View
                 return IsActive || _controlToolBar.IsActive || _brushWin.IsActive || _backScreenWin.IsActive || _highlighterWin.IsActive;
             }
         }
-
-        public bool IsDisposed { get; private set; } = false;
         
         #endregion
 
@@ -235,19 +233,14 @@ namespace EasyVideoWin.View
             }
 
         }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected void Dispose(bool disposing)
+        
+        protected override void Dispose(bool disposing)
         {
             if (!IsDisposed)
             {
                 if (disposing)
                 {
+                    base.Dispose(disposing);
                     //Clean Up managed resources
                     CallController.Instance.PropertyChanged -= OnWhiteBoardPresenterChanged;
                     Application.Current.Dispatcher.Invoke(() => {

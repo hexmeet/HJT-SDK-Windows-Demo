@@ -5,6 +5,7 @@ using EasyVideoWin.Model;
 using EasyVideoWin.Model.CloudModel;
 using EasyVideoWin.Model.CloudModel.CloudRest;
 using log4net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -32,7 +33,7 @@ namespace EasyVideoWin.View
         #region -- Members --
         private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public delegate void SvcLyoutModeChangedHandler(bool isSpeakerMode, bool isDpiChanged=false);
+        public delegate void SvcLyoutModeChangedHandler(bool isSpeakerMode, bool isDpiChanged = false);
         public event SvcLyoutModeChangedHandler SvcLyoutModeChanged;
         public event PropertyChangedEventHandler PropertyChanged;
         public event EventHandler ShowNormalCellsChanged;
@@ -55,7 +56,7 @@ namespace EasyVideoWin.View
         private string _boardRoom = "";
         private const string ACS_URL = "{0}/acs/index.html?jwt={1}";
         private const string ACS_TEST_URL = "{0}/acs/pseudoAuth?uname={1}&room={2}&role=chair+person";
-        private VideoContentWindow _receiveContentWin;
+        private VideoContentWindow _receiveContentWin = null;
         private ContentControlView _sendContentWin = null;
         private Visibility _showNormalCellsBtnVisibility;
         private Visibility _requestSpeakVisibility;
@@ -63,6 +64,7 @@ namespace EasyVideoWin.View
         private System.Timers.Timer _checkWhiteBoardConnectionTimer;
 
         private const int INITIAL_WIDTH = 1280;
+        private ulong _presenterDeviceId;
 
         #endregion
 
@@ -87,6 +89,7 @@ namespace EasyVideoWin.View
             {
                 _isAudioMuted = value;
                 log.InfoFormat("IsAudioMuted changed to: {0}", value);
+                OnPropertyChanged("IsAudioMuted");
                 OnPropertyChanged("MuteAudioVisibility");
                 OnPropertyChanged("UnmuteAudioVisibility");
             }
@@ -172,12 +175,12 @@ namespace EasyVideoWin.View
                 return IsSpeakerMode ? Visibility.Collapsed : Visibility.Visible;
             }
         }
-        
+
         public Visibility ShowShareVisibility
         {
             get
             {
-                bool isStartWhiteBoard =    ContentStreamStatus.ReceivingWhiteBoardStarted == CallController.Instance.CurrentContentStreamStatus
+                bool isStartWhiteBoard = ContentStreamStatus.ReceivingWhiteBoardStarted == CallController.Instance.CurrentContentStreamStatus
                                          || ContentStreamStatus.SendingWhiteBoardStarted == CallController.Instance.CurrentContentStreamStatus;
                 if (
                        null != _receiveContentWin
@@ -192,7 +195,7 @@ namespace EasyVideoWin.View
                 }
             }
         }
-        
+
         public Visibility RequestSpeakVisibility
         {
             get
@@ -205,7 +208,7 @@ namespace EasyVideoWin.View
                 OnPropertyChanged("RequestSpeakVisibility");
             }
         }
-        
+
         public bool IsReceiveContentWinActive
         {
             get
@@ -213,7 +216,7 @@ namespace EasyVideoWin.View
                 return _receiveContentWin.IsActive;
             }
         }
-        
+
         public bool IsWhiteboardActive
         {
             get
@@ -223,7 +226,7 @@ namespace EasyVideoWin.View
         }
 
         public string AcsServerAddress { get; set; }
-
+        
         #endregion
 
         #region -- Constructor --
@@ -250,11 +253,23 @@ namespace EasyVideoWin.View
             this.Loaded += LayoutOperationbarWindow_Loaded;
             EVSdkManager.Instance.EventWhiteBoardIndication += EVSdkWrapper_EventWhiteBoardIndication;
             EVSdkManager.Instance.EventParticipant += EVSdkWrapper_EventParticipant;
+            LoginManager.Instance.PropertyChanged += LoginManager_PropertyChanged;
         }
-        
+
         #endregion
 
         #region -- Public Methods --
+
+        public VideoContentWindow GetReceiveContentWindow()
+        {
+            return _receiveContentWin;
+        }
+
+        // can not use properties for full stack error reason
+        public ContentWhiteboard GetContentWhiteboardWindow()
+        {
+            return _contentWhiteboard;
+        }
 
         public void InitContentWindow()
         {
@@ -558,16 +573,17 @@ namespace EasyVideoWin.View
             //change the content window to max size to get clearer content.
             _receiveContentWin.TitleConfNumberLabel.Content = CallController.Instance.ConferenceNumber;
 
-            if (VideoPeopleWindow.Instance.WindowState == WindowState.Maximized && VideoPeopleWindow.Instance.FullScreenStatus)
-            {
-                _receiveContentWin.SetFullScreen();
-                log.Info("Receive content window is set to full screen");
-            }
-            else
-            {
-                _receiveContentWin.MaximizeWindow();
-                log.Info("Receive content window is set to max");
-            }
+            // do not max the content window to max to avoid max handy once time.
+            //if (VideoPeopleWindow.Instance.WindowState == WindowState.Maximized && VideoPeopleWindow.Instance.FullScreenStatus)
+            //{
+            //    _receiveContentWin.SetFullScreen();
+            //    log.Info("Receive content window is set to full screen");
+            //}
+            //else
+            //{
+            //    _receiveContentWin.MaximizeWindow();
+            //    log.Info("Receive content window is set to max");
+            //}
             log.Info("OnReceivingContentStarted end");
         }
 
@@ -622,14 +638,15 @@ namespace EasyVideoWin.View
             string cmd = "window.isHighDpiDevice(\'" + _contentWhiteboard.IsHighDpiDevice.ToString() + "\')";
             _contentWhiteboard.Browser.GetBrowser().MainFrame.ExecuteJavaScriptAsync(cmd);
 
-            if (VideoPeopleWindow.Instance.WindowState == WindowState.Maximized && !VideoPeopleWindow.Instance.FullScreenStatus)
-            {
-                _contentWhiteboard.MaximizeWindow();
-            }
-            else if (VideoPeopleWindow.Instance.WindowState == WindowState.Maximized && VideoPeopleWindow.Instance.FullScreenStatus)
-            {
-                _contentWhiteboard.SetFullScreen();
-            }
+            // do not max the content window to max to avoid max handy once time.
+            //if (VideoPeopleWindow.Instance.WindowState == WindowState.Maximized && !VideoPeopleWindow.Instance.FullScreenStatus)
+            //{
+            //    _contentWhiteboard.MaximizeWindow();
+            //}
+            //else if (VideoPeopleWindow.Instance.WindowState == WindowState.Maximized && VideoPeopleWindow.Instance.FullScreenStatus)
+            //{
+            //    _contentWhiteboard.SetFullScreen();
+            //}
 
             _contentWhiteboard.Activate();
             _contentWhiteboard.Focus();
@@ -838,6 +855,13 @@ namespace EasyVideoWin.View
                 _ctsSetPresenter = null;
             }
 
+            if (0 == deviceId)
+            {
+                log.Info("deviceId is 0 and do not GetWhiteBoardPresenterName");
+                return;
+            }
+
+            _presenterDeviceId = deviceId;
             _ctsSetPresenter = new CancellationTokenSource();
             Task.Run(() => {
                 if (null == _ctsSetPresenter || _ctsSetPresenter.Token.IsCancellationRequested)
@@ -845,10 +869,30 @@ namespace EasyVideoWin.View
                     return;
                 }
 
+                // when token is invalid and update token, then update presenter name. in the case, the result of first thread may be later than the thread of updated token
+                bool invalidToken = false;
                 CancellationToken cancellationToken = _ctsSetPresenter.Token;
-                RestPartNameInfo partNameInfo = CloudApiManager.Instance.GetPartyName(CallController.Instance.ConferenceNumber, deviceId);
-                if (cancellationToken.IsCancellationRequested)
+                CloudApiManager.Instance.Token = LoginManager.Instance.LoginToken;
+                RestPartNameInfo partNameInfo = CloudApiManager.Instance.GetPartyName(CallController.Instance.ConferenceNumber, deviceId, (response) => {
+                    try
+                    {
+                        ErrorMessageRest errMsg = JsonConvert.DeserializeObject<ErrorMessageRest>(response.Content);
+                        log.ErrorFormat("GetWhiteBoardPresenterName failed, errorCode: {0}, errorInfo: {0}", errMsg.errorCode, errMsg.errorInfo);
+                        if (errMsg.errorCode == ErrorMessageRest.ERR_INVALID_TOKEN)
+                        {
+                            invalidToken = true;
+                            LoginManager.Instance.UpdateLoginToken();
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        log.InfoFormat("Exception for handle error of GetWhiteBoardPresenterName, exception:{0}", e);
+                    }
+                });
+
+                if (cancellationToken.IsCancellationRequested || invalidToken)
                 {
+                    log.Info("GetWhiteBoardPresenterName cancelled.");
                     return;
                 }
 
@@ -862,6 +906,7 @@ namespace EasyVideoWin.View
                     CallController.Instance.WhiteBoardPresenter = LoginManager.Instance.DisplayName;
                     log.InfoFormat("Failed to get WhiteBoardPresenter, show display name: {0}", LoginManager.Instance.DisplayName);
                 }
+                _presenterDeviceId = 0;
             });
         }
         
@@ -1232,6 +1277,20 @@ namespace EasyVideoWin.View
             Application.Current.Dispatcher.InvokeAsync(() => {
                 this.confManagementBtn.ExtraInfoText = number.ToString();
             });
+        }
+
+        private void LoginManager_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if ("LoginToken" == e.PropertyName)
+            {
+                if (string.IsNullOrEmpty(LoginManager.Instance.LoginToken))
+                {
+                    return;
+                }
+
+                log.Info("LoginToken updated and GetWhiteBoardPresenterName");
+                GetWhiteBoardPresenterName(_presenterDeviceId);
+            }
         }
 
         #endregion

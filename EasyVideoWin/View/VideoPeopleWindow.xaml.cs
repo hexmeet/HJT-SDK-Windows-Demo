@@ -96,6 +96,12 @@ namespace EasyVideoWin.View
 
         public void Set2PresettingState()
         {
+            log.InfoFormat("Set2PresettingState: {0}", _presettingState);
+            if (Visibility.Visible != this.Visibility)
+            {
+                log.InfoFormat("Can not Set2PresettingState for visibility is {0}", this.Visibility);
+                return;
+            }
             ChangeWindowState(_presettingState);
             Activate();
         }

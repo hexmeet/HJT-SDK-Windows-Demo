@@ -37,6 +37,8 @@ namespace EasyVideoWin
         private IncomingCallPromptDialog _incomingCallPromptDialog;
         private System.Timers.Timer _incomingCallPromptTimer = null;
         private bool _flashWindowStarted = false;
+        private MessageBoxTip _messageBoxTip = null;
+        private string _messageTipExtraInfo = null;
 
         public MainWindow():base(INITIAL_WIDTH, INITIAL_HEIGHT)
         {
@@ -171,7 +173,18 @@ namespace EasyVideoWin
             return null;
         }
 
-        public void ShowPromptTip(string prompt)
+        public void CloseMessageBoxTip()
+        {
+            if (null != _messageBoxTip && _messageBoxTip.IsLoaded)
+            {
+                // only keep the last prompt message to show
+                log.InfoFormat("Prompt message arrived, but previous message is still displayed, close it. Message -- {0}", _messageTipExtraInfo);
+                _messageBoxTip.Close();
+                _messageBoxTip = null;
+            }
+        }
+
+        public void ShowPromptTip(string prompt, string extraInfo)
         {
             IMasterDisplayWindow masterWindow = GetCurrentMainDisplayWindow();
             if (null == masterWindow)
@@ -179,7 +192,10 @@ namespace EasyVideoWin
                 log.Info("Can not show error message for master window is null");
                 return;
             }
-            MessageBoxTip tip = new MessageBoxTip();
+
+            CloseMessageBoxTip();
+            _messageBoxTip = new MessageBoxTip();
+            _messageTipExtraInfo = extraInfo;
             Window tipOwner = null;
             if (
                    null != (masterWindow as VideoPeopleWindow)
@@ -189,12 +205,14 @@ namespace EasyVideoWin
             {
                 tipOwner = LayoutBackgroundWindow.Instance.LayoutOperationbarWindow;
             }
-            log.InfoFormat("Show error prompt, tipOwner is null:{0}", null == tipOwner);
-            DisplayUtil.SetWindowCenterAndOwner(tip, masterWindow, tipOwner);
-            tip.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), prompt, LanguageUtil.Instance.GetValueByKey("CONFIRM"));
-            tip.ShowDialog();
+            log.InfoFormat("ShowPromptTip(MessageBoxTip), tipOwner is null:{0}", null == tipOwner);
+            DisplayUtil.SetWindowCenterAndOwner(_messageBoxTip, masterWindow, tipOwner);
+            _messageBoxTip.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), prompt, LanguageUtil.Instance.GetValueByKey("CONFIRM"));
+            _messageBoxTip.ShowDialog();
+            _messageBoxTip = null;
+            _messageTipExtraInfo = "";
         }
-
+        
         protected override void OnClosed(EventArgs e)
         {
             log.Info("OnClosed");
