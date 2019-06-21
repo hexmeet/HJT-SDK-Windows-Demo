@@ -41,12 +41,22 @@ namespace EasyVideoWin.ViewModel
             }
         }
 
+        public Visibility MoreVisibility
+        {
+            get
+            {
+                return (LoginProgressEnum.EnterpriseLogin == LoginManager.Instance.LoginProgress || LoginProgressEnum.EnterpriseJoinConf == LoginManager.Instance.LoginProgress)
+                        ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
         #endregion
 
         #region -- Constructor --
 
         public LoginInfoViewModel()
         {
+            OnPropertyChanged("MoreVisibility");
             LoginManager.Instance.PropertyChanged += LoginManager_PropertyChanged;
         }
 
@@ -75,10 +85,11 @@ namespace EasyVideoWin.ViewModel
                     default:
                         break;
                 }
-
             }
-        }
 
+            OnPropertyChanged("MoreVisibility");
+        }
+        
         #endregion
     }
 }

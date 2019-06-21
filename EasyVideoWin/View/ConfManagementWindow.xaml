@@ -9,32 +9,47 @@
         xmlns:WinForms="clr-namespace:EasyVideoWin.WinForms"
         xmlns:cefSharp="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
         mc:Ignorable="d"
-        Title="ConfManagementWindow" Height="570" Width="662" FontFamily="Arial, Microsoft YaHei"
-        WindowStyle="None" BorderThickness="1" ResizeMode="NoResize" ShowInTaskbar="False" MouseLeftButtonDown="BackGround_MouseMove" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
-    <Viewbox>
-        <Grid Height="570" Width="662">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="28" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Grid.Column="0">
-                <DockPanel HorizontalAlignment="Right" Margin="0, 0, 0, 0">
-                    <CustomControls:WpfImageButton ImageWidth="28" ImageHeight="28"
+        Title="{DynamicResource CONF_MANAGEMENT}" Height="570" Width="662" FontFamily="Arial, Microsoft YaHei"
+        WindowStyle="None" BorderThickness="1" ResizeMode="NoResize" ShowInTaskbar="True" MouseLeftButtonDown="BackGround_MouseMove" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="28" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Grid.Column="0" Background="#313131">
+            <DockPanel HorizontalAlignment="Right" Margin="0, 0, 0, 0">
+                <CustomControls:WpfImageButton x:Name="minButton" Click="MinWindow_Click" ImageWidth="28" ImageHeight="28" Height="28"
+                                                   TextVisibility="Collapsed" Cursor="Hand"
+                                                   NormalImage="pack://application:,,,/Resources/Icons/WindowTitleBar/minimize_normal.png"
+                                                   MouseOverImage="pack://application:,,,/Resources/Icons/WindowTitleBar/minimize_hover.png"
+                                                   PressedImage="pack://application:,,,/Resources/Icons/WindowTitleBar/minimize_click.png"/>
+                <CustomControls:WpfImageButton x:Name="maxButton" Click="MaxWindow_Click" ImageWidth="28" ImageHeight="28" Height="28"
+                                                   TextVisibility="Collapsed" Cursor="Hand"
+                                                   NormalImage="pack://application:,,,/Resources/Icons/WindowTitleBar/maximize_normal.png"
+                                                   MouseOverImage="pack://application:,,,/Resources/Icons/WindowTitleBar/maximize_hover.png"
+                                                   PressedImage="pack://application:,,,/Resources/Icons/WindowTitleBar/maximize_click.png"/>
+                <CustomControls:WpfImageButton x:Name="restoreButton" Click="RestoreWindow_Click" ImageWidth="28" ImageHeight="28" Height="28"
+                                                   TextVisibility="Collapsed" Cursor="Hand"
+                                                   NormalImage="pack://application:,,,/Resources/Icons/WindowTitleBar/restore_normal.png"
+                                                   MouseOverImage="pack://application:,,,/Resources/Icons/WindowTitleBar/restore_hover.png"
+                                                   PressedImage="pack://application:,,,/Resources/Icons/WindowTitleBar/restore_click.png"/>
+                <CustomControls:WpfImageButton ImageWidth="28" ImageHeight="28"
                                                    TextVisibility="Collapsed"
-                                        NormalImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_normal.png"
-                                        PressedImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_click.png"
-                                        MouseOverImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_hover.png"
-                                        Cursor="Hand" Click="CloseBtn_Click"/>
-                </DockPanel>
-            </Grid>
-            <Grid Grid.Row="1" Grid.Column="0" Background="#FFFFFF">
-                <!--<WindowsFormsHost Name="wfh" Background="#FFFFFF">
-                    --><!--<WinForms:WhiteBoardForm x:Name="conferenceForm" BackColor="#FFFFFF" FormBorderStyle="None"/>--><!--
-                </WindowsFormsHost>-->
-                <cefSharp:ChromiumWebBrowser Name="browser"/>
-                <ContentPresenter Name="contentPresenter"/>
-            </Grid>
+                                                   NormalImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_normal.png"
+                                                   PressedImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_click.png"
+                                                   MouseOverImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_hover.png"
+                                                   Cursor="Hand" Click="CloseBtn_Click"/>
+            </DockPanel>
         </Grid>
-    </Viewbox>
-    
+        <Grid Grid.Row="1" Grid.Column="0" Background="#FFFFFF">
+            <!--<WindowsFormsHost Name="wfh" Background="#FFFFFF">
+                    -->
+            <!--<WinForms:WhiteBoardForm x:Name="conferenceForm" BackColor="#FFFFFF" FormBorderStyle="None"/>-->
+            <!--
+                </WindowsFormsHost>-->
+            <cefSharp:ChromiumWebBrowser Name="browser"/>
+            <ContentPresenter Name="contentPresenter"/>
+        </Grid>
+    </Grid>
+
 </Window>

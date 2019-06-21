@@ -235,8 +235,14 @@ namespace EasyVideoWin.View
                 {
                     return;
                 }
-
-                _conferenceJsEvent.UpdateToken(LoginManager.Instance.LoginToken);
+                Application.Current.Dispatcher.InvokeAsync(() => {
+                    log.Info("Update login token to browser");
+                    _conferenceJsEvent.UpdateToken(LoginManager.Instance.LoginToken);
+                    if (this.browser.IsBrowserInitialized)
+                    {
+                        this.browser.Load(GetConferenceUrl());
+                    }
+                });
             }
         }
 

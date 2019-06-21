@@ -38,6 +38,8 @@ namespace EasyVideoWin.Helpers
         private const string CEF_LOG_NAME = "CEF.log";
         public const string INSTALL_PACKAGE_PATH = "Install";
         public static readonly string SIP_SETTING = "SipSetting";
+        private const string CONFIG_DISABLE_CAMERA_ON_JOIN_CONF         = "DisableCameraOnJoinConf";
+        private const string CONFIG_DISABLE_MIC_ON_JOIN_CONF            = "DisableMicOnJoinConf";
 
         public static readonly string AES_KEY = "JA56!*?>afa%^fgFACD$#$<:'F$&klac";
         public static readonly string AES_IV = ";lGFF56?>{]')*}A";
@@ -63,7 +65,7 @@ namespace EasyVideoWin.Helpers
             System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
 
         [DllImport("User32.DLL", SetLastError = true)]
-        public static extern bool SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
+        private static extern bool SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -90,7 +92,9 @@ namespace EasyVideoWin.Helpers
         protected const uint SWP_NOSENDCHANGING = 0x0400;
         protected const uint SWP_DEFERERASE = 0x2000;
         protected const uint SWP_ASYNCWINDOWPOS = 0x4000;
+        protected const uint SWP_SHOWWINDOW = 0x0040;
         protected const int HWND_TOP = 0;
+        protected const int HWND_TOPMOST = -1;
         protected const int HWND_NOTOPMOST = -2;
 
         private const int GWL_EXSTYLE = (-20);
@@ -310,6 +314,19 @@ namespace EasyVideoWin.Helpers
                                 );
         }
 
+        public static bool SetWindowPosTopMost(IntPtr handle, int left, int top, int width, int height)
+        {
+            return SetWindowPos(
+                                  handle
+                                , HWND_TOPMOST
+                                , left
+                                , top
+                                , width
+                                , height
+                                , SWP_SHOWWINDOW
+                                );
+        }
+
         public static Bitmap GetScreenSnapshot()
         {
             Rectangle rc = SystemInformation.VirtualScreen;
@@ -458,7 +475,7 @@ namespace EasyVideoWin.Helpers
         public static string HexMeetTime()
         {
             DateTime now = DateTime.Now;
-            string formatTime = now.ToString("yyyy-MM-dd_hh.mm.ss");
+            string formatTime = now.ToString("yyyy-MM-dd_HH.mm.ss");
             StringBuilder sb = new StringBuilder();
             sb.Append(System.Reflection.Assembly.GetExecutingAssembly().GetName().Name).Append("_");
             sb.Append(LanguageUtil.Instance.GetValueByKey("SCREEN_SHOT"));
@@ -940,6 +957,28 @@ namespace EasyVideoWin.Helpers
             }
         }
 
+        public static void SetDisableCameraOnJoinConf(bool disabled)
+        {
+            IniWriteValue(CONFIG_TITLE, CONFIG_DISABLE_CAMERA_ON_JOIN_CONF, disabled.ToString(), GetCurConfigFile());
+        }
+
+        public static bool GetDisableCameraOnJoinConf()
+        {
+            string value = Utils.IniReadValue(CONFIG_TITLE, CONFIG_DISABLE_CAMERA_ON_JOIN_CONF, GetCurConfigFile());
+            return "TRUE" == value.ToUpper();
+        }
+
+        public static void SetDisableMicOnJoinConf(bool disabled)
+        {
+            IniWriteValue(CONFIG_TITLE, CONFIG_DISABLE_MIC_ON_JOIN_CONF, disabled.ToString(), GetCurConfigFile());
+        }
+
+        public static bool GetDisableMicOnJoinConf()
+        {
+            string value = Utils.IniReadValue(CONFIG_TITLE, CONFIG_DISABLE_MIC_ON_JOIN_CONF, GetCurConfigFile());
+            return "TRUE" == value.ToUpper();
+        }
+
         public static bool GetIsConfRunning()
         {
             string str = Utils.IniReadValue(Utils.RUNNING_STATUS_TITLE, "IsConfRunning", Utils.GetCurConfigFile());
@@ -1395,6 +1434,28 @@ namespace EasyVideoWin.Helpers
         public static bool GetAutoHidePartyName()
         {
             string value = Utils.IniReadValue(Utils.CONFIG_TITLE, "AutoHidePartyName", Utils.GetCurConfigFile());
+            return "TRUE" == value.ToUpper();
+        }
+
+        public static void SetDisablePrompt(bool disablePrompt)
+        {
+            Utils.IniWriteValue(Utils.CONFIG_TITLE, "DisablePrompt", disablePrompt.ToString(), Utils.GetCurConfigFile());
+        }
+
+        public static bool GetDisablePrompt()
+        {
+            string value = Utils.IniReadValue(Utils.CONFIG_TITLE, "DisablePrompt", Utils.GetCurConfigFile());
+            return "TRUE" == value.ToUpper();
+        }
+
+        public static void SetEnable4x4Layout(bool enable4x4Layout)
+        {
+            Utils.IniWriteValue(Utils.CONFIG_TITLE, "Enable4x4Layout", enable4x4Layout.ToString(), Utils.GetCurConfigFile());
+        }
+
+        public static bool GetEnable4x4Layout()
+        {
+            string value = Utils.IniReadValue(Utils.CONFIG_TITLE, "Enable4x4Layout", Utils.GetCurConfigFile());
             return "TRUE" == value.ToUpper();
         }
 

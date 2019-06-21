@@ -102,6 +102,9 @@ namespace EasyVideoWin.View
                 this.comboBoxConfId.SelectedIndex = 0;
             }
 
+            this.turnOffCamera.IsChecked = Utils.GetDisableCameraOnJoinConf();
+            this.turnOffMicrophone.IsChecked = Utils.GetDisableMicOnJoinConf();
+
             log.InfoFormat("Update control values, conf id count:{0}, display name:{1}", confIds.Count, this.textBoxNameDisplayedInConf.Text);
         }
 
@@ -192,7 +195,9 @@ namespace EasyVideoWin.View
             Utils.SetDisplayNameInConf(szNameDisplayedInConf);
             bool enableCamera = null == this.turnOffCamera.IsChecked || !this.turnOffCamera.IsChecked.Value;
             bool enableMicrophone = null == this.turnOffMicrophone.IsChecked || !this.turnOffMicrophone.IsChecked.Value;
-            
+            Utils.SetDisableCameraOnJoinConf(!enableCamera);
+            Utils.SetDisableMicOnJoinConf(!enableMicrophone);
+
             // join the conference
             if (LoginStatus.LoggedIn == LoginManager.Instance.CurrentLoginStatus)
             {

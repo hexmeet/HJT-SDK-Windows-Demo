@@ -78,6 +78,8 @@ namespace EasyVideoWin.View
             _joinConfPassword = Utils.GetAnonymousJoinConfPassword();
             this.textBlockJoiningMeeting.Text = string.Format(LanguageUtil.Instance.GetValueByKey("JOINING_MEETING"), _joinConfId);
             this.textBoxDisplayName.Text = Utils.GetDisplayNameInConf();
+            this.turnOffCamera.IsChecked = Utils.GetDisableCameraOnJoinConf();
+            this.turnOffMicrophone.IsChecked = Utils.GetDisableMicOnJoinConf();
         }
 
         public void CloseWindow()
@@ -149,6 +151,8 @@ namespace EasyVideoWin.View
             Utils.SetDisplayNameInConf(szNameDisplayedInConf);
             bool enableCamera = null == this.turnOffCamera.IsChecked || !this.turnOffCamera.IsChecked.Value;
             bool enableMicrophone = null == this.turnOffMicrophone.IsChecked || !this.turnOffMicrophone.IsChecked.Value;
+            Utils.SetDisableCameraOnJoinConf(!enableCamera);
+            Utils.SetDisableMicOnJoinConf(!enableMicrophone);
             Application.Current.Dispatcher.InvokeAsync(() => {
                 LoginManager.Instance.AnonymousJoinConference(
                     _isJoinDirectly

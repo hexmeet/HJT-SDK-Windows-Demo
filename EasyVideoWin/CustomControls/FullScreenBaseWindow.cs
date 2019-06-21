@@ -14,7 +14,7 @@ using System.Windows.Interop;
 
 namespace EasyVideoWin.CustomControls
 {
-    public class FullScreenBaseWindow : Window, IMasterDisplayWindow, INotifyPropertyChanged
+    public class FullScreenBaseWindow : Window, IMasterDisplayWindow, INotifyPropertyChanged, IDisposable
     {
         #region -- Members --
 
@@ -107,6 +107,8 @@ namespace EasyVideoWin.CustomControls
             }
         }
 
+        public bool IsDisposed { get; set; } = false;
+
         #endregion
 
         #region -- Constructor --
@@ -125,7 +127,7 @@ namespace EasyVideoWin.CustomControls
 
             this.Loaded += FullScreenBaseWindow_Loaded;
         }
-
+        
         #endregion
 
         #region -- Public Method --
@@ -140,7 +142,7 @@ namespace EasyVideoWin.CustomControls
             {
                 _maximized = false;
             }
-
+            
             WindowState = newState;
         }
 
@@ -167,28 +169,48 @@ namespace EasyVideoWin.CustomControls
 
         public void MinimizeWindow()
         {
+            if (!FullScreenStatus && WindowState.Minimized == this.WindowState)
+            {
+                log.InfoFormat("Window has been Minimized, hash: {0}", this.GetHashCode());
+                return;
+            }
             FullScreenStatus = false;
             ChangeWindowState(WindowState.Minimized);
         }
 
         public void MaximizeWindow()
         {
+            if (!FullScreenStatus && WindowState.Maximized == this.WindowState)
+            {
+                log.InfoFormat("Window has been Maximized, hash: {0}", this.GetHashCode());
+                return;
+            }
             FullScreenStatus = false;
             ChangeWindowState(WindowState.Maximized);
         }
 
         public void RestoreWindow()
         {
+            if (!FullScreenStatus && WindowState.Normal == this.WindowState)
+            {
+                log.InfoFormat("Window has been Normal, hash: {0}", this.GetHashCode());
+                return;
+            }
             FullScreenStatus = false;
             ChangeWindowState(WindowState.Normal);
         }
 
         public void SetFullScreen()
         {
+            if (FullScreenStatus && WindowState.Maximized == this.WindowState)
+            {
+                log.InfoFormat("Window has been Full Screen, hash: {0}", this.GetHashCode());
+                return;
+            }
             //reset normal when window is max; and set full screen(window is max too) 
             if (this.WindowState == WindowState.Maximized && !FullScreenStatus)
             {
-                log.DebugFormat("first reset window to normal, then set window to max in full screen");
+                log.Info("first reset window to normal, then set window to max in full screen");
                 FullScreenStatus = false;
                 ChangeWindowState(WindowState.Normal);
             }
@@ -196,7 +218,13 @@ namespace EasyVideoWin.CustomControls
             FullScreenStatus = true;
             ChangeWindowState(WindowState.Maximized);
         }
-        
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         #endregion
 
         #region -- Protected Method --
@@ -216,6 +244,14 @@ namespace EasyVideoWin.CustomControls
             _position.Y = this.Top;
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Microsoft.Win32.SystemEvents.DisplaySettingsChanged -= new System.EventHandler(DisplaySettingsChanged);
+            }
+        }
+
         #endregion
 
         #region -- Private Method --
@@ -224,7 +260,7 @@ namespace EasyVideoWin.CustomControls
         {
             HwndSource hwndSource = (HwndSource)HwndSource.FromVisual((Window)sender);
             hwndSource.AddHook(DragHook);
-            this.StateChanged += MainWindow_StateChanged;
+            this.StateChanged += FullScreenBaseWindow_StateChanged;
 
             _aspectRatio = _initialWidth / (_initialHeight - _titlebarHeight);
 
@@ -242,9 +278,9 @@ namespace EasyVideoWin.CustomControls
             }
         }
 
-        private void MainWindow_StateChanged(object sender, EventArgs e)
+        private void FullScreenBaseWindow_StateChanged(object sender, EventArgs e)
         {
-            //log.InfoFormat("Window state changed, state:{0}", this.WindowState);
+            log.InfoFormat("Window state changed, state: {0}, _maximized: {1}, hash code: {2}, name: {3}", this.WindowState, _maximized, this.GetHashCode(), this.Name);
             if (WindowState.Maximized == this.WindowState && !_maximized)
             {
                 _maximized = true;
@@ -460,7 +496,7 @@ namespace EasyVideoWin.CustomControls
                 double ratioY = ((double)dpiY / 96d);
                 double maxCx = (double)winInfo.maxCx / ratioX;
                 double maxCy = (double)winInfo.maxCy / ratioY;
-                log.InfoFormat("Adjust window size, width={0}, height={1}, maxCx={2}, maxCy={3}, left={4}, top={5}, WindowState={6} hash code={7}", this.Width, this.Height, maxCx, maxCy, this.Left, this.Top, this.WindowState, this.GetHashCode());
+                log.InfoFormat("Adjust window size, width={0}, height={1}, maxCx={2}, maxCy={3}, left={4}, top={5}, WindowState={6}, hash code={7}", this.Width, this.Height, maxCx, maxCy, this.Left, this.Top, this.WindowState, this.GetHashCode());
                 // when the screen size is less than the specified size of main window, then set the size of main window
                 // to a proper size.
                 if (_initialWidth >= maxCx || _initialHeight >= maxCy)

@@ -1,7 +1,9 @@
 ﻿using EasyVideoWin.Helpers;
+using log4net;
 using System;
 using System.Windows;
 using System.Windows.Input;
+using System.ComponentModel;
 
 namespace EasyVideoWin.CustomControls
 {
@@ -10,6 +12,8 @@ namespace EasyVideoWin.CustomControls
     /// </summary>
     public partial class MessageBoxTip : Window
     {
+        private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private bool _resize = true;
         private IMasterDisplayWindow _backgroundWindow;
 
@@ -17,7 +21,7 @@ namespace EasyVideoWin.CustomControls
         {
             InitializeComponent();
         }
-
+        
         public MessageBoxTip(IMasterDisplayWindow backgroundWindow) : this()
         {
             _backgroundWindow = backgroundWindow;
@@ -68,5 +72,11 @@ namespace EasyVideoWin.CustomControls
             }
         }
 
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+
+            log.Info("MessageBoxTip Closed");
+        }
     }
 }

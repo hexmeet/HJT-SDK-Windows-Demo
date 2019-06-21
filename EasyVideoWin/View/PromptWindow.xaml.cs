@@ -26,10 +26,10 @@ namespace EasyVideoWin.View
         private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly int SHOW_DURATION = 3000;
         
-        private static PromptWindow _instance = new PromptWindow(null, true);
+        private static PromptWindow _instance = new PromptWindow(null);
 
-        private bool _hideWindowOnTimeUp;
         private Timer _autoCloseTimer = null;
+        private IMasterDisplayWindow _masterWindow = null;
 
         public static PromptWindow Instance
         {
@@ -39,11 +39,10 @@ namespace EasyVideoWin.View
             }
         }
 
-        private PromptWindow(Window owner, bool hideWindowOnTimeUp = false)
+        private PromptWindow(Window owner)
         {
             InitializeComponent();
             InitParams(owner);
-            _hideWindowOnTimeUp = hideWindowOnTimeUp;
         }
         
         private void InitParams(Window owner)
@@ -82,43 +81,52 @@ namespace EasyVideoWin.View
 
         public void CloseWindow()
         {
-            if (_hideWindowOnTimeUp)
+            if (Visibility.Visible != this.Visibility)
             {
-                if (Visibility.Visible != this.Visibility)
-                {
-                    return;
-                }
-
-                this.Visibility = Visibility.Collapsed;
+                return;
             }
-            else
+            if (null != _autoCloseTimer && _autoCloseTimer.Enabled)
             {
-                this.Close();
+                log.InfoFormat("Close window disable timer:{0}", _autoCloseTimer.Enabled);
+                _autoCloseTimer.Enabled = false;
             }
+            log.Info("Close window");
+            this.Visibility = Visibility.Collapsed;
         }
-        
-        public void ShowPromptByTime(string content, int duration)
+
+        public void ShowPromptByTime(string content, int duration, IMasterDisplayWindow masterWin, Window activeWindow)
         {
             if (string.IsNullOrEmpty(content))
             {
                 return;
             }
-
+            _masterWindow = masterWin;
             log.Info("Show prompt by time");
             if (null != _autoCloseTimer && _autoCloseTimer.Enabled)
             {
                 log.InfoFormat("Timer enabled:{0}", _autoCloseTimer.Enabled);
                 _autoCloseTimer.Enabled = false;
             }
-            
-            Application.Current.Dispatcher.InvokeAsync(() => {
-                // note: Put the code below the UI thread queue to make sure the execution after the last time out.
+
+            //log.Info("Begin to show prompt content.");
+            //this.label.Content = content;
+            //this.Show();
+            ////this.Top += (WindowDownRatio * ratio);
+            //StartAutoCloseTimer(duration);
+            //SetProperPosition();
+            Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                // note: Put the code below the UI thread queue to make sure the execution after the last arrival item timeout. 
                 log.Info("Begin to show prompt content.");
                 this.label.Content = content;
                 this.Show();
                 //this.Top += (WindowDownRatio * ratio);
                 StartAutoCloseTimer(duration);
                 SetProperPosition();
+                if (IsActive && null != activeWindow)
+                {
+                    activeWindow.Activate();
+                }
             });
         }
 
@@ -129,7 +137,11 @@ namespace EasyVideoWin.View
 
         private void SetProperPosition()
         {
-            Rect mainWindowRect = VideoPeopleWindow.Instance.GetWindowRect();
+            if (null == _masterWindow)
+            {
+                return;
+            }
+            Rect mainWindowRect = _masterWindow.GetWindowRect();
             double width = this.ActualWidth;
             if (width > mainWindowRect.Width)
             {

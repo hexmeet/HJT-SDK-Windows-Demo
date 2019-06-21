@@ -179,6 +179,11 @@ int EVSdkWrapper::EVEngineGetUserInfo(Structs::EVUserInfoCli^ %userInfo)
     return rst;
 }
 
+System::String^ EVSdkWrapper::EVEngineGetDisplayName()
+{
+    std::string szDisplayName = m_pEVEngine->getDisplayName();
+    return Utils::Utf8Str2ManagedStr(szDisplayName);
+}
 
 //Device
 array<Structs::EVDeviceCli^>^ EVSdkWrapper::EVEngineGetDevices(Structs::EV_DEVICE_TYPE_CLI type)
@@ -360,9 +365,11 @@ int EVSdkWrapper::EVEngineGetStats(Structs::EVStatsCli^ %statsCli)
 {
     ev::engine::EVStats evStats;
     evStats.size = 0;
+    System::String^ logInfo = "Begin to getStats from sdk";
+    OutputLog(logInfo);
     int rst = m_pEVEngine->getStats(evStats);
-    System::String^ str = System::String::Format("Get stats size:{0}", evStats.size);
-    OutputLog(str);
+    logInfo = System::String::Format("getStats size:{0}", evStats.size);
+    OutputLog(logInfo);
     if (ev::common::EV_ERROR::EV_OK == rst)
     {
         statsCli->Unmanaged2ManagedStruct(evStats);

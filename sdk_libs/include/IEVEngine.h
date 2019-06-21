@@ -19,6 +19,7 @@ typedef enum _EV_SERVER_ERROR {
     EV_SERVER_GET_FAILED = 1009,
     EV_SERVER_NOT_SUPPORTED = 1010,
     EV_SERVER_REDIS_LOCK_TIMEOUT = 1011,
+    EV_SERVER_LOCAL_ZONE_STOPPED = 1019,
     EV_SERVER_INVALID_USER_NAME_PASSWORD = 1100,
     EV_SERVER_LOGIN_FAILED_MORE_THAN_5_TIMES = 1101,
     EV_SERVER_ACCOUNT_TEMPORARILY_LOCKED = 1102,
@@ -163,7 +164,9 @@ typedef enum _EV_CALL_ERROR {
     EV_CALL_HAISHEN_GATEWAY_VIDEO_PORT_COUNT_USED_UP = 2029,
     EV_CALL_ONLY_ROOM_OWNER_CAN_ACTIVATE_ROOM = 2031,
     EV_CALL_NOT_ALLOW_ANONYMOUS_PARTY = 2033,
-    EV_CALL_TRIAL_ORG_EXPIRED = 2035
+    EV_CALL_TRIAL_ORG_EXPIRED = 2035,
+    EV_CALL_LOCAL_ZONE_NOT_STARTED = 2043,
+    EV_CALL_LOCAL_ZONE_STOPPED = 2045
 } EV_CALL_ERROR;
 
 }
@@ -262,6 +265,9 @@ public:
 
 class EV_CLASS_API EVSite {
 public:
+    EVSite() {
+        clear();
+    }
     void clear() {
         window = NULL;
         is_local = TRUE;
@@ -280,6 +286,9 @@ public:
 
 class EV_CLASS_API EVLayoutIndication {
 public:
+    EVLayoutIndication() {
+        clear();
+    }
     void clear() {
         mode = EV_LAYOUT_AUTO_MODE;
         setting_mode = EV_LAYOUT_AUTO_MODE;
@@ -344,14 +353,6 @@ public:
         (void)registered;
     }
 
-    virtual void onDownloadUserImageComplete(const char * path) {
-        (void)path;
-    }
-
-    virtual void onUploadUserImageComplete(const char * path) {
-        (void)path;
-    }
-
     virtual void onWhiteBoardIndication(EVWhiteBoardInfo & info) {
         (void)info;
     }
@@ -403,8 +404,6 @@ public:
     virtual int login(const char * server, unsigned int port, const char * username, const char * encrypted_password) = 0;
     virtual int loginWithLocation(const char * location_server, unsigned int port, const char * username, const char * encrypted_password) = 0;
     virtual int logout() = 0;
-    virtual int downloadUserImage(const char * path) = 0;
-    virtual int uploadUserImage(const char * path) = 0;
 
     //Conference & Layout
     virtual int setMaxRecvVideo(unsigned int num) = 0;

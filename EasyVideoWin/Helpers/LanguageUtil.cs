@@ -19,9 +19,10 @@ namespace EasyVideoWin.Helpers
         
         private static LanguageUtil _instance = new LanguageUtil();
 
-        private Dictionary<LanguageType, String> _languageTypeVsFileName = new Dictionary<LanguageType, string>();
-        private readonly String LANGUAGE_FILE_PATH = @"Resources\Languages\{0}.xaml";
-        private ResourceDictionary _languageResource = null;
+        private Dictionary<LanguageType, string> _languageTypeVsFileName = new Dictionary<LanguageType, string>();
+        private readonly string GENERAL_LANGUAGE_FILE_PATH = @"Resources\Languages\{0}-general.xaml";
+        private readonly string COMPANY_LANGUAGE_FILE_PATH = @"Resources\Languages\{0}-company.xaml";
+        private List<ResourceDictionary> _languageResources = null;
         private LanguageType _currentLanguage = LanguageType.ZH_CN;
         private Dictionary<LanguageType, string> _dictWebLanguage = new Dictionary<LanguageType, string>();
 
@@ -80,24 +81,28 @@ namespace EasyVideoWin.Helpers
 
         public bool UpdateLanguage(LanguageType languageType)
         {
-            String requestedlanguageFilePath = GetFilePathByType(languageType);
-
+            var requestedlanguageFilePathList = GetFilePathByType(languageType);
             List<ResourceDictionary> dictionaryList = new List<ResourceDictionary>();
             foreach (ResourceDictionary dictionary in Application.Current.Resources.MergedDictionaries)
             {
                 dictionaryList.Add(dictionary);
             }
 
-            ResourceDictionary resourceDictionary = dictionaryList.FirstOrDefault(d => d.Source.OriginalString.Equals(requestedlanguageFilePath));
-            if (null == resourceDictionary)
+            List<ResourceDictionary> resourceList = new List<ResourceDictionary>();
+            foreach (var requestedlanguageFilePath in requestedlanguageFilePathList)
             {
-                return false;
+                ResourceDictionary resourceDictionary = dictionaryList.FirstOrDefault(d => d.Source.OriginalString.Equals(requestedlanguageFilePath));
+                if (null == resourceDictionary)
+                {
+                    return false;
+                }
+
+                Application.Current.Resources.MergedDictionaries.Remove(resourceDictionary);
+                Application.Current.Resources.MergedDictionaries.Add(resourceDictionary);
+                resourceList.Add(resourceDictionary);
             }
-
-            Application.Current.Resources.MergedDictionaries.Remove(resourceDictionary);
-            Application.Current.Resources.MergedDictionaries.Add(resourceDictionary);
-
-            _languageResource = resourceDictionary;
+            
+            _languageResources = resourceList;
             CurrentLanguage = languageType;
             SaveCurrentLanguage(CurrentLanguage);
 
@@ -106,12 +111,20 @@ namespace EasyVideoWin.Helpers
 
         public String GetValueByKey(String key)
         {
-            if (_languageResource == null)
+            if (_languageResources == null)
             {
                 return "";
             }
 
-            return (_languageResource[key] as String);
+            for (var i = 0; i < _languageResources.Count; ++i)
+            {
+                if (_languageResources[i].Contains(key))
+                {
+                    return (_languageResources[i][key] as String);
+                }
+            }
+
+            return key;
         }
 
         public string GetCurrentWebLanguage()
@@ -128,9 +141,9 @@ namespace EasyVideoWin.Helpers
 
         #region -- Private Methods --
 
-        private String GetFilePathByType(LanguageType languageType)
+        private List<string> GetFilePathByType(LanguageType languageType)
         {
-            String fileName;
+            string fileName;
             if (_languageTypeVsFileName.ContainsKey(languageType))
             {
                 fileName = _languageTypeVsFileName[languageType];
@@ -140,7 +153,10 @@ namespace EasyVideoWin.Helpers
                 fileName = _languageTypeVsFileName[LanguageType.ZH_CN];
             }
 
-            return String.Format(LANGUAGE_FILE_PATH, fileName);
+            List<string> fileList = new List<string>();
+            fileList.Add(string.Format(GENERAL_LANGUAGE_FILE_PATH, fileName));
+            fileList.Add(string.Format(COMPANY_LANGUAGE_FILE_PATH, fileName));
+            return fileList;
         }
 
 

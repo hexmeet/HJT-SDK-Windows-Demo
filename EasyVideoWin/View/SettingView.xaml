@@ -1,5 +1,6 @@
 ﻿<UserControl x:Class="EasyVideoWin.View.SettingView"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             x:Name="settingViewCtrl"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
@@ -60,7 +61,10 @@
             </Grid>
 
             <Grid Grid.Column="1">
-                <ContentPresenter Grid.Row="1" Grid.Column="1" x:Name="ContentArea" Content="{Binding CurrentView}"/>
+                <ScrollViewer Style="{StaticResource GrayScrollViewer}" HorizontalAlignment="Left" Height="{Binding Path=ControlHeight, ElementName=settingViewCtrl}" BorderThickness="0"
+                              VerticalScrollBarVisibility="Auto" Width="480">
+                    <ContentPresenter Grid.Row="1" Grid.Column="1" x:Name="ContentArea" Content="{Binding CurrentView}"/>
+                </ScrollViewer >
             </Grid>
         </Grid>
         

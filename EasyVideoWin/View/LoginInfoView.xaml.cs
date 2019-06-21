@@ -192,6 +192,11 @@ namespace EasyVideoWin.View
             LoginManager.Instance.TryAutoLogin();
         }
 
+        private void More_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            LoginManager.Instance.LoginProgress = LoginProgressEnum.AdvancedSetting;
+        }
+
         #endregion
 
 

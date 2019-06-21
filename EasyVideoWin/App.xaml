@@ -15,8 +15,10 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources\Styles\Main.xaml"/>
-                <ResourceDictionary Source="Resources\Languages\en-US.xaml"/>
-                <ResourceDictionary Source="Resources\Languages\zh-CN.xaml"/>
+                <ResourceDictionary Source="Resources\Languages\en-US-general.xaml"/>
+                <ResourceDictionary Source="Resources\Languages\en-US-company.xaml"/>
+                <ResourceDictionary Source="Resources\Languages\zh-CN-general.xaml"/>
+                <ResourceDictionary Source="Resources\Languages\zh-CN-company.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
 

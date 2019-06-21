@@ -133,7 +133,7 @@ namespace EasyVideoWin.Helpers
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-        private struct RECT
+        public struct RECT
         {
             public int left;
             public int top;
@@ -142,7 +142,7 @@ namespace EasyVideoWin.Helpers
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-        private struct MONITORINFOEX
+        public struct MONITORINFOEX
         {
             public int cbSize;
             public RECT rcMonitor;
@@ -154,9 +154,9 @@ namespace EasyVideoWin.Helpers
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Ansi)]
-        private static extern int GetMonitorInfo(IntPtr hmonitor, ref MONITORINFOEX lpmi);
+        public static extern int GetMonitorInfo(IntPtr hmonitor, ref MONITORINFOEX lpmi);
 
-        private static MONITORINFOEX CreateMonitorInfo()
+        public static MONITORINFOEX CreateMonitorInfo()
         {
             MONITORINFOEX monitorInfo = new MONITORINFOEX();
             monitorInfo.cbSize = (int)Marshal.SizeOf(monitorInfo);

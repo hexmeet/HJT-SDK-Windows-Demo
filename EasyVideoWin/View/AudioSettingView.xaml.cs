@@ -93,7 +93,7 @@ namespace EasyVideoWin.View
             {
                 log.Info("Speaker may be occupied by other app exclusively.");
                 MainWindow mainWindow = Application.Current.MainWindow as MainWindow;
-                mainWindow.ShowPromptTip(LanguageUtil.Instance.GetValueByKey("FAILED_PLAY_TEST_MUSIC_FOR_SPEAKER_OCCUPIED"));
+                mainWindow.ShowPromptTip(LanguageUtil.Instance.GetValueByKey("FAILED_PLAY_TEST_MUSIC_FOR_SPEAKER_OCCUPIED"), "Speaker may be occupied by other app exclusively.");
             }
             
         }

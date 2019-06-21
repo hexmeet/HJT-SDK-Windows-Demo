@@ -34,32 +34,16 @@
                                                    />
                 </DockPanel>
                 <DockPanel HorizontalAlignment="Right" Margin="0, 0, 0, 0">
-                    <TextBlock Text="{DynamicResource ADVANCED_SETTING}"
-                               Visibility="{Binding AdvancedSettingVisibility}"
-                               MouseLeftButtonDown="AdvancedSetting_MouseLeftButtonDown"
+                    <TextBlock Text="{DynamicResource SETTING}"
+                               MouseLeftButtonDown="Setting_MouseLeftButtonDown"
                                VerticalAlignment="Center" Foreground="#c1c1c1" FontSize="12" Cursor="Hand"/>
-
-                    <CustomControls:WpfImageButton x:Name="moreMenuBtn" ImageWidth="28" ImageHeight="28"
-                                                   TextVisibility="Collapsed"
-                                        NormalImage="pack://application:,,,/Resources/Icons/WindowTitlebar/more_normal.png"
-                                        PressedImage="pack://application:,,,/Resources/Icons/WindowTitlebar/more_click.png"
-                                        MouseOverImage="pack://application:,,,/Resources/Icons/WindowTitlebar/more_hover.png"
-                                        Cursor="Hand" Click="MoreBtn_Click" Initialized="MoreBtn_SourceInitialized">
-                        <CustomControls:WpfImageButton.ContextMenu>
-                            <ContextMenu Width="120" Background="White" Style="{StaticResource TextMenu}">
-                                <MenuItem Style="{StaticResource TextMenuItem}" Header="{DynamicResource START_DIAGNOSTICS}"
-                                          Foreground="#919191" FontSize="14" Click="SendDiagnostics_Click" Cursor="Hand" />
-                                <MenuItem Style="{StaticResource TextMenuItem}" Header="{DynamicResource ABOUT}"
-                                          Foreground="#919191" FontSize="14" Click="About_Click" Cursor="Hand"/>
-                            </ContextMenu>
-                        </CustomControls:WpfImageButton.ContextMenu>
-                    </CustomControls:WpfImageButton>
                     <CustomControls:WpfImageButton ImageWidth="28" ImageHeight="28"
                                                    TextVisibility="Collapsed"
                                         NormalImage="pack://application:,,,/Resources/Icons/WindowTitlebar/minimize_normal.png"
                                         PressedImage="pack://application:,,,/Resources/Icons/WindowTitlebar/minimize_click.png"
                                         MouseOverImage="pack://application:,,,/Resources/Icons/WindowTitlebar/minimize_hover.png"
                                         Cursor="Hand" Click="MinBtn_Click"/>
+
                     <CustomControls:WpfImageButton ImageWidth="28" ImageHeight="28"
                                                    TextVisibility="Collapsed"
                                         NormalImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_normal.png"

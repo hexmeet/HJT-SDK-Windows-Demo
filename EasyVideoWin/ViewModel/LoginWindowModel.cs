@@ -100,15 +100,6 @@ namespace EasyVideoWin.ViewModel
                 return LoginProgressEnum.Idle == LoginManager.Instance.LoginProgress ? Visibility.Collapsed : Visibility.Visible;
             }
         }
-
-        public Visibility AdvancedSettingVisibility
-        {
-            get
-            {
-                return (LoginProgressEnum.EnterpriseLogin == LoginManager.Instance.LoginProgress || LoginProgressEnum.EnterpriseJoinConf == LoginManager.Instance.LoginProgress)
-                    ? Visibility.Visible : Visibility.Collapsed;
-            }
-        }
         
         public Visibility TitleVisibility
         {
@@ -230,7 +221,6 @@ namespace EasyVideoWin.ViewModel
             }
             
             OnPropertyChanged("BackVisibility");
-            OnPropertyChanged("AdvancedSettingVisibility");
         }
 
         private void Back(object parameter)

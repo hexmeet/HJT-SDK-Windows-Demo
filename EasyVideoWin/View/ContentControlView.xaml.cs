@@ -16,6 +16,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Resources;
+using static EasyVideoWin.Helpers.DisplayUtil;
 using static EasyVideoWin.View.BackScreenColorSelectWindow;
 using static EasyVideoWin.View.BrushHighlighterWindow;
 using static EasyVideoWin.View.BrushSelectWindow;
@@ -211,20 +212,38 @@ namespace EasyVideoWin.View
 
             var bounds = _selScreen.Bounds;
 
-            bool result = Utils.SetWindowPos(Handle, -1, bounds.X, bounds.Y, bounds.Width, bounds.Height, 0x0040);
+            bool result = Utils.SetWindowPosTopMost(Handle, bounds.X, bounds.Y, bounds.Width, bounds.Height);
             log.InfoFormat("Set WindowPosition->{0},x:{1},y:{2},width:{3},height:{4}", result, bounds.X, bounds.Y, bounds.Width, bounds.Height);
             if (!result)
             {
                 log.Error("Set WindowPosition GetLastError: " + Utils.GetLastError());
                 log.Error("Set WindowPosition GetLastWin32Error: " + Marshal.GetLastWin32Error());
-                result = Utils.SetWindowPos(Handle, -1, bounds.X, bounds.Y, bounds.Width, bounds.Height, 0x0040);
+                result = Utils.SetWindowPosTopMost(Handle, bounds.X, bounds.Y, bounds.Width, bounds.Height);
                 log.InfoFormat("Set WindowPosition again->{0},x:{1},y:{2},width:{3},height:{4}", result, bounds.X, bounds.Y, bounds.Width, bounds.Height);
+            }
+
+            // sometimes the window size is not correct in high dpi devices, so check the screen size and adjust it
+            IntPtr hMonitor = DpiUtil.MonitorFromWindow(Handle, DpiUtil.MONITOR_DEFAULTTONEAREST);
+            MONITORINFOEX monitorInfo = DisplayUtil.CreateMonitorInfo();
+            int rst = DisplayUtil.GetMonitorInfo(hMonitor, ref monitorInfo);
+            if (rst == 0)
+            {
+                log.Error("failed to get monitor info");
+                return;
+            }
+            int width = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
+            int height = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
+            log.InfoFormat("Check if adjust window size, screen size: {0}x{1}", width, height);
+            if (bounds.Width < width || bounds.Height < height)
+            {
+                log.Info("Window size is not less than screen and adjust the window size");
+                Utils.SetWindowPosTopMost(Handle, bounds.X, bounds.Y, width, height);
             }
         }
 
         public void SetWindowPositionExByRect(Rect rect)
         {
-            bool result = Utils.SetWindowPos(Handle, -1, (int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height, 0x0040);
+            bool result = Utils.SetWindowPosTopMost(Handle, (int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height);
             log.InfoFormat("Set SetWindowPositionExByRect->{0},x:{1},y:{2},width:{3},height:{4}", result, rect.X, rect.Y, rect.Width, rect.Height);
         }
 
@@ -254,6 +273,10 @@ namespace EasyVideoWin.View
         private void BackScreenWin_Closed(object sender, EventArgs e)
         {
             _backScreenWin.Closed -= BackScreenWin_Closed;
+            if (IsDisposed)
+            {
+                return;
+            }
             _backScreenWin = new BackScreenColorSelectWindow();
             _backScreenWin.Closed += BackScreenWin_Closed;
         }
@@ -261,6 +284,10 @@ namespace EasyVideoWin.View
         private void PenWin_Closed(object sender, EventArgs e)
         {
             _brushWin.Closed -= PenWin_Closed;
+            if (IsDisposed)
+            {
+                return;
+            }
             _brushWin = new BrushSelectWindow();
             _brushWin.Closed += PenWin_Closed;
         }

@@ -85,6 +85,7 @@ public:
     int EVEngineChangePassword(System::String^ oldPassword, System::String^ newPassword);
     int EVEngineChangeDisplayName(System::String^ displayName);
     int EVEngineGetUserInfo(Structs::EVUserInfoCli^ %userInfo);
+    System::String^ EVEngineGetDisplayName();
 
     //Device
     array<Structs::EVDeviceCli^>^ EVEngineGetDevices(Structs::EV_DEVICE_TYPE_CLI type);

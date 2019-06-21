@@ -83,13 +83,13 @@ namespace EasyVideoWin.Model.CloudModel
             return GetObject<AcsRest>(url, null, hdlErrMsg);
         }
 
-        public RestPartNameInfo GetPartyName(string confNumericId, ulong deviceId)
+        public RestPartNameInfo GetPartyName(string confNumericId, ulong deviceId, HandleErrorMessage hdlErrMsg)
         {
             Dictionary<object, object> uriParams = new Dictionary<object, object>();
             uriParams.Add("confNumericId", confNumericId);
             uriParams.Add("deviceId", deviceId);
             string url = GetFullAcsUrl(REST_GET_PARTY_NAME_API, true, uriParams);
-            return GetObject<RestPartNameInfo>(url, null, (RestResponse response) => { });
+            return GetObject<RestPartNameInfo>(url, null, hdlErrMsg);
         }
 
         #endregion

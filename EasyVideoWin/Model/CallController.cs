@@ -26,6 +26,12 @@ namespace EasyVideoWin.Model
         , SendingWhiteBoardStarted
     }
 
+    public enum MaxRecvVideoLayout
+    {
+        Layout_3x3      = 9
+        , Layout_4x4    = 16
+    }
+
     public class ContentStreamInfo
     {
         public ContentStreamStatus LastStatus { get; set; }
