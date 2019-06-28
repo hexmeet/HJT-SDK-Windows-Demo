@@ -6,8 +6,6 @@
         xmlns:local="clr-namespace:EasyVideoWin.View"
         xmlns:ViewModel="clr-namespace:EasyVideoWin.ViewModel"
         xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
-        xmlns:WinForms="clr-namespace:EasyVideoWin.WinForms"
-        xmlns:cefSharp="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
         mc:Ignorable="d"
         Title="SettingWindow" Height="480" Width="620" FontFamily="Arial, Microsoft YaHei"
         WindowStyle="None" BorderThickness="1" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">

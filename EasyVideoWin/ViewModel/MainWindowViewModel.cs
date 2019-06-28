@@ -604,7 +604,7 @@ namespace EasyVideoWin.ViewModel
                         {
                             VideoPeopleWindow.Instance.AdjustWindowSize();
                         }
-
+                        log.InfoFormat("VideoPeopleWindow, left: {0}, top: {1}", VideoPeopleWindow.Instance.Left, VideoPeopleWindow.Instance.Top);
                         if (
                                Visibility.Visible == SoftwareUpdateWindow.Instance.Visibility
                             && Visibility.Visible == VideoPeopleWindow.Instance.Visibility

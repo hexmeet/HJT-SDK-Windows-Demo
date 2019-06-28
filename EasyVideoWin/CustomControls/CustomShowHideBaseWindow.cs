@@ -77,7 +77,7 @@ namespace EasyVideoWin.CustomControls
 
         #region -- Public Methods --
 
-        public bool SetProperWindowPos(double left, double top, double width, double height)
+        public bool SetProperWindowPos(double left, double top, double width, double height, bool forceUpdate = false)
         {
             if (IntPtr.Zero == _handle)
             {
@@ -85,31 +85,40 @@ namespace EasyVideoWin.CustomControls
             }
 
             // check if the value is changed to avoid UI refresh for OOM
-            if (this.Left == left && this.Top == top && this.Width == width && this.Height == height)
+            if (this.Left == left && this.Top == top && this.Width == width && this.Height == height && !forceUpdate)
             {
                 return false;
             }
 
             _isWindowHidden = false;
-
-            if (this.Left != left)
+            if (forceUpdate)
             {
-                this.Left = left;
-            }
-            
-            if (this.Top != top)
-            {
-                this.Top = top;
-            }
-            
-            if (this.Width != width)
-            {
-                this.Width = width;
-            }
-            
-            if (this.Height != height)
-            {
+                this.Left   = left;
+                this.Top    = top;
+                this.Width  = width;
                 this.Height = height;
+            }
+            else
+            {
+                if (this.Left != left)
+                {
+                    this.Left = left;
+                }
+
+                if (this.Top != top)
+                {
+                    this.Top = top;
+                }
+
+                if (this.Width != width)
+                {
+                    this.Width = width;
+                }
+
+                if (this.Height != height)
+                {
+                    this.Height = height;
+                }
             }
             
             //Utils.SetWindowPosSmoothly(_handle, left, top, width, height);

@@ -125,7 +125,16 @@ namespace EasyVideoWin
 
             if (winToBeBroughtToFront.WindowState == WindowState.Minimized || winToBeBroughtToFront.Visibility == Visibility.Hidden)
             {
-                winToBeBroughtToFront.WindowState = WindowState.Normal;
+                FullScreenBaseWindow fullWin = winToBeBroughtToFront as FullScreenBaseWindow;
+                log.InfoFormat("The current window is minimized and should change to normal. FullScreenBaseWindow: {0}", null != fullWin);
+                if (null != fullWin)
+                {
+                    fullWin.RestoreWindow();
+                }
+                else
+                {
+                    winToBeBroughtToFront.WindowState = WindowState.Normal;
+                }
                 winToBeBroughtToFront.Show();
             }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -6,6 +7,8 @@ namespace EasyVideoWin.Helpers
 {
     class DpiUtil
     {
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         [DllImport("kernel32.dll")]
         private static extern IntPtr LoadLibrary(string libname);
 
@@ -135,6 +138,21 @@ namespace EasyVideoWin.Helpers
 
             }
             return 1;
+        }
+
+        public static void GetDpiByHandle(IntPtr handle, out uint dpiX, out uint dpiY)
+        {
+            dpiX = 96;
+            dpiY = 96;
+            var currentScreen = GetScreenByHandle(handle);
+            try
+            {
+                GetDpiByScreen(currentScreen, out dpiX, out dpiY);
+            }
+            catch (DllNotFoundException e)
+            {
+                log.InfoFormat("Failed to GetDpiByHandle, exception: {0}", e);
+            }
         }
 
         public static void GetDpiRatioByHandle(IntPtr handle, out double ratioX, out double ratioY)

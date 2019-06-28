@@ -468,7 +468,7 @@
     <sys:String x:Key="INVALID_USER">无效的用户</sys:String>
     <sys:String x:Key="INVALID_MEETING_ID">无效的会议室号码</sys:String>
     <sys:String x:Key="GOT_IT">知道了</sys:String>
-    <sys:String x:Key="FAILED_PLAY_TEST_MUSIC_FOR_SPEAKER_OCCUPIED">由于扬声器被其他应用独占，不能播放测试声音</sys:String>
+    <sys:String x:Key="FAILED_PLAY_TEST_MUSIC_FOR_SPEAKER_OCCUPIED">未检测到可用扬声器，不能播放测试声音</sys:String>
     <sys:String x:Key="SCREEN_SHOT">屏幕截图</sys:String>
     <sys:String x:Key="PATH_PERMISSION_FOR_SNAP_PICTURE">不能保存屏幕截图到指定的路径，请检查路径是否存在并且对该路径有合适的操作权限。</sys:String>
     <sys:String x:Key="JOINING_MEETING">即将进入会议 {0}</sys:String>

@@ -83,62 +83,66 @@ namespace EasyVideoWin
         {
             log.Info("Receive event handle");
             Current.Dispatcher.InvokeAsync((() => ((MainWindow)Current.MainWindow).BringToForeground()));
+            Current.Dispatcher.InvokeAsync(() => {
+                // workaround: invoke BringToForeground twice to resolve the window can not be brought to foreground in browser Edge. ticket:7820
+                ((MainWindow)Current.MainWindow).BringToForeground();
 
-            // join conf
-            string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
-            string joinConfId = Utils.GetAnonymousJoinConfId();
-            string joinConfPassword = Utils.GetAnonymousJoinConfPassword();
-            log.InfoFormat("Join conf address: {0}, conf id: {1}", joinConfAddress, joinConfId);
-            if (string.IsNullOrEmpty(joinConfAddress) || string.IsNullOrEmpty(joinConfId))
-            {
-                log.Info("Empty conf address or conf id.");
-                return;
-            }
-
-            LoginStatus status = LoginManager.Instance.CurrentLoginStatus;
-            log.InfoFormat("Login status: {0}", status);
-            if (LoginStatus.LoggedIn == status)
-            {
-                log.InfoFormat("Call status: {0}", CallController.Instance.CurrentCallStatus);
-                if ((CallStatus.Idle == CallController.Instance.CurrentCallStatus || CallStatus.Ended == CallController.Instance.CurrentCallStatus))
+                // join conf
+                string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
+                string joinConfId = Utils.GetAnonymousJoinConfId();
+                string joinConfPassword = Utils.GetAnonymousJoinConfPassword();
+                log.InfoFormat("Join conf address: {0}, conf id: {1}", joinConfAddress, joinConfId);
+                if (string.IsNullOrEmpty(joinConfAddress) || string.IsNullOrEmpty(joinConfId))
                 {
-                    if (Utils.GetAnonymousLogoutAndAnonymousJoinConf())
+                    log.Info("Empty conf address or conf id.");
+                    return;
+                }
+
+                LoginStatus status = LoginManager.Instance.CurrentLoginStatus;
+                log.InfoFormat("Login status: {0}", status);
+                if (LoginStatus.LoggedIn == status)
+                {
+                    log.InfoFormat("Call status: {0}", CallController.Instance.CurrentCallStatus);
+                    if ((CallStatus.Idle == CallController.Instance.CurrentCallStatus || CallStatus.Ended == CallController.Instance.CurrentCallStatus))
                     {
-                        log.Info("Logout and prepare to join conf anonymously.");
-                        Application.Current.Dispatcher.InvokeAsync(() => {
-                            CloseMessageTip();
-                            LoginManager.Instance.Logout();
-                        });
+                        if (Utils.GetAnonymousLogoutAndAnonymousJoinConf())
+                        {
+                            log.Info("Logout and prepare to join conf anonymously.");
+                            //Application.Current.Dispatcher.InvokeAsync(() => {
+                                CloseMessageTip();
+                                LoginManager.Instance.Logout();
+                            //});
+                        }
+                        else
+                        {
+                            Utils.SetAnonymousJoinConfServerAddress("");
+                            Utils.SetAnonymousJoinConfId("");
+                            Utils.SetAnonymousJoinConfPassword("");
+                            log.Info("Dial out to conf.");
+                            //Application.Current.Dispatcher.InvokeAsync(() => {
+                                CloseMessageTip();
+                                CallController.Instance.JoinConference(joinConfId, "", joinConfPassword);
+                            //});
+                        }
                     }
                     else
                     {
-                        Utils.SetAnonymousJoinConfServerAddress("");
-                        Utils.SetAnonymousJoinConfId("");
-                        Utils.SetAnonymousJoinConfPassword("");
-                        log.Info("Dial out to conf.");
-                        Application.Current.Dispatcher.InvokeAsync(() => {
-                            CloseMessageTip();
-                            CallController.Instance.JoinConference(joinConfId, "", joinConfPassword);
-                        });
+                        log.Info("In calling and do not dial out.");
                     }
                 }
-                else
+                else if (LoginStatus.NotLogin == status || LoginStatus.LoginFailed == status)
                 {
-                    log.Info("In calling and do not dial out.");
+                    log.Info("Not login and need anonymous join conf");
+                    //Application.Current.Dispatcher.InvokeAsync(() => {
+                        CloseMessageTip();
+                        //LoginManager.Instance.ServiceType = Utils.ServiceTypeEnum.Enterprise;
+                        //LoginManager.Instance.LoginProgress = LoginProgressEnum.EnterpriseJoinConf;
+                        LoginManager.Instance.ServiceType = Utils.ServiceTypeEnum.None;
+                        LoginManager.Instance.LoginProgress = LoginProgressEnum.Idle;
+                        LoginManager.Instance.IsNeedAnonymousJoinConf = true;
+                    //});
                 }
-            }
-            else if (LoginStatus.NotLogin == status || LoginStatus.LoginFailed == status)
-            {
-                log.Info("Not login and need anonymous join conf");
-                Application.Current.Dispatcher.InvokeAsync(() => {
-                    CloseMessageTip();
-                    //LoginManager.Instance.ServiceType = Utils.ServiceTypeEnum.Enterprise;
-                    //LoginManager.Instance.LoginProgress = LoginProgressEnum.EnterpriseJoinConf;
-                    LoginManager.Instance.ServiceType = Utils.ServiceTypeEnum.None;
-                    LoginManager.Instance.LoginProgress = LoginProgressEnum.Idle;
-                    LoginManager.Instance.IsNeedAnonymousJoinConf = true;
-                });
-            }
+            });
         }
 
         // close message tip to avoid the modal dialog prevent some oprations such as the opration of video bar can not be displayed 
