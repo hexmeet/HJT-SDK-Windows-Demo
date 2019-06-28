@@ -101,7 +101,7 @@ namespace EasyVideoWin.View
         private System.Windows.Point _moveStartPoint;
         private bool _moveDetected;
 
-        private Rect _mainWindowRect;
+        private Rect _videoPeopleWindowRect;
 
         private bool _disableChangeLayout = false;
         private IndependentActiveWindowType _independentActiveWindow;
@@ -155,7 +155,7 @@ namespace EasyVideoWin.View
             InitializeComponent();
 
             VideoPeopleWindow.Instance.TitleBarWindowMove += OnTitleBarWindowMove;
-            VideoPeopleWindow.Instance.StateChanged += new EventHandler(OnMainWindowStateChanged);
+            VideoPeopleWindow.Instance.StateChanged += new EventHandler(OnVideoPeopleWindowStateChanged);
             VideoPeopleWindow.Instance.PropertyChanged += VideoPeopleWindow_PropertyChanged;
             this.SourceInitialized += LayoutBackgroundWindow_SourceInitialized;
             
@@ -321,6 +321,7 @@ namespace EasyVideoWin.View
             _normalCellsSection.DpiChanged += NormalCellsSection_DpiChanged;
             _normalCellsSection.MouseMove += NormalCellsSection_MouseEnter;
             _normalCellsSection.MouseLeave += NormalCellsSection_MouseLeave;
+            log.InfoFormat("_normalCellsSection, IsWindowHidden: {0}, left: {1}, top: {2}", _normalCellsSection.IsWindowHidden, _normalCellsSection.Left, _normalCellsSection.Top);
             
             _titlebar.Owner = _messageOverlayWindow;
             _layoutOperationbar.Owner = _messageOverlayWindow;
@@ -332,44 +333,44 @@ namespace EasyVideoWin.View
         public void ShowWindow(bool bFirst = false, bool isDpiChanged = false)
         {
             log.InfoFormat("Show window, isFirst:{0}, isDpiChanged:{1}", bFirst, isDpiChanged);
-            _mainWindowRect = VideoPeopleWindow.Instance.GetWindowRect();
+            _videoPeopleWindowRect = VideoPeopleWindow.Instance.GetWindowRect();
             
             double height = 0;
             double width = 0;
             double top = 0;
             double left = 0;
-            if ((_mainWindowRect.Width / (_mainWindowRect.Height - VideoPeopleWindow.Instance.TitlebarHeight)) > (16.0 / 9.0))
+            if ((_videoPeopleWindowRect.Width / (_videoPeopleWindowRect.Height - VideoPeopleWindow.Instance.TitlebarHeight)) > (16.0 / 9.0))
             {
-                height = _mainWindowRect.Height - VideoPeopleWindow.Instance.TitlebarHeight;
+                height = _videoPeopleWindowRect.Height - VideoPeopleWindow.Instance.TitlebarHeight;
                 width = height * 16.0 / 9.0;
             }
             else
             {
-                width = _mainWindowRect.Width;
+                width = _videoPeopleWindowRect.Width;
                 height = width * 9.0 / 16.0;
             }
 
             if (WindowState.Maximized == VideoPeopleWindow.Instance.WindowState && VideoPeopleWindow.Instance.FullScreenStatus)
             {
-                if ((_mainWindowRect.Width / _mainWindowRect.Height) > (16.0 / 9.0))
+                if ((_videoPeopleWindowRect.Width / _videoPeopleWindowRect.Height) > (16.0 / 9.0))
                 {
-                    height = _mainWindowRect.Height;
+                    height = _videoPeopleWindowRect.Height;
                     width = height * 16.0 / 9.0;
                 }
                 else
                 {
-                    width = _mainWindowRect.Width;
+                    width = _videoPeopleWindowRect.Width;
                     height = width * 9.0 / 16.0;
                 }
-                top += _mainWindowRect.Top + (_mainWindowRect.Height - height) / 2;
+                top += _videoPeopleWindowRect.Top + (_videoPeopleWindowRect.Height - height) / 2;
             }
             else
             {
-                top = _mainWindowRect.Top + VideoPeopleWindow.Instance.TitlebarHeight;
-                top += (_mainWindowRect.Height - VideoPeopleWindow.Instance.TitlebarHeight - height) / 2;
+                top = _videoPeopleWindowRect.Top + VideoPeopleWindow.Instance.TitlebarHeight;
+                top += (_videoPeopleWindowRect.Height - VideoPeopleWindow.Instance.TitlebarHeight - height) / 2;
             }
 
-            left = _mainWindowRect.Left + (_mainWindowRect.Width - width) / 2;
+            left = _videoPeopleWindowRect.Left + (_videoPeopleWindowRect.Width - width) / 2;
             this.Width = width;
             this.Height = height;
             this.Left = left;
@@ -654,14 +655,14 @@ namespace EasyVideoWin.View
             ShowWindow(false, true);
         }
         
-        private void OnMainWindowStateChanged(object sender, EventArgs e)
+        private void OnVideoPeopleWindowStateChanged(object sender, EventArgs e)
         {
             if (CallStatus.Connected != CallController.Instance.CurrentCallStatus)
             {
                 return;
             }
 
-            log.InfoFormat("Received main window state changed, state:{0}, call status:{1}", VideoPeopleWindow.Instance.WindowState, CallController.Instance.CurrentCallStatus);
+            log.InfoFormat("Received video people window state changed, state:{0}, call status:{1}", VideoPeopleWindow.Instance.WindowState, CallController.Instance.CurrentCallStatus);
 
             switch (VideoPeopleWindow.Instance.WindowState)
             {
@@ -1460,19 +1461,36 @@ namespace EasyVideoWin.View
             return _normalCellsSection.Width / (SMALL_VIDEO_WINDOW_WIDTH + CELL_BORDER_LENGTH * 2);
         }
 
+        private void HideLayoutCell(LayoutCellWindow cell)
+        {
+            cell.MouseEnter -= LayoutCell_MouseEnter;
+            cell.MouseLeave -= LayoutCell_MouseLeave;
+            cell.Operationbar.MouseEnter -= LayoutCell_MouseEnter;
+            cell.Operationbar.MouseLeave -= LayoutCell_MouseLeave;
+            cell.Operationbar.HideWindow();
+            cell.HideWindow();
+        }
+
         private void ShowNormalCells()
         {
             if (null == _layoutNormalCells)
             {
                 return;
             }
-            log.Info("Show normal cells");
+            log.InfoFormat("Show normal cells, _showNormalCellsSection: {0}", _showNormalCellsSection);
             if (!_showNormalCellsSection)
             {
-                for (var i=0; i< _layoutNormalCells.Length; ++i)
+                HideLayoutCell(_localVideoCell);
+
+                if (_isSpeakerMode)
                 {
-                    _layoutNormalCells[i].HideWindow();
+                    for (int i = 1; i < _layoutCells.Length; ++i)
+                    {
+                        var cell = _layoutCells[i];
+                        HideLayoutCell(cell);
+                    }
                 }
+
                 return;
             }
 
@@ -1516,13 +1534,13 @@ namespace EasyVideoWin.View
                 _showNormalCellsNavigateDown = false;
             }
             
-            log.Info("Set proper size of normal cells section.");
             double width = (SMALL_VIDEO_WINDOW_WIDTH + CELL_BORDER_LENGTH * 2) * ratio;
             height += (NORMAL_CELLS_SECTION_BAR_HEIGHT * 2 + SMALL_VIDEO_WINDOW_HEIGHT * showCount + CELL_BORDER_LENGTH * (showCount + 1)) * ratio;
             _normalCellsSection.SetProperWindowSize(width, height);
             _normalCellsSection.Owner = _layoutOperationbar;
             _normalCellsSection.ShowWindow();
-            
+            log.InfoFormat("_normalCellsSection position, left: {0}, top: {1}, ratio: {2}", _normalCellsSection.Left, _normalCellsSection.Top, ratio);
+
             if (!HasActiveWindow())
             {
                 log.Info("Set normal cells section to top");
@@ -1549,14 +1567,17 @@ namespace EasyVideoWin.View
                 height = SMALL_VIDEO_WINDOW_HEIGHT * ratio;
                 double left = _normalCellsSection.Left + CELL_BORDER_LENGTH * ratio;
                 double top = _normalCellsSection.Top + (SMALL_VIDEO_WINDOW_HEIGHT + CELL_BORDER_LENGTH) * ratio * i + (CELL_BORDER_LENGTH + NORMAL_CELLS_SECTION_BAR_HEIGHT) * ratio; //_normalCellsSection.Top + SMALL_VIDEO_WINDOW_HEIGHT * ratio * i + (i + 1) * 2 * ratio;
-                if (cell.SetProperWindowPos(left, top, width, height))
+                log.InfoFormat("Prepare to set cell position, name={0}, set to: left={1}, top={2}, current: left={3}, top={4}", cell.CellName, left, top, cell.Left, cell.Top);
+                // force update the cell position in gallery mode for maybe the position of cell is not correct when change the position fo normal cell section and change window state from max to normal
+                if (cell.SetProperWindowPos(left, top, width, height, !_isSpeakerMode))
                 {
-                    log.InfoFormat("Set normal cell position, name:{0}, left:{1}, top:{2}, width:{3}, height:{4}", cell.CellName, left, top, width, height);
+                    log.InfoFormat("Set normal cell position, name: {0}, left:{1}, top:{2}, width:{3}, height:{4}", cell.CellName, left, top, width, height);
                 }
                 else
                 {
                     log.InfoFormat("The position of cell is not changed, cell name={0}", cell.CellName);
                 }
+                
                 if (!_autoHidePartyName)
                 {
                     ShowLayoutCellOperationbar(cell, true);
@@ -1582,12 +1603,7 @@ namespace EasyVideoWin.View
                     var cell = _layoutCells[i];
                     if (!usedSites.ContainsKey(cell))
                     {
-                        cell.MouseEnter -= LayoutCell_MouseEnter;
-                        cell.MouseLeave -= LayoutCell_MouseLeave;
-                        cell.Operationbar.MouseEnter -= LayoutCell_MouseEnter;
-                        cell.Operationbar.MouseLeave -= LayoutCell_MouseLeave;
-                        cell.Operationbar.HideWindow();
-                        cell.HideWindow();
+                        HideLayoutCell(cell);
                     }
                 }
             }
@@ -1731,7 +1747,7 @@ namespace EasyVideoWin.View
                     log.InfoFormat("Site device_id: {0}, name: {1}, mic_muted: {2}", LayoutIndication.sites[i].device_id, LayoutIndication.sites[i].name, LayoutIndication.sites[i].mic_muted);
                 }
 
-                _isSpeakerMode = ManagedEVSdk.Structs.EV_LAYOUT_MODE_CLI.EV_LAYOUT_GALLERY_MODE != layoutIndication.setting_mode;
+                _isSpeakerMode = ManagedEVSdk.Structs.EV_LAYOUT_MODE_CLI.EV_LAYOUT_GALLERY_MODE != layoutIndication.mode;
                 _layoutOperationbar.IsSpeakerMode = _isSpeakerMode;
                 _speakerBorder.Visibility = Visibility.Collapsed;
 
@@ -1831,8 +1847,8 @@ namespace EasyVideoWin.View
             this.Left += x;
             this.Top += y;
 
-            _mainWindowRect = VideoPeopleWindow.Instance.GetWindowRect();
-            double left = _mainWindowRect.Left + (_mainWindowRect.Width - this.Width) / 2;
+            _videoPeopleWindowRect = VideoPeopleWindow.Instance.GetWindowRect();
+            double left = _videoPeopleWindowRect.Left + (_videoPeopleWindowRect.Width - this.Width) / 2;
             if (left != this.Left)
             {
                 log.InfoFormat("The left is not fit to the main window and need to adjust it. Fixed left:{0}, current left:{1}", left, this.Left);
@@ -1845,16 +1861,16 @@ namespace EasyVideoWin.View
                 case WindowState.Maximized:
                     if (VideoPeopleWindow.Instance.FullScreenStatus)
                     {
-                        top = _mainWindowRect.Top;
+                        top = _videoPeopleWindowRect.Top;
                     }
                     else
                     {
-                        top = _mainWindowRect.Top + VideoPeopleWindow.Instance.TitlebarHeight;
+                        top = _videoPeopleWindowRect.Top + VideoPeopleWindow.Instance.TitlebarHeight;
                     }
 
                     break;
                 case WindowState.Normal:
-                    top = _mainWindowRect.Top + VideoPeopleWindow.Instance.TitlebarHeight;
+                    top = _videoPeopleWindowRect.Top + VideoPeopleWindow.Instance.TitlebarHeight;
                     break;
                 default:
                     break;

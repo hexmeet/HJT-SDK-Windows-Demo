@@ -417,7 +417,7 @@ namespace EasyVideoWin.Helpers
 
         public static void CenterWindowOnMasterWindowScreen(Window window, IMasterDisplayWindow masterWindow)
         {
-            log.Info("Center window on master window screen");
+            log.InfoFormat("Center window on master window screen, window: widht={0}, height={1}", window.Width, window.Height);
             if (null == masterWindow)
             {
                 log.Info("Master window is null and can not center window");
@@ -449,16 +449,22 @@ namespace EasyVideoWin.Helpers
 
             if (screen.DeviceName.Equals(System.Windows.Forms.Screen.PrimaryScreen.DeviceName))
             {
-                log.Info("Set window on primary screen");
+                log.InfoFormat("Set window on primary screen, screen: left={0}, top: {1}, width: {2}, height: {3}, ratio: {4}"
+                    , screen.Bounds.Left, screen.Bounds.Top, screen.Bounds.Width, screen.Bounds.Height, currentRatio
+                );
                 window.Left = (screen.Bounds.Left / currentRatio + (screen.Bounds.Width / currentRatio - tempWidth) / 2);
                 window.Top = (screen.Bounds.Top / currentRatio + (screen.Bounds.Height / currentRatio - tempHeight) / 2);
             }
             else
             {
-                log.Info("Set window on extend screen");
+                log.InfoFormat("Set window on extend screen, screen: left={0}, top: {1}, width: {2}, height: {3}, ratio: {4}"
+                    , screen.Bounds.Left, screen.Bounds.Top, screen.Bounds.Width, screen.Bounds.Height, currentRatio
+                );
                 window.Left = (screen.Bounds.Left * currentRatio + (screen.Bounds.Width * currentRatio - tempWidth) / 2);
                 window.Top = (screen.Bounds.Top * currentRatio + (screen.Bounds.Height * currentRatio - tempHeight) / 2);
             }
+
+            log.InfoFormat("window is centered, left: {0}, top: {1}", window.Left, window.Top);
         }
     }
 }

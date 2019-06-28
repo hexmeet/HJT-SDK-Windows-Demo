@@ -468,7 +468,7 @@
     <sys:String x:Key="INVALID_USER">Invalid user.</sys:String>
     <sys:String x:Key="INVALID_MEETING_ID">Invalid Meeting ID</sys:String>
     <sys:String x:Key="GOT_IT">Got it</sys:String>
-    <sys:String x:Key="FAILED_PLAY_TEST_MUSIC_FOR_SPEAKER_OCCUPIED">Test music can not be played for the speaker may be occupied exclusively by other application.</sys:String>
+    <sys:String x:Key="FAILED_PLAY_TEST_MUSIC_FOR_SPEAKER_OCCUPIED">No loudspeaker detected, unable to play test music.</sys:String>
     <sys:String x:Key="SCREEN_SHOT">screen_shot</sys:String>
     <sys:String x:Key="PATH_PERMISSION_FOR_SNAP_PICTURE">Snapshot can't be saved to the specified path, please check if the path is existed or there is proper permission for the path.</sys:String>
     <sys:String x:Key="JOINING_MEETING">join the meeting {0}</sys:String>
