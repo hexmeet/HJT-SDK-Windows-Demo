@@ -140,7 +140,7 @@
                     <TextBlock Text="{DynamicResource DISABLE_PROMPT_DESCRIPTION}" Style="{DynamicResource GeneralCheckboxDescription}"/>
                     <CheckBox Content="{DynamicResource ENABLE_4X4_LAYOUT}" Margin="20,3,0,5" IsChecked="{Binding Enable4x4Layout}" FontSize="14" Foreground="#313131"/>
                     <TextBlock Text="{DynamicResource LAYOUT_4X4_DESCRIPTION}" Style="{DynamicResource GeneralCheckboxDescription}"/>
-
+                    <CheckBox Content="{DynamicResource SUPPORT_1080P}" Margin="20,3,0,5" IsChecked="{Binding Support1080P}" FontSize="14" Foreground="#313131"/>
                 </StackPanel>
             </Grid>
         </Grid>

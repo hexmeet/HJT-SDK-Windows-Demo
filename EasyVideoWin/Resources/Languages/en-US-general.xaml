@@ -266,8 +266,8 @@
     <sys:String x:Key="RESERVATION">Reservation</sys:String>
     <sys:String x:Key="MY_CONFERENCE">My Meetings</sys:String>
     <sys:String x:Key="CONFERENCE_MANAGEMENT">Management</sys:String>
-    <sys:String x:Key="CHAIRMAN_MUTE_ENDPOINT_INFO">You have been muted by the meeting manager</sys:String>
-    <sys:String x:Key="CHAIRMAN_UNMUTE_ENDPOINT_INFO">You have been unmuted by the meeting host</sys:String>
+    <sys:String x:Key="CHAIRMAN_MUTE_ENDPOINT_INFO">You have been muted by the meeting manager.</sys:String>
+    <sys:String x:Key="CHAIRMAN_UNMUTE_ENDPOINT_INFO">You have been unmuted by the meeting manager.</sys:String>
     <sys:String x:Key="CONFERENCE_NEED_PASSWORD">Please input the meeting password.</sys:String>
     <sys:String x:Key="NAME_DISPLAYED_IN_CONF_MAX_LENGTH">The length of username can not exceed 16.</sys:String>
     <sys:String x:Key="NAME_DISPLAYED_IN_CONF_INCORRECT_PROMPT">The username can not contain &quot;, &lt;, &gt;.</sys:String>
@@ -400,7 +400,7 @@
     <sys:String x:Key="INVALID_ENDPOINT">Invalid endpoint.</sys:String>
     <sys:String x:Key="SERVER_UNLICENSED">The called cloud platform is not activated.</sys:String>
     <sys:String x:Key="SERVER_LICENSE_EXPIRED">License expired.</sys:String>
-    <sys:String x:Key="NEITHER_TEMPLATE_NOR_ONGOING_NOR_BINDED_ROOM">Invalid call number.</sys:String>
+    <sys:String x:Key="NEITHER_TEMPLATE_NOR_ONGOING_NOR_BINDED_ROOM">Invalid meeting ID or meeting has not started yet, please double check.</sys:String>
     <sys:String x:Key="LOCK_TIMEOUT">Call timeout.</sys:String>
     <sys:String x:Key="TEMPLATE_CONF_WITHOUT_CONFROOM">There is no meeting room bound to the called groupd.</sys:String>
     <sys:String x:Key="ROOM_EXPIRED">Meeting room expired.</sys:String>
@@ -481,4 +481,5 @@
     <sys:String x:Key="CONF_MANAGEMENT">Meeting Management</sys:String>
     <sys:String x:Key="DISABLE_PROMPT">Disable prompt</sys:String>
     <sys:String x:Key="DISABLE_PROMPT_DESCRIPTION">If checked, prompt information such as network status is not popup after joining conference.</sys:String>
+    <sys:String x:Key="SUPPORT_1080P">Support 1080P</sys:String>
 </ResourceDictionary>

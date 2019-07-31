@@ -481,4 +481,5 @@
     <sys:String x:Key="CONF_MANAGEMENT">会议管理</sys:String>
     <sys:String x:Key="DISABLE_PROMPT">关闭提示</sys:String>
     <sys:String x:Key="DISABLE_PROMPT_DESCRIPTION">勾选后，进入会议后，网络状况等提示信息将不再提示</sys:String>
+    <sys:String x:Key="SUPPORT_1080P">支持 1080P</sys:String>
 </ResourceDictionary>

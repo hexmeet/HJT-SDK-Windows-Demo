@@ -170,7 +170,7 @@ namespace EasyVideoWin.ViewModel
                 }
                 else if (LoginStatus.NotLogin == LoginManager.Instance.CurrentLoginStatus)
                 {
-                    // destruct confrence view object to relase the browser
+                    // destruct confrence view object to release the browser
                     Application.Current.Dispatcher.InvokeAsync(() => {
                         if (null != _conferenceView)
                         {

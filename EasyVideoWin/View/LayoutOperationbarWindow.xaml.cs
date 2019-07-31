@@ -391,7 +391,7 @@ namespace EasyVideoWin.View
 
         private void Browser_IsBrowserInitializedChanged(object sender, IsBrowserInitializedChangedEventArgs e)
         {
-            log.InfoFormat("Content white board browser initialized changed: {0}", e.IsBrowserInitialized);
+            log.InfoFormat("Content white board browser initialized changed to: {0}", e.IsBrowserInitialized);
             if (e.IsBrowserInitialized)
             {
                 LoadWhiteBoard();
@@ -1103,6 +1103,7 @@ namespace EasyVideoWin.View
             }
             
             Application.Current.Dispatcher.InvokeAsync(() => {
+                log.Info("Begin to handle EventWhiteBoardIndication in UI thread");
                 CloudApiManager.Instance.DoradoZoneAddress = whiteBoardInfo.authServer;
                 CloudApiManager.Instance.AcsServerAddress = whiteBoardInfo.server;
                 AcsServerAddress = whiteBoardInfo.server;
@@ -1113,19 +1114,32 @@ namespace EasyVideoWin.View
 
         private void ReInitWhiteBoard()
         {
-            Application.Current.Dispatcher.InvokeAsync(() => {
-                if (null != _contentWhiteboard)
-                {
-                    log.Info("Content white board has been constructed! Maybe the request arrived during conference ongoing for re-register.");
-                    return;
-                }
+            if (null != _contentWhiteboard)
+            {
+                log.Info("Content white board has been constructed! Maybe the request arrived during conference ongoing for re-register.");
+                return;
+            }
 
-                CreateWhiteboard();
-            });
+            CreateWhiteboard();
+            log.InfoFormat("_contentWhiteboard.IsActive: {0}, this.IsActive: {1}, LayoutBackgroundWindow.Instance.IsActive: {2}", _contentWhiteboard.IsActive, this.IsActive, LayoutBackgroundWindow.Instance.IsActive);
         }
 
         private void LoadWhiteBoard()
         {
+            log.Info("LoadWhiteBoard");
+            Application.Current.Dispatcher.InvokeAsync(() => {
+                // workaround: active VideoPeopleWindow. the VideoPeopleWindow is not active in the following case:
+                // 1. join conf with mic muted, 2. speak to show mute prompt, 3. when prompt disapeared, the VideoPeopleWindow is not acivated and show back
+                // note: if not load whiteboard, this issue is not occurred.
+                if (!VideoPeopleWindow.Instance.IsActive)
+                {
+                    VideoPeopleWindow.Instance.Activate();
+                    VideoPeopleWindow.Instance.Topmost = true;
+                    VideoPeopleWindow.Instance.Topmost = false;
+                    VideoPeopleWindow.Instance.Focus();
+                }
+            });
+
             CancelLoadWhiteBoardWindowWorker();
 
             _loadWhiteBoardWindowWorker = new BackgroundWorker();
@@ -1154,7 +1168,13 @@ namespace EasyVideoWin.View
                 }
                 
                 Application.Current.Dispatcher.InvokeAsync(() => {
-                    log.Info("Begin to load white board url.");
+                    // check _contentWhiteboard again in UI thread to avoid the object is released
+                    if (null == _contentWhiteboard)
+                    {
+                        log.Info("_contentWhiteboard is null, don't load the white board");
+                        return;
+                    }
+                    log.InfoFormat("Begin to load white board url., _contentWhiteboard.IsActive: {0}", _contentWhiteboard.IsActive);
                     // real deploy we use nginx or SLB as reverse proxy port as 80, so could be skip it here.
                     if (CallController.Instance.acsInfo != null)
                     {
@@ -1203,7 +1223,7 @@ namespace EasyVideoWin.View
                     _contentWhiteboard.Browser.Load(_whiteboardUrl);
                     _contentWhiteboard.getJwtParam();
                     StartCheckWhiteBoardConnectionTimer();
-                    log.Info("Load white board url end.");
+                    log.InfoFormat("Load white board url end. _contentWhiteboard.IsActive: {0}", _contentWhiteboard.IsActive);
                 });
 
                 log.Info("Load white board worker completed end.");

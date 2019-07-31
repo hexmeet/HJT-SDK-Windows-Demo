@@ -238,6 +238,18 @@ namespace EasyVideoWin.ViewModel
             }
         }
 
+        public bool Support1080P
+        {
+            get
+            {
+                return EVSdkManager.Instance.HDEnabled();
+            }
+            set
+            {
+                EVSdkManager.Instance.EnableHD(value);
+            }
+        }
+
         #endregion
 
         #region -- Constructor --

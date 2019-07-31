@@ -1,5 +1,6 @@
 ﻿using EasyVideoWin.CustomControls;
 using EasyVideoWin.Helpers;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,11 +23,19 @@ namespace EasyVideoWin.View
     /// </summary>
     public partial class LayoutCellOperationbarWindow : CustomShowHideBaseWindow, INotifyPropertyChanged
     {
+        #region -- Members --
+
+        private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        private const double CELL_NAME_ADJUT_HEIGHT_TO_WIN = 13;
+
+        #endregion
+
         #region -- Constructor --
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private const int INITIAL_HEIGHT = 35;
+        private const int INITIAL_HEIGHT = 27;
         private Visibility _micMutedVisibility;
         private bool _isMicMuted;
 
@@ -43,6 +52,7 @@ namespace EasyVideoWin.View
             set
             {
                 this.cellName.Text = value;
+                this.cellName.Width = double.NaN;
             }
         }
 
@@ -94,6 +104,9 @@ namespace EasyVideoWin.View
 
             this.Height = INITIAL_HEIGHT;
             this.Loaded += LayoutCellOperationbarWindow_Loaded;
+
+            this.SizeChanged += LayoutCellOperationbarWindow_SizeChanged;
+            this.cellName.SizeChanged += CellName_SizeChanged;
         }
         
         #endregion
@@ -122,6 +135,47 @@ namespace EasyVideoWin.View
         private void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void CellName_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            log.InfoFormat("CellName_SizeChanged, CellName: {0}, width: {1}, actualWidth: {2}, win width: {3}, win actualWidth: {4}"
+                , cellName.Text
+                , cellName.Width
+                , cellName.ActualWidth
+                , this.Width
+                , this.ActualWidth
+            );
+
+            AdjustCellNameWidth();
+        }
+
+        private void LayoutCellOperationbarWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            log.InfoFormat("LayoutCellOperationbarWindow_SizeChanged, CellName: {0}, width: {1}, actualWidth: {2}, win width: {3}, win actualWidth: {4}"
+                , cellName.Text
+                , cellName.Width
+                , cellName.ActualWidth
+                , this.Width
+                , this.ActualWidth
+            );
+
+            double width = this.ActualWidth - CELL_NAME_ADJUT_HEIGHT_TO_WIN;
+            if (cellName.ActualWidth < width && width > 0)
+            {
+                cellName.Width = double.NaN;
+            }
+
+            AdjustCellNameWidth();
+        }
+
+        private void AdjustCellNameWidth()
+        {
+            double width = this.ActualWidth - CELL_NAME_ADJUT_HEIGHT_TO_WIN;
+            if (this.cellName.ActualWidth > width && width > 0)
+            {
+                this.cellName.Width = width;
+            }
         }
 
         #endregion

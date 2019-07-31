@@ -172,8 +172,12 @@ namespace EasyVideoWin.View
 
             _layoutOperationbar.EventInitScreen += LayoutOperationbar_EventInitScreen;
             _layoutOperationbar.EventRequestSpeaker += LayoutOperationbar_EventRequestSpeaker;
+
+            this.Activated += LayoutBackgroundWindow_Activated;
+            this.Deactivated += LayoutBackgroundWindow_Deactivated;
         }
         
+
         #endregion
 
         #region -- Public Methods --
@@ -835,7 +839,7 @@ namespace EasyVideoWin.View
         {
             double left = cell.Left;
             double top = 0;
-            double width = cell.Width;
+            double width = cell.Width - 3;
             double height = cell.Operationbar.InitialHeight;
             int cellBottom = (int)(cell.Top + cell.Height);
             // maybe cellBottom is only larger than (_layoutOperationbar.Top + _layoutOperationbar.Height) 0.xx, so convert to int 
@@ -1249,6 +1253,11 @@ namespace EasyVideoWin.View
                     _layoutCells[i].Operationbar.HideWindow();
                 }
             }
+
+            if (!_localVideoCell.Operationbar.IsMicMuted)
+            {
+                _localVideoCell.Operationbar.HideWindow();
+            }
         }
 
         private void LayoutCell_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -1287,7 +1296,8 @@ namespace EasyVideoWin.View
                 if (item.Value == cell)
                 {
                     _isFocusVideoMode = true;
-                    _cancelFocusVideoWindow.Owner = this._speakerModeMainCell;
+                    // put _cancelFocusVideoWindow above _messageOverlayWindow to make sure to operate the _cancelFocusVideoWindow
+                    _cancelFocusVideoWindow.Owner = _messageOverlayWindow; // this._speakerModeMainCell;
                     SetCancelFocusVideoWindow2ProperPos();
                     SvcSetLayout(ManagedEVSdk.Structs.EV_LAYOUT_PAGE_CLI.EV_LAYOUT_CURRENT_PAGE, _isSpeakerMode, item.Key);
                     break;
@@ -1608,7 +1618,10 @@ namespace EasyVideoWin.View
                 }
             }
 
-            ShowLayoutCellOperationbar(_localVideoCell, true);
+            if (_localVideoCell.Operationbar.IsMicMuted)
+            {
+                ShowLayoutCellOperationbar(_localVideoCell, true);
+            }
             log.Info("Show normal cells end.");
         }
         
@@ -1761,7 +1774,7 @@ namespace EasyVideoWin.View
                 }
 
                 OnDisableLayoutChanged(!LayoutIndication.mode_settable);
-                log.Info("Handle Layout indication end");
+                log.InfoFormat("Handle Layout indication end, IsActive: {0}", this.IsActive);
             });
             log.Info("EventLayoutIndication end");
         }
@@ -2149,6 +2162,7 @@ namespace EasyVideoWin.View
 
         private void ShowPromptWindow(string promptContent, int duration)
         {
+            log.Info("ShowPromptWindow");
             if (WindowState.Minimized == VideoPeopleWindow.Instance.WindowState)
             {
                 log.Info("Do not show prompt window for video people window is minimized.");
@@ -2204,10 +2218,10 @@ namespace EasyVideoWin.View
             }
             else
             {
-                log.Info("VideoPeopleWindow as owner of prompt window.");
+                log.InfoFormat("VideoPeopleWindow as owner of prompt window. this.IsActive: {0}", this.IsActive);
                 masterWin = VideoPeopleWindow.Instance;
                 promptWindow.Owner = _layoutOperationbar;
-                if (VideoPeopleWindow.Instance.IsActive)
+                if (VideoPeopleWindow.Instance.IsActive || this.IsActive)
                 {
                     log.Info("VideoPeopleWindow is activated.");
                     activeWin = VideoPeopleWindow.Instance;
@@ -2697,8 +2711,22 @@ namespace EasyVideoWin.View
             {
                 Application.Current.Dispatcher.InvokeAsync(() => {
                     _localVideoCell.Operationbar.IsMicMuted = _layoutOperationbar.IsAudioMuted;
+                    if (_localVideoCell.Operationbar.IsMicMuted)
+                    {
+                        _localVideoCell.Operationbar.ShowWindow();
+                    }
                 });
             }
+        }
+
+        private void LayoutBackgroundWindow_Deactivated(object sender, EventArgs e)
+        {
+            log.InfoFormat("LayoutBackgroundWindow_Deactivated, IsActive: {0}", this.IsActive);
+        }
+
+        private void LayoutBackgroundWindow_Activated(object sender, EventArgs e)
+        {
+            log.InfoFormat("LayoutBackgroundWindow_Activated, IsActive: {0}", this.IsActive);
         }
 
         public Window GetWindow()

@@ -589,7 +589,9 @@
     <Compile Include="ViewModel\MediaStatisticsViewModel.cs" />
     <Compile Include="ViewModel\MicrophoneViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
-    <Compile Include="View\AboutView.xaml.cs" />
+    <Compile Include="View\AboutView.xaml.cs">
+      <DependentUpon>AboutView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\AudioDeviceSelectorWindow.xaml.cs">
       <DependentUpon>AudioDeviceSelectorWindow.xaml</DependentUpon>
     </Compile>
@@ -607,6 +609,12 @@
     </Compile>
     <Compile Include="View\CameraSelectorView.xaml.cs">
       <DependentUpon>CameraSelectorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\GeneralView.xaml.cs">
+      <DependentUpon>GeneralView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SettingView.xaml.cs">
+      <DependentUpon>SettingView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\SettingWindow.xaml.cs">
       <DependentUpon>SettingWindow.xaml</DependentUpon>
@@ -653,7 +661,6 @@
     <Compile Include="View\VideoSettingView.xaml.cs">
       <DependentUpon>VideoSettingView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\GeneralView.xaml.cs" />
     <Compile Include="View\LogoView.xaml.cs">
       <DependentUpon>LogoView.xaml</DependentUpon>
     </Compile>
@@ -735,7 +742,6 @@
     <Compile Include="View\SelectShareContentModeWindow.xaml.cs">
       <DependentUpon>SelectShareContentModeWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\SettingView.xaml.cs" />
     <Compile Include="View\SpeakingPrompt.xaml.cs">
       <DependentUpon>SpeakingPrompt.xaml</DependentUpon>
     </Compile>
@@ -912,8 +918,8 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\AboutView.xaml">
-      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\AudioDeviceSelectorWindow.xaml">
       <SubType>Designer</SubType>
@@ -936,6 +942,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\CameraSelectorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\GeneralView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\SettingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -996,10 +1010,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\VideoSettingView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="View\GeneralView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -1102,10 +1112,6 @@
     <Page Include="View\SelectShareContentModeWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\SettingView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="View\SpeakingPrompt.xaml">
       <SubType>Designer</SubType>

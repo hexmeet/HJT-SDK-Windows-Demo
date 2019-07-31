@@ -349,6 +349,16 @@ int EVSdkWrapper::EVEngineEnableHighFPS(bool enable)
     return m_pEVEngine->enableHighFPS(enable);
 }
 
+bool EVSdkWrapper::EVEngineHDEnabled()
+{
+    return m_pEVEngine->HDEnabled();
+}
+
+int EVSdkWrapper::EVEngineEnableHD(bool enable)
+{
+    return m_pEVEngine->enableHD(enable);
+}
+
 int EVSdkWrapper::EVEngineSetLayout(Structs::EVLayoutRequestCli^ layout)
 {
     ev::engine::EVLayoutRequest evLayoutRequest;
