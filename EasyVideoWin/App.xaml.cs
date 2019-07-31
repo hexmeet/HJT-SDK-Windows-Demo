@@ -408,7 +408,7 @@ namespace EasyVideoWin
         
         static App()
         {
-        //   DpiUtil.Load_DPI_Aware();
+           DpiUtil.Load_DPI_Aware();
         }
     }
 }

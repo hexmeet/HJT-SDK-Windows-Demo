@@ -263,6 +263,9 @@ public:
     std::string specifiedUpgradingServerAddress;
     uint64_t serverTime;
     std::string callNumber;
+    std::string appServerType;
+    std::string urlSuffixForMobile;
+    std::string urlSuffixForPC;
 };
 
 class EV_CLASS_API EVCallInfo {
@@ -374,6 +377,16 @@ public:
     virtual void onCallLogUpdated(EVCallLog & call_log) {
         (void)call_log;
     }
+
+    virtual void onVideoPreviewFrame(void * frame, int size) {
+        (void)frame;
+        (void)size;
+    }
+
+    virtual void onContentPreviewFrame(void * frame, int size) {
+        (void)frame;
+        (void)size;
+    }
 };
 
 class EV_CLASS_API IEVCommon {
@@ -403,6 +416,7 @@ public:
     virtual int enableMicMeter(bool enable) = 0;
     virtual float getMicVolume() = 0;
     virtual int setDeviceRotation(int rotation) = 0;
+    virtual int audioInterruption(int type) = 0;
 
     //Set Windows
     virtual int setLocalVideoWindow(void * id) = 0;
@@ -447,6 +461,7 @@ public:
     virtual int getStats(EVStats & stats) = 0; 
     virtual int getCallInfo(EVCallInfo & call_info) = 0;
     virtual int getContentInfo(EVContentInfo & content_info) = 0;
+    virtual int enablePreviewFrameCb(EV_STREAM_TYPE type, bool enable) = 0;
 
     //Send Content
     virtual int sendContent() = 0;

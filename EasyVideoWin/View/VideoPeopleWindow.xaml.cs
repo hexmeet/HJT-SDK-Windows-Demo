@@ -71,6 +71,8 @@ namespace EasyVideoWin.View
             
             this.IsVisibleChanged += VideoPeopleWindow_IsVisibleChanged;
             this.SizeChanged += VideoPeopleWindow_SizeChanged;
+            this.Activated += VideoPeopleWindow_Activated;
+            this.Deactivated += VideoPeopleWindow_Deactivated;
         }
         
         #endregion
@@ -179,6 +181,16 @@ namespace EasyVideoWin.View
         private void VideoPeopleWindow_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             log.InfoFormat("SizeChanged, new:{0}x{1}, previous:{2}x{3}", e.NewSize.Width, e.NewSize.Height, e.PreviousSize.Width, e.PreviousSize.Height);
+        }
+
+        private void VideoPeopleWindow_Activated(object sender, EventArgs e)
+        {
+            log.InfoFormat("VideoPeopleWindow_Activated, IsActive: {0}", IsActive);
+        }
+
+        private void VideoPeopleWindow_Deactivated(object sender, EventArgs e)
+        {
+            log.InfoFormat("VideoPeopleWindow_Deactivated, IsActive: {0}", IsActive);
         }
 
         #endregion

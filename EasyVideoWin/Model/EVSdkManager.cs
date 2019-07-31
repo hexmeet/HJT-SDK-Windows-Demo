@@ -594,21 +594,40 @@ namespace EasyVideoWin.Model
 
         public bool HighFPSEnabled()
         {
-            _log.Info("Get high fps enabled");
+            _log.Info("HighFPSEnabled");
             bool rst = this.EVSdkWrapper.EVEngineHighFPSEnabled();
-            _log.InfoFormat("High fps enabled:{0}", rst);
+            _log.InfoFormat("HighFPSEnabled: {0}", rst);
             return rst;
         }
 
         public void EnableHighFPS(bool enable)
         {
-            _log.InfoFormat("Enable high fps:{0}", enable);
+            _log.InfoFormat("EnableHighFPS: {0}", enable);
             int rst = this.EVSdkWrapper.EVEngineEnableHighFPS(enable);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to enable high fps, enable:{0}, result:{1}", enable, rst);
+                _log.InfoFormat("Failed to EnableHighFPS, enable:{0}, result:{1}", enable, rst);
             }
-            _log.Info("Done for enable high fps");
+            _log.Info("Done for EnableHighFPS");
+        }
+
+        public bool HDEnabled()
+        {
+            _log.Info("Get HDEnabled");
+            bool rst = this.EVSdkWrapper.EVEngineHDEnabled();
+            _log.InfoFormat("HDEnabled:{0}", rst);
+            return rst;
+        }
+
+        public void EnableHD(bool enable)
+        {
+            _log.InfoFormat("EnableHD:{0}", enable);
+            int rst = this.EVSdkWrapper.EVEngineEnableHD(enable);
+            if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
+            {
+                _log.InfoFormat("Failed to EnableHD, enable:{0}, result:{1}", enable, rst);
+            }
+            _log.Info("Done for EnableHD");
         }
 
         public void SetLayout(ManagedEVSdk.Structs.EVLayoutRequestCli layout)

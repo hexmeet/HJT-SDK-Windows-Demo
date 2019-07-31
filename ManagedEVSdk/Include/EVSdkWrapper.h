@@ -117,6 +117,8 @@ public:
     int EVEngineRequestRemoteUnmute(bool val);
     bool EVEngineHighFPSEnabled();
     int EVEngineEnableHighFPS(bool enable);
+    int EVEngineEnableHD(bool enable);
+    bool EVEngineHDEnabled();
     int EVEngineSetLayout(Structs::EVLayoutRequestCli^ layout);
     float EVEngineGetNetworkQuality();
     int EVEngineGetStats(Structs::EVStatsCli^ %stats);

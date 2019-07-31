@@ -11,6 +11,7 @@ using EasyVideoWin.CustomControls;
 using log4net;
 using Aliyun.OSS;
 using EasyVideoWin.Model;
+using System.Reflection;
 
 namespace EasyVideoWin.Helpers
 {
@@ -20,7 +21,6 @@ namespace EasyVideoWin.Helpers
         private string _appdatafolder = "";
 		private string _tempZipFileName = "";
         private string _onlyZipFileName = "";
-		public static string _destFileName = "HexMeetLogs";
 		public static string _sysInfoFileName = "SysInfo.txt";
 		public static string _collectorFolderName = "LogCollect";
 		public static string _logFilename = "HexMeet.log";
@@ -35,7 +35,27 @@ namespace EasyVideoWin.Helpers
 
 		public string MailContent { get; set; }
 
-		public LogFileCollector()
+        public string AssemblyTitle
+        {
+            get
+            {
+                // get all attribute title in the assembly
+                object[] attributes = Assembly.GetExecutingAssembly().GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
+                if (attributes.Length > 0)
+                {
+                    // get the first 
+                    AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute)attributes[0];
+                    if (!string.IsNullOrEmpty(titleAttribute.Title))
+                    {
+                        return titleAttribute.Title;
+                    }
+                }
+                // if there is no attribute title or the first title is empty, return the .exe name
+                return System.IO.Path.GetFileNameWithoutExtension(Assembly.GetExecutingAssembly().CodeBase);
+            }
+        }
+
+        public LogFileCollector()
 		{
 
 		}
@@ -264,9 +284,13 @@ namespace EasyVideoWin.Helpers
             {
                 user = "unlogined";
             }
-            string savedFilename = string.Format("{0}_{1}_{2}.zip", _destFileName,
-                        DateTime.Now.ToString("yyyyMMddHHmmss"), user);
-			zipfile.Save(Path.Combine(this._appdatafolder, savedFilename));
+            string savedFilename = string.Format(
+                "{0}Logs_{1}_{2}.zip"
+                , AssemblyTitle
+                , DateTime.Now.ToString("yyyyMMddHHmmss")
+                , user
+            );
+            zipfile.Save(Path.Combine(this._appdatafolder, savedFilename));
 			_tempZipFileName = Path.Combine(this._appdatafolder, savedFilename);
             _onlyZipFileName = savedFilename;
 

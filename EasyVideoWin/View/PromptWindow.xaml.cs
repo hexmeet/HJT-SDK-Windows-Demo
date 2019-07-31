@@ -123,8 +123,10 @@ namespace EasyVideoWin.View
                 //this.Top += (WindowDownRatio * ratio);
                 StartAutoCloseTimer(duration);
                 SetProperPosition();
+                log.InfoFormat("window IsActive: {0}, null != activeWindow: {1}", this.IsActive, null != activeWindow);
                 if (IsActive && null != activeWindow)
                 {
+                    log.Info("activeWindow, activate");
                     activeWindow.Activate();
                 }
             });
