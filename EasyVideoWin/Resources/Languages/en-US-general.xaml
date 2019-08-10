@@ -393,7 +393,7 @@
 
     <!-- Call error message -->
     <sys:String x:Key="SERVICE_EXCEPTION">Service exception.</sys:String>
-    <sys:String x:Key="INVALID_NUMERICID">Invalid numeric ID.</sys:String>
+    <sys:String x:Key="INVALID_NUMERICID">Invalid meeting ID.</sys:String>
     <sys:String x:Key="INVALID_USERNAME">Invalid username.</sys:String>
     <sys:String x:Key="INVALID_USERID">Invalid user ID.</sys:String>
     <sys:String x:Key="INVALID_DEVICEID">Invalid device ID.</sys:String>
@@ -466,7 +466,7 @@
     <sys:String x:Key="SEND_CONTENT_DENIED">The request for sending conent is denied due to lack of permission.</sys:String>
     <sys:String x:Key="NO_MICROPHONE">There is no microphone found and other can not listen to you. Please check microphone device.</sys:String>
     <sys:String x:Key="INVALID_USER">Invalid user.</sys:String>
-    <sys:String x:Key="INVALID_MEETING_ID">Invalid Meeting ID</sys:String>
+    <sys:String x:Key="INVALID_MEETING_ID">Invalid meeting ID.</sys:String>
     <sys:String x:Key="GOT_IT">Got it</sys:String>
     <sys:String x:Key="FAILED_PLAY_TEST_MUSIC_FOR_SPEAKER_OCCUPIED">No loudspeaker detected, unable to play test music.</sys:String>
     <sys:String x:Key="SCREEN_SHOT">screen_shot</sys:String>
@@ -482,4 +482,5 @@
     <sys:String x:Key="DISABLE_PROMPT">Disable prompt</sys:String>
     <sys:String x:Key="DISABLE_PROMPT_DESCRIPTION">If checked, prompt information such as network status is not popup after joining conference.</sys:String>
     <sys:String x:Key="SUPPORT_1080P">Support 1080P</sys:String>
+    <sys:String x:Key="NOT_AVAILABLE_FOR_ADMINISTRATORS">Administrator is not allowed to access app. Please use user account.</sys:String>
 </ResourceDictionary>
