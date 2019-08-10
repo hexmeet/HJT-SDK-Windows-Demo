@@ -108,6 +108,7 @@ namespace EasyVideoWin.ViewModel
             , {1104,    "NO_USERNAME"}
             , {1105,    "EMAIL_MISMATCH"}
             , {1106,    "COMPANY_ADMINISTRATOR_NOT_IN_ANY_COMPANY"}
+            , {1112,    "NOT_AVAILABLE_FOR_ADMINISTRATORS"}
             , {1200,    "FILE_UPLOAD_FAILED"}
             , {1201,    "INVALID_LICENSE"}
             , {1202,    "INVALID_IMPORT_USER_FILE"}

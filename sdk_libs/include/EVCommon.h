@@ -467,6 +467,8 @@ public:
     virtual int sendContent() = 0;
     virtual int sendWhiteBoard() = 0;
     virtual int stopContent() = 0;
+    virtual int enableContentAudio(bool enable) = 0;
+    virtual bool contentAudioEnabled() = 0;
 
     //Call Log
     virtual int setCallLogMaxSize(unsigned int num) = 0;
@@ -476,6 +478,10 @@ public:
     //Provision
     virtual int setProvision(const char * server, unsigned int port) = 0;
     virtual int clearProvision() = 0;
+
+    //Codec
+    virtual int enableHardDecoding(bool enable) = 0;
+    virtual bool hardDecodingEnabled() = 0;
 };
 
 }
