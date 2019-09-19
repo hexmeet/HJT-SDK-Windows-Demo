@@ -116,7 +116,7 @@ namespace EasyVideoWin.View
             InkCanvasCursorStatus = InkCanvasCursorEnum.PEN;
             _brushWin = new BrushSelectWindow();
             _backScreenWin = new BackScreenColorSelectWindow();
-            _controlToolBar = new ContentControlToolBarView();
+            _controlToolBar = new ContentControlToolBarView(false);
             _highlighterWin = new BrushHighlighterWindow();
             _whiteboardPopup = new ContentWhiteboardPopup();
             _whiteboardPopup.Background = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#01FFFFFF"));

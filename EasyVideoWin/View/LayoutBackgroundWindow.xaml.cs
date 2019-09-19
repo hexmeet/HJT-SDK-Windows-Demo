@@ -429,7 +429,7 @@ namespace EasyVideoWin.View
         
         public void HideWindow(bool isCallEnded = false)
         {
-            log.Info("Begin to hide windows related.");
+            log.InfoFormat("Begin to hide windows related. Visibility: {0}, WindowState: {1}", this.Visibility, this.WindowState);
 
             _cancelFocusVideoWindow.HideWindow();
             _recordingIndicationWindow.HideWindow();
@@ -454,7 +454,7 @@ namespace EasyVideoWin.View
             log.InfoFormat("Hide executed for layout background window, visibility:{0}", this.Visibility);
         }
         
-        private void OnCallEnded()
+        public void OnCallEnded()
         {
             log.InfoFormat("Call ended and set the controls to default. visibility:{0}", this.Visibility);
             // set to speaker mode and clear the layout cell to avoid to see the last frame when reconnect
@@ -644,8 +644,8 @@ namespace EasyVideoWin.View
                 }
 
                 // for unknown reason, the window changed to visible by system invoke
-                log.InfoFormat("For unknown reason, the window changed to visible by system invoke when not Connected or Streaming. Hide it. Stack info:{0}", info);
-                this.Hide();
+                log.InfoFormat("For unknown reason, the window changed to visible by system invoke when not Connected or Streaming. Stack info:{0}", info);
+                //this.Hide();
             }
         }
 
@@ -701,6 +701,7 @@ namespace EasyVideoWin.View
 
         private void LayoutBackgroundWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            log.InfoFormat("LayoutBackgroundWindow_MouseDown, _layoutOperationbar.IsWindowHidden: {0}", _layoutOperationbar.IsWindowHidden);
             if (_layoutOperationbar.IsWindowHidden)
             {
                 log.Info("LayoutBackgroundWindow_MouseDown, show layout operation bar.");
@@ -854,7 +855,8 @@ namespace EasyVideoWin.View
             }
             if (cell.Operationbar.SetProperWindowPos(left, top, width, height))
             {
-                log.Info("Set the cell operation bar to proper position");
+                log.InfoFormat("Set the cell operation bar to proper position, cell name: {0}, left: {1}, top: {2}, width: {3}, height: {4}"
+                    , cell.CellName, cell.Operationbar.Left, cell.Operationbar.Top, cell.Operationbar.Width, cell.Operationbar.Height);
             }
             else
             {
@@ -1488,6 +1490,14 @@ namespace EasyVideoWin.View
                 return;
             }
             log.InfoFormat("Show normal cells, _showNormalCellsSection: {0}", _showNormalCellsSection);
+
+            // remove the useless evnets
+            _localVideoCell.MouseLeftButtonDown -= LayoutCell_MouseLeftButtonDown;
+            for (int i = 0; i < _layoutCells.Length; ++i)
+            {
+                _layoutCells[i].MouseLeftButtonDown -= LayoutCell_MouseLeftButtonDown;
+            }
+
             if (!_showNormalCellsSection)
             {
                 HideLayoutCell(_localVideoCell);
@@ -1505,13 +1515,7 @@ namespace EasyVideoWin.View
             }
 
             double ratio = GetNormalCellsSectionRatio();
-            // remove the useless evnets
-            _localVideoCell.MouseLeftButtonDown -= LayoutCell_MouseLeftButtonDown;
-            for (int i = 0; i < _layoutCells.Length; ++i)
-            {
-                _layoutCells[i].MouseLeftButtonDown -= LayoutCell_MouseLeftButtonDown;
-            }
-
+            
             log.Info("Reset normal cells decoration borders.");
             _normalCellsSection.ResetDecorationBorders();
             

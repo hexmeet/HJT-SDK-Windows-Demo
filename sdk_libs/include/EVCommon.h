@@ -19,6 +19,13 @@
 #define EV_CLASS_API 
 #endif
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
 
 namespace ev {
 namespace common {
@@ -237,6 +244,24 @@ public:
     uint64_t startTime;
     uint64_t duration;
     bool isAudioOnly;
+};
+
+//////////////////////////////
+//  Call Log
+////////////////////////////// 
+
+class EV_CLASS_API EVSubtitle {
+public:
+    EVSubtitle() {
+        enable = FALSE;
+        enable_timestamp = FALSE;
+        content.clear();
+        fontFilePath.clear();
+    }
+    bool enable;
+    bool enable_timestamp;
+    std::string content;
+    std::string fontFilePath;
 };
 
 //////////////////////////////
@@ -462,6 +487,11 @@ public:
     virtual int getCallInfo(EVCallInfo & call_info) = 0;
     virtual int getContentInfo(EVContentInfo & content_info) = 0;
     virtual int enablePreviewFrameCb(EV_STREAM_TYPE type, bool enable) = 0;
+    virtual int setVideoActive(int active) = 0;
+    virtual int videoActive() = 0;
+    virtual int enableAdaptiveResolution(bool enable) = 0;
+    virtual bool adaptiveResolutionEnabled() = 0;
+    virtual int setSubtitle(EVSubtitle & subtitle) = 0;
 
     //Send Content
     virtual int sendContent() = 0;

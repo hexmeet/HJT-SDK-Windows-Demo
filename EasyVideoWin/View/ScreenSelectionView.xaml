@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
         xmlns:local="clr-namespace:EasyVideoWin.View"
         mc:Ignorable="d"
         Title="ScreenSelectionView" Height="250" Width="400" ShowInTaskbar="False"
@@ -23,7 +24,43 @@
             </Grid>
 
             <Grid x:Name="screenLine0" Grid.Row="1" Background="#f1f1f1">
-                <Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <StackPanel x:Name="screen00" Width="133" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Visibility="Collapsed"  MouseLeftButtonDown="camera1Check_Click">
+                        <Border x:Name="grid0" Width="128" Height="70" BorderBrush="#589bf9" BorderThickness="3" Background="#313131">
+                            <Image x:Name="screen0Img" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Image.Source>
+                                    <BitmapImage UriSource="pack://application:,,,/Resources/Icons/icon_screen.png"/>
+                                </Image.Source>
+                            </Image>
+                        </Border>
+                        <TextBlock Text ="{DynamicResource SCREEN1}" Foreground="#515151" FontSize="16px" HorizontalAlignment="Center"  VerticalAlignment="Center" Margin="0,6,0,6"/>
+                    </StackPanel>
+                    <StackPanel x:Name="screen01" Width="134" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Visibility="Collapsed" MouseLeftButtonDown="camera2Check_Click">
+                        <Border x:Name="grid1" Width="128" Height="70" BorderThickness="3">
+                            <Image x:Name="screen1Img" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Image.Source>
+                                    <BitmapImage UriSource="pack://application:,,,/Resources/Icons/icon_screen.png"/>
+                                </Image.Source>
+                            </Image>
+                        </Border>
+                        <TextBlock Text ="{DynamicResource SCREEN2}" Foreground="#515151" FontSize="16px" HorizontalAlignment="Center"  VerticalAlignment="Center" Margin="0,6,0,6"/>
+                    </StackPanel>
+                    <StackPanel x:Name="screen02" Width="133" Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Visibility="Collapsed" MouseLeftButtonDown="camera3Check_Click">
+                        <Border x:Name="grid2" Width="128" Height="70" BorderThickness="3">
+                            <Image x:Name="screen2Img" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Image.Source>
+                                    <BitmapImage UriSource="pack://application:,,,/Resources/Icons/icon_screen.png"/>
+                                </Image.Source>
+                            </Image>
+                        </Border>
+                        <TextBlock Text ="{DynamicResource SCREEN3}" Foreground="#515151" FontSize="16px" HorizontalAlignment="Center"  VerticalAlignment="Center" Margin="0,6,0,6"/>
+                    </StackPanel>
+                </StackPanel>
+                
+                <!--<Grid.ColumnDefinitions>
                     <ColumnDefinition Width="133"/>
                     <ColumnDefinition Width="134"/>
                     <ColumnDefinition Width="133"/>
@@ -63,11 +100,22 @@
                         </Border>
                         <TextBlock Text ="{DynamicResource SCREEN3}" Foreground="#515151" FontSize="16px" HorizontalAlignment="Center"  VerticalAlignment="Center" Margin="0,6,0,6"/>
                     </StackPanel>
-                </Grid>
+                </Grid>-->
             </Grid>
 
             <Grid x:Name="saveGrid" Grid.Row="2" Background="White">
-                <Button x:Name="SaveLoginBtn" Style="{StaticResource BtnRedLoneKey}" Content="{DynamicResource CONFIRM}" FontSize="14"  Height="31" Width="200"  Click="SaveBtn_Click"  />
+                <DockPanel HorizontalAlignment="Left">
+                    <CheckBox x:Name="ShareComputerSound" Content="{DynamicResource SHARE_COMPUTER_SOUND}" Margin="20,0,0,0" IsChecked="{Binding AutoLogin}" FontSize="14" Foreground="#313131" VerticalAlignment="Center" />
+                </DockPanel>
+                <DockPanel HorizontalAlignment="Right">
+                    <CustomControls:TextButton
+                            Style="{StaticResource ConfirmButton}"
+                            ButtonWidth="80"
+                            ButtonHeight="30"
+                            FontSize="14"
+                            Margin="0, 0, 20, 0"
+                            Click="SaveBtn_Click" />
+                </DockPanel>
             </Grid>
         </Grid>
     </Viewbox>

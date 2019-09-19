@@ -190,6 +190,7 @@ namespace EasyVideoWin.ViewModel
                 MediaStatisticsView.Instance = new MediaStatisticsView();
             }
             MediaStatisticsView.Instance.Shows();
+            DisplayUtil.CenterWindowOnMasterWindowScreen(MediaStatisticsView.Instance, LayoutBackgroundWindow.Instance);
             // 2018/03/08 - Do NOT force media statistics window to be always topest 
             // MediaStatisticsView.Instance.Owner = _layoutBackgroundWindow.GetTopestWindow();
         }

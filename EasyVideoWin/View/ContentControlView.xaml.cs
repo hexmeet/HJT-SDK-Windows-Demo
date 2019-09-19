@@ -62,7 +62,7 @@ namespace EasyVideoWin.View
         //revike last draw
         private CommandStack _cmdStack;
         private int _editingOperationCount;
-        private float _ratio;
+        private float _ratio = 1;
 
         #endregion
 
@@ -132,7 +132,7 @@ namespace EasyVideoWin.View
 
             _brushWin = new BrushSelectWindow();
             _backScreenWin = new BackScreenColorSelectWindow();
-            _controlToolBar = new ContentControlToolBarView();
+            _controlToolBar = new ContentControlToolBarView(true);
             _highlighterWin = new BrushHighlighterWindow();
 
             var color = ColorConverter.ConvertFromString("#01FFFFFF");
@@ -175,6 +175,8 @@ namespace EasyVideoWin.View
             _highlighterWin.ListenerHighlighter += new ListenerHighlighterHandler(SetHighlighterPenAndColor);
             _backScreenWin.ListenerBackGroundSelected += new ListenerBackGroundSelectedHandler(SetBackGroundByType);
 
+            _controlToolBar.ListenerEnableShareSoundClick += new ContentControlToolBarView.ListenerClickHandler(EnableShareSound_Click);
+            _controlToolBar.ListenerDisableShareSoundClick += new ContentControlToolBarView.ListenerClickHandler(DisableShareSound_Click);
             _controlToolBar.ListenerStartCursorClick += new ContentControlToolBarView.ListenerClickHandler(StartCursor_Click);
             _controlToolBar.ListenerStopCursorClick += new ContentControlToolBarView.ListenerClickHandler(StopCursor_Click);
             _controlToolBar.ListenerPenSettingClick += new ContentControlToolBarView.ListenerClickHandler(PenSetting_Click);
@@ -373,7 +375,21 @@ namespace EasyVideoWin.View
             confirm.Height *= _ratio;
             confirm.Show();
         }
-        
+
+        private void EnableShareSound_Click(object sender, RoutedEventArgs e)
+        {
+            log.Info("EnableShareSound_Click");
+            CallController.Instance.EnableContentAudio(true);
+            _controlToolBar.RefreshShareSoundBtnStatus();
+        }
+
+        private void DisableShareSound_Click(object sender, RoutedEventArgs e)
+        {
+            log.Info("DisableShareSound_Click");
+            CallController.Instance.EnableContentAudio(false);
+            _controlToolBar.RefreshShareSoundBtnStatus();
+        }
+
         private void StartCursor_Click(object sender, RoutedEventArgs e)
         {
             log.Debug("ContentControlView StartCursor_Click");
@@ -722,8 +738,6 @@ namespace EasyVideoWin.View
 
         private void ToolBarMove_Click(object sender, MouseButtonEventArgs e)
         {
-            log.DebugFormat("Move toolbar position in content view: {0}", this.GetHashCode());
-
             double screenLogicX = this.Left;
             double screenLogicY = this.Top;
             double screenLogicWidth = this.Width;
@@ -738,7 +752,7 @@ namespace EasyVideoWin.View
 
             if ((screenLogicWidth + screenLogicX) < (toolbarLogicX + maxControlToolBarLength))
             {
-                _controlToolBar.Left = screenLogicX + screenLogicWidth - 60;
+                _controlToolBar.Left = screenLogicX + screenLogicWidth - 80;
                 if (toolbarLogicY < screenLogicY)
                 {
                     _controlToolBar.Top = screenLogicY + 10;
@@ -818,6 +832,8 @@ namespace EasyVideoWin.View
                 _controlToolBar.VerticalAlignment = VerticalAlignment.Bottom;
 
             }
+
+            log.InfoFormat("_controlToolBar position, left: {0}, top: {1}, width: {2}, height: {3}", _controlToolBar.Left, _controlToolBar.Top, _controlToolBar.Width, _controlToolBar.Height);
         }
         
         private void SetInkCanvasTransparent()
@@ -860,23 +876,23 @@ namespace EasyVideoWin.View
             log.Debug("ContentControlView SetToolBarPositionLogical");
             this.Topmost = true;
             double inkCanvasWidth = this.Width;
-            _ratio = (float)inkCanvasWidth / 1920;
-            if (_ratio <= 0.5)
-            {
-                _ratio = 0.6f;
-            }
-            else if (_ratio <= 0.6)
-            {
-                _ratio = 0.7f;
-            }
-            else if (_ratio <= 0.7)
-            {
-                _ratio = 0.8f;
-            }
-            else if (_ratio < 0.8)
-            {
-                _ratio = 0.9f;
-            }
+            //_ratio = (float)inkCanvasWidth / 1920;
+            //if (_ratio <= 0.5)
+            //{
+            //    _ratio = 0.6f;
+            //}
+            //else if (_ratio <= 0.6)
+            //{
+            //    _ratio = 0.7f;
+            //}
+            //else if (_ratio <= 0.7)
+            //{
+            //    _ratio = 0.8f;
+            //}
+            //else if (_ratio < 0.8)
+            //{
+            //    _ratio = 0.9f;
+            //}
             _controlToolBar.Width = 520 * _ratio;
             _controlToolBar.Height = 70 * _ratio;
             double toolBarWidth = _controlToolBar.Width;

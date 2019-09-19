@@ -33,7 +33,7 @@ namespace EasyVideoWin.View
 
             //initScreen();
             //SetImgSources();
-
+            this.ShareComputerSound.IsChecked = false;
         }
 
         private void SetImgSources(Screen tmpScreen, int index)
@@ -88,12 +88,12 @@ namespace EasyVideoWin.View
 
        public void InitScreen()
         {
-            screen00.Visibility = Visibility.Hidden;
-            screen01.Visibility = Visibility.Hidden;
-            screen02.Visibility = Visibility.Hidden;
-            //screen03.Visibility = Visibility.Hidden;
-            //screen04.Visibility = Visibility.Hidden;
-            //screen05.Visibility = Visibility.Hidden;
+            screen00.Visibility = Visibility.Collapsed;
+            screen01.Visibility = Visibility.Collapsed;
+            screen02.Visibility = Visibility.Collapsed;
+            //screen03.Visibility = Visibility.Collapsed;
+            //screen04.Visibility = Visibility.Collapsed;
+            //screen05.Visibility = Visibility.Collapsed;
             screenSelIndex = 0;
             int screenNum = getAllScreens();
 
@@ -178,6 +178,7 @@ namespace EasyVideoWin.View
             //ScreenWaitingView waitingView = new ScreenWaitingView();
             //waitingView.Show();
             //waitingView.SetScreenSelected(_screenList[screenSelIndex]);
+            CallController.Instance.EnableContentAudio(this.ShareComputerSound.IsChecked.Value);
             SelectedScreen = _screenList[screenSelIndex];
             this.Close();
         }

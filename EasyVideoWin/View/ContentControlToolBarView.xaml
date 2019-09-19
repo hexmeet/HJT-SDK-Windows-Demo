@@ -9,8 +9,8 @@
         Title="ContentControlToolBarView" Height="70" Width="520" WindowStartupLocation="Manual" ShowInTaskbar="False"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent" OpacityMask="White"
         MouseLeftButtonDown="Window_MouseLeftButtonDown" BorderThickness="6,6,6,6" Panel.ZIndex="200"
-        SizeToContent="Manual" >
-    <Viewbox>
+        SizeToContent="WidthAndHeight" >
+    <!--<Viewbox>-->
     <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="SizeAll">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -20,61 +20,73 @@
             <Border CornerRadius="5" Background="Black">
                 <Border>
                     <StackPanel Name="ToolbarPanel" Margin="10,0,10,0" Orientation="Horizontal"  HorizontalAlignment="Center"  VerticalAlignment="Top" Background="Black">
-                        <CustomControls:WpfImageButton x:Name="StartCursor" Visibility="Visible" Cursor="Hand" ImageWidth="36" ImageHeight="33" Margin="8,3,8,3"
-                                                           Click="StartCursor_Click" TitleText="{DynamicResource START_CURSOR}" TextFontSize="14" TextForeground="#919191"
+                            <CustomControls:WpfImageButton x:Name="EnableShareSound" Visibility="Visible" Cursor="Hand" ImageWidth="36" ImageHeight="33" Margin="8,3,8,3"
+                                                           Click="EnableShareSound_Click" TitleText="{DynamicResource SHARE_SOUND}" TextFontSize="12" TextForeground="#919191"
+                                                           NormalImage="pack://application:,,,/Resources/Icons/Content/icon_sharemusic.png"
+                                                           MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_sharemusic.png"
+                                                        />
+
+                            <CustomControls:WpfImageButton x:Name="DisableShareSound" Visibility="Collapsed" Cursor="Hand" ImageWidth="36" ImageHeight="33" Margin="8,3,8,3"
+                                                           Click="DisableShareSound_Click" TitleText="{DynamicResource STOP_SHARING_SOUND}" TextFontSize="12" TextForeground="#919191"
+                                                           NormalImage="pack://application:,,,/Resources/Icons/Content/icon_sharemusic-off.png"
+                                                           MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_sharemusic-off.png"
+                                                        />
+
+                            <CustomControls:WpfImageButton x:Name="StartCursor" Visibility="Visible" Cursor="Hand" ImageWidth="36" ImageHeight="33" Margin="8,3,8,3"
+                                                           Click="StartCursor_Click" TitleText="{DynamicResource START_CURSOR}" TextFontSize="12" TextForeground="#919191"
                                                            NormalImage="pack://application:,,,/Resources/Icons/Content/icon_start.png"
                                                            MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_start.png"
                                                         />
 
                         <CustomControls:WpfImageButton x:Name="StopCursor" Visibility="Collapsed" Cursor="Hand" ImageWidth="36" ImageHeight="33" Margin="8,3,8,3"
-                                                           Click="StopCursor_Click" TitleText="{DynamicResource STOP_CURSOR}" TextFontSize="14" TextForeground="#919191"
+                                                           Click="StopCursor_Click" TitleText="{DynamicResource STOP_CURSOR}" TextFontSize="12" TextForeground="#919191"
                                                            NormalImage="pack://application:,,,/Resources/Icons/Content/icon_stop.png"
                                                            MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_stop.png"
                                                         />
 
                         <CustomControls:WpfImageButton x:Name="PenSetting" Visibility="Collapsed" Cursor="Hand" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
-                                                           Click="PenSetting_Click" TitleText="{DynamicResource BRUSH}" TextFontSize="14" TextForeground="#919191"
+                                                           Click="PenSetting_Click" TitleText="{DynamicResource BRUSH}" TextFontSize="12" TextForeground="#919191"
                                                            NormalImage="pack://application:,,,/Resources/Icons/Content/Pen/Type/black_default.png"
                                                            MouseOverImage="pack://application:,,,/Resources/Icons/Content/Pen/Type/black_default.png"
                                                         />
                         
                         <CustomControls:WpfImageButton x:Name="Highlighter" Visibility="Collapsed" Cursor="Hand" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
-                                                           Click="Highlighter_Click" TitleText="{DynamicResource HIGHLIGHTER}" TextFontSize="14" TextForeground="#919191"
+                                                           Click="Highlighter_Click" TitleText="{DynamicResource HIGHLIGHTER}" TextFontSize="12" TextForeground="#919191"
                                                            NormalImage="pack://application:,,,/Resources/Icons/Content/Pen/Type/h_yellow_default.png"
                                                            MouseOverImage="pack://application:,,,/Resources/Icons/Content/Pen/Type/h_yellow_default.png"
                                                         />
 
                             <CustomControls:WpfImageButton x:Name="Erase" Visibility="Collapsed" Cursor="Hand" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
-                                                           Click="Erase_Click" TitleText="{DynamicResource ERASER}" TextFontSize="14" TextForeground="#919191"
+                                                           Click="Erase_Click" TitleText="{DynamicResource ERASER}" TextFontSize="12" TextForeground="#919191"
                                                            NormalImage="pack://application:,,,/Resources/Icons/Content/icon_eraser.png"
                                                            MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_eraser.png"
                                                         />
 
                             <CustomControls:WpfImageButton x:Name="Revoke" Visibility="Collapsed" Cursor="Hand" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
-                                                           Click="Revoke_Click" TitleText="{DynamicResource REVERT}" TextFontSize="14" TextForeground="#919191"
+                                                           Click="Revoke_Click" TitleText="{DynamicResource REVERT}" TextFontSize="12" TextForeground="#919191"
                                                            NormalImage="pack://application:,,,/Resources/Icons/Content/icon_revoke.png"
                                                            MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_revoke.png"
                                                         />
 
                         <CustomControls:WpfImageButton x:Name="Wallpaper" Visibility="Collapsed" Cursor="Hand" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
-                                                           Click="Wallpaper_Click" TitleText="{DynamicResource BACKGROUND}" TextFontSize="14" TextForeground="#919191"
+                                                           Click="Wallpaper_Click" TitleText="{DynamicResource BACKGROUND}" TextFontSize="12" TextForeground="#919191"
                                                            NormalImage="pack://application:,,,/Resources/Icons/Content/icon_background.png"
                                                            MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_background.png"
                                                         />
 
                         <CustomControls:WpfImageButton x:Name="Clear" Visibility="Collapsed" Cursor="Hand" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
-                                                           Click="Clear_Click" TitleText="{DynamicResource CLEAR}" TextFontSize="14" TextForeground="#919191"
+                                                           Click="Clear_Click" TitleText="{DynamicResource CLEAR}" TextFontSize="12" TextForeground="#919191"
                                                            NormalImage="pack://application:,,,/Resources/Icons/Content/icon_clear.png"
                                                            MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_clear.png"
                                                         />
                         <CustomControls:WpfImageButton Cursor="Hand" Visibility="Visible" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
-                                                           Click="Snap_Click" TitleText="{DynamicResource SAVE}" TextFontSize="14" TextForeground="#919191"
+                                                           Click="Snap_Click" TitleText="{DynamicResource SAVE}" TextFontSize="12" TextForeground="#919191"
                                                            NormalImage="pack://application:,,,/Resources/Icons/Content/icon_save.png"
                                                            MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_save.png"
                                                         />
 
                         <CustomControls:WpfImageButton x:Name="Exit" Cursor="Hand" Visibility="Visible" ImageWidth="50" ImageHeight="36" Margin="8,3,8,3"
-                                                           Click="Exit_Click" TitleText="{DynamicResource STOP_SHARE}" TextFontSize="14" TextForeground="#919191"
+                                                           Click="Exit_Click" TitleText="{DynamicResource STOP_SHARE}" TextFontSize="12" TextForeground="#919191"
                                                            NormalImage="pack://application:,,,/Resources/Icons/Content/icon_exit.png"
                                                            MouseOverImage="pack://application:,,,/Resources/Icons/Content/icon_exit.png"
                                                         />
@@ -83,5 +95,5 @@
             </Border>
         </Grid>
     </Grid>
-    </Viewbox>
+    <!--</Viewbox>-->
 </Window>

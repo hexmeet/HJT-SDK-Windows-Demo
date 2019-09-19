@@ -61,7 +61,16 @@
                     Click="Join_Click"
                     ButtonContent="{DynamicResource JOIN}" NormalBackgroundColor="#4381FF" HoverBackgroundColor="#5F94FF" ClickBackgroundColor="#3C74E5" />
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Width="280" Margin="0, 10, 0, 0">
-                <CheckBox Name="turnOffCamera" Content="{DynamicResource TURN_OFF_CAMERA}"></CheckBox>
+                <Grid>
+                    <DockPanel HorizontalAlignment="Left">
+                        <CheckBox Name="turnOffCamera" Content="{DynamicResource TURN_OFF_CAMERA}"></CheckBox>
+                    </DockPanel>
+                    <DockPanel x:Name="moreDockPanel" HorizontalAlignment="Right">
+                        <TextBlock Text="{DynamicResource MORE}"
+                               MouseLeftButtonDown="More_MouseLeftButtonDown"
+                               VerticalAlignment="Center" Foreground="#4381FF" FontSize="12" Cursor="Hand"/>
+                    </DockPanel>
+                </Grid>
                 <CheckBox Name="turnOffMicrophone" Content="{DynamicResource TURN_OFF_MICROPHONE}" Margin="0, 10, 0, 0"></CheckBox>
             </StackPanel>
         </StackPanel>

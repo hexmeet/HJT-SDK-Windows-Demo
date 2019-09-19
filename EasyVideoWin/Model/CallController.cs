@@ -484,5 +484,15 @@ namespace EasyVideoWin.Model
         {
             EVSdkManager.Instance.SetMaxRecvVideo(num);
         }
+
+        public void EnableContentAudio(bool enable)
+        {
+            EVSdkManager.Instance.EnableContentAudio(enable);
+        }
+
+        public bool ContentAudioEnabled()
+        {
+            return EVSdkManager.Instance.ContentAudioEnabled();
+        }
     }
 }

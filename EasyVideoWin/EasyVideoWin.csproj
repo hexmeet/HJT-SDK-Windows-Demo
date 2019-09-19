@@ -1397,6 +1397,8 @@
     <Resource Include="Resources\Icons\WindowTitlebar\more_click.png" />
     <Resource Include="Resources\Icons\WindowTitlebar\more_hover.png" />
     <Resource Include="Resources\Icons\WindowTitlebar\more_normal.png" />
+    <Resource Include="Resources\Icons\Content\icon_sharemusic-off.png" />
+    <Resource Include="Resources\Icons\Content\icon_sharemusic.png" />
     <Content Include="Resources\sounds\camera.wav" />
     <Content Include="Resources\sounds\speaker.wav" />
     <Resource Include="Resources\Icons\icon_me_click.png" />

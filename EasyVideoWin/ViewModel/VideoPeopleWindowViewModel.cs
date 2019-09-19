@@ -114,16 +114,6 @@ namespace EasyVideoWin.ViewModel
 
             switch (status)
             {
-                case CallStatus.Ended:
-                    log.Info("Call ended.");
-                    Application.Current.Dispatcher.InvokeAsync(() =>
-                    {
-                        log.Info("Call Ended and begin to hide layout background related window.");
-                        LayoutBackgroundWindow.Instance.HideWindow(true);
-                        log.Info("Call Ended and layout background related window has been hidden.");
-                    });
-
-                    break;
                 case CallStatus.Dialing:
                     CurrentView = _callingView;
                     Application.Current.Dispatcher.InvokeAsync(() =>
