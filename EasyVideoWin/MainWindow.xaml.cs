@@ -214,7 +214,7 @@ namespace EasyVideoWin
             {
                 tipOwner = LayoutBackgroundWindow.Instance.LayoutOperationbarWindow;
             }
-            log.InfoFormat("ShowPromptTip(MessageBoxTip), tipOwner is null:{0}", null == tipOwner);
+            log.InfoFormat("ShowPromptTip(MessageBoxTip), hash: {0}, tipOwner is null:{1}, ", _messageBoxTip.GetHashCode(), null == tipOwner);
             DisplayUtil.SetWindowCenterAndOwner(_messageBoxTip, masterWindow, tipOwner);
             _messageBoxTip.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), prompt, LanguageUtil.Instance.GetValueByKey("CONFIRM"));
             _messageBoxTip.ShowDialog();
@@ -258,9 +258,11 @@ namespace EasyVideoWin
             }
             Application.Current.Dispatcher.InvokeAsync(() =>
             {
+                log.Info("EventJoinConferenceIndication arrived and CloseMessageBoxTip");
+                CloseMessageBoxTip();
                 if (Utils.GetAutoAnswer())
                 {
-                    _viewModel.StartJoinConference(callInfo.conference_number, callInfo.password, this);
+                    _viewModel.StartJoinConference(callInfo.conference_number, LoginManager.Instance.DisplayName, callInfo.password, this);
                     log.Info("Auto answer. EventJoinConferenceIndication end");
                     return;
                 }
@@ -284,7 +286,7 @@ namespace EasyVideoWin
                 StopIncomingCallPromptTimer();
                 if (_incomingCallPromptDialog.IsAccept)
                 {
-                    _viewModel.StartJoinConference(callInfo.conference_number, callInfo.password, this);
+                    _viewModel.StartJoinConference(callInfo.conference_number, LoginManager.Instance.DisplayName, callInfo.password, this);
                 }
             });
             log.Info("EventJoinConferenceIndication end");

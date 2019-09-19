@@ -74,13 +74,13 @@ namespace EasyVideoWin.ViewModel
             , {2017,    "NO_TIME_SPACE_TO_ACTIVATE_ROOM"}
             , {2019,    "NOT_FOUND_SIGNALING_IP"}
             , {2021,    "MIXED_MRU_COMPLETELY_FULL"}
-            , {2023,    "MAX_PORT_COUNT_USED_UP"}
+            , {2023,    "CONF_PORT_COUNT_USED_UP"}
             , {2024,    "ORG_PORT_COUNT_USED_UP"}
-            , {2025,    "EXCEEDED_CONFERENCE_PORT_COUNT_IN_LICENSE"}
+            , {2025,    "HAISHEN_PORT_COUNT_USED_UP"}
             , {2027,    "EXCEEDED_GATEWAY_AUDIO_PORT_COUNT_IN_LICENSE"}
             , {2029,    "EXCEEDED_GATEWAY_VIDEO_PORT_COUNT_IN_LICENSE"}
             , {2031,    "ONLY_ROOM_OWNER_CAN_ACTIVATE_ROOM"}
-            , {2033,    "NOT_ALLOWED_ANONYMOUS_PARTY"}
+            , {2033,    "NOT_ALLOW_ANONYMOUS_PARTY"}
             //, {2043,    "LOCAL_ZONE_NOT_STARTED"} do not prompt the error
             //, {2045,    "LOCAL_ZONE_STOPPED"} do not prompt the error
         };
@@ -431,7 +431,21 @@ namespace EasyVideoWin.ViewModel
                     {
                         CurrentView = _mainView;
                     }
-                    
+
+                    Application.Current.Dispatcher.InvokeAsync(() => {
+                        log.Info("CallStatus.Ended");
+                        // maybe VideoPeopleWindow.Instance.Set2PresettingState() in UpdateWindowVisibility(), so hide LayoutBackgroundWindow in the following
+                        if (Visibility.Visible != LayoutBackgroundWindow.Instance.Visibility)
+                        {
+                            log.Info("LayoutBackgroundWindow is not visible, so OnCallEnded");
+                            LayoutBackgroundWindow.Instance.OnCallEnded();
+                        }
+                        else
+                        {
+                            LayoutBackgroundWindow.Instance.HideWindow(true);
+                        }
+                    });
+
                     SetThreadExecutionState(EXECUTION_STATE.ES_CONTINUOUS);
 
                     log.Info("Call ended and collect garbage");
@@ -623,9 +637,9 @@ namespace EasyVideoWin.ViewModel
             });
         }
         
-        public void StartJoinConference(string confNumber, string password, IMasterDisplayWindow ownerWindow)
+        public void StartJoinConference(string confNumber, string displayName, string password, IMasterDisplayWindow ownerWindow)
         {
-            JoinConference(confNumber, "", password, ownerWindow);
+            JoinConference(confNumber, displayName, password, ownerWindow);
         }
 
         private void TimerCheckSystemStatus_Elapsed(object sender, System.Timers.ElapsedEventArgs e)

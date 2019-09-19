@@ -117,14 +117,14 @@ namespace EasyVideoWin.Model
         //Log
         public void SetLog(ManagedEVSdk.Structs.EV_LOG_LEVEL_CLI level, string logPath, string logFileName, uint maxFileSize)
         {
-            _log.InfoFormat("Set log, level={0}, path={1}, file name={2}, max size={3}", level, logPath, logFileName, maxFileSize);
+            _log.InfoFormat("SetLog, level={0}, path={1}, file name={2}, max size={3}", level, logPath, logFileName, maxFileSize);
             this.EVSdkWrapper.EVEngineSetLog(level, logPath, logFileName, maxFileSize);
             _log.Info("SetLog done");
         }
 
         public void EnableLog(bool enable)
         {
-            _log.InfoFormat("EnableLog:{0}", enable);
+            _log.InfoFormat("EnableLog: {0}", enable);
             this.EVSdkWrapper.EVEngineEnableLog(enable);
             _log.Info("EnableLog done");
         }
@@ -136,7 +136,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineInitialize(configPath, configFileName);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to initialize, result:{0}, config path:{1}, config file name:{2}", rst, configPath, configFileName);
+                _log.InfoFormat("Failed to Initialize, result:{0}, config path:{1}, config file name:{2}", rst, configPath, configFileName);
             }
             _log.Info("Initialize done");
         }
@@ -147,7 +147,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineSetRootCA(rootCaPath);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to set root CA, result:{0}, root ca path:{1}", rst, rootCaPath);
+                _log.InfoFormat("Failed to SetRootCA, result:{0}, root ca path:{1}", rst, rootCaPath);
             }
             _log.Info("SetRootCA done");
         }
@@ -158,7 +158,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineSetUserImage(backgroundFilePath, userImagePath);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to set user image, result:{0}, background file path:{1}, user image path:{2}", rst, backgroundFilePath, userImagePath);
+                _log.InfoFormat("Failed to SetUserImage, result:{0}, background file path:{1}, user image path:{2}", rst, backgroundFilePath, userImagePath);
             }
             _log.Info("SetUserImage done");
         }
@@ -169,7 +169,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineEnableWhiteBoard(enable);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to enable white board, result:{0}, enable:{1}", rst, enable);
+                _log.InfoFormat("Failed to EnableWhiteBoard, result:{0}, enable:{1}", rst, enable);
             }
             _log.Info("EnableWhiteBoard done");
         }
@@ -180,31 +180,31 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineSetUserAgent(company, version);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to set user agent, result:{0}, company:{1}, version:{2}", rst, company, version);
+                _log.InfoFormat("Failed to SetUserAgent, result:{0}, company:{1}, version:{2}", rst, company, version);
             }
             _log.Info("SetUserAgent done");
         }
 
         public void Release()
         {
-            _log.Info("Begin to release Sdk");
+            _log.Info("Release");
             int rst = this.EVSdkWrapper.EVEngineRelease();
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to release, result:{0}", rst);
+                _log.InfoFormat("Failed to Release, result:{0}", rst);
             }
 
-            _log.Info("End to release Sdk");
+            _log.Info("Release done");
         }
 
         // Login
         public void EnableSecure(bool enable)
         {
-            _log.InfoFormat("EnableSecure:{0}", enable);
+            _log.InfoFormat("EnableSecure: {0}", enable);
             int rst = this.EVSdkWrapper.EVEngineEnableSecure(enable);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to enable secure, result:{0}, enable:{1}", rst, enable);
+                _log.InfoFormat("Failed to EnableSecure, result:{0}, enable:{1}", rst, enable);
             }
             _log.Info("EnableSecure done");
         }
@@ -220,7 +220,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineLogin(server, port, username, password);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to set user agent, result:{0}, server:{1}, port:{2}, username:{3}", rst, server, port, username);
+                _log.InfoFormat("Failed to Login, result:{0}, server:{1}, port:{2}, username:{3}", rst, server, port, username);
             }
             _log.Info("Login done");
         }
@@ -231,20 +231,20 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineLoginWithLocation(locationServer, port, username, password);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to set user agent, result:{0}, location server:{1}, port:{2}, username:{3}", rst, locationServer, port, username);
+                _log.InfoFormat("Failed to LoginWithLocation, result:{0}, location server:{1}, port:{2}, username:{3}", rst, locationServer, port, username);
             }
-            _log.Info("LoginWithLocation");
+            _log.Info("LoginWithLocation done");
         }
 
         public void Logout()
         {
-            _log.Info("Begin to logout");
+            _log.Info("Logout");
             int rst = this.EVSdkWrapper.EVEngineLogout();
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
                 _log.InfoFormat("Failed to logout, result:{0}", rst);
             }
-            _log.Info("End to logout");
+            _log.Info("Logout done");
         }
 
         public void DownloadUserImage(string path)
@@ -253,7 +253,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineDownloadUserImage(path);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to download user image, result:{0}, path:{1}", rst, path);
+                _log.InfoFormat("Failed to DownloadUserImage, result:{0}, path:{1}", rst, path);
             }
             _log.Info("DownloadUserImage done");
         }
@@ -264,7 +264,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineUploadUserImage(path);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to upload user image, result:{0}, path:{1}", rst, path);
+                _log.InfoFormat("Failed to UploadUserImage, result:{0}, path:{1}", rst, path);
             }
             _log.Info("UploadUserImage done");
         }
@@ -276,7 +276,7 @@ namespace EasyVideoWin.Model
             _log.Info("ChangePassword done");
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to change password, result:{0}", rst);
+                _log.InfoFormat("Failed to ChangePassword, result:{0}", rst);
                 return false;
             }
             return true;
@@ -289,7 +289,7 @@ namespace EasyVideoWin.Model
             _log.Info("ChangeDisplayName done");
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to change display name, result:{0}, display name:{1}", rst, displayName);
+                _log.InfoFormat("Failed to ChangeDisplayName, result:{0}, display name:{1}", rst, displayName);
                 return false;
             }
             return true;
@@ -301,7 +301,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineGetUserInfo(ref userinfo);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to get user info, result:{0}", rst);
+                _log.InfoFormat("Failed to GetUserInfo, result:{0}", rst);
                 userinfo = null;
             }
             _log.Info("GetUserInfo done");
@@ -318,17 +318,17 @@ namespace EasyVideoWin.Model
         //Device
         public ManagedEVSdk.Structs.EVDeviceCli[] GetDevices(ManagedEVSdk.Structs.EV_DEVICE_TYPE_CLI type)
         {
-            _log.InfoFormat("Get devices:{0}", type);
+            _log.InfoFormat("GetDevices: {0}", type);
             var devices = this.EVSdkWrapper.EVEngineGetDevices(type);
-            _log.InfoFormat("Got devices size:{0}", devices.Length);
+            _log.InfoFormat("GetDevices done, size:{0}", devices.Length);
             return devices;
         }
 
         public ManagedEVSdk.Structs.EVDeviceCli GetDevice(ManagedEVSdk.Structs.EV_DEVICE_TYPE_CLI type)
         {
-            _log.InfoFormat("Get device:{0}", type);
+            _log.InfoFormat("GetDevice: {0}", type);
             var device = this.EVSdkWrapper.EVEngineGetDevice(type);
-            _log.Info("Got device");
+            _log.Info("GetDevice done");
             return device;
         }
 
@@ -345,7 +345,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineEnableMicMeter(enable);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to enable mic meter, enable:{0}, result:{1}", enable, rst);
+                _log.InfoFormat("Failed to EnableMicMeter, enable:{0}, result:{1}", enable, rst);
             }
             _log.Info("EnableMicMeter done");
         }
@@ -354,7 +354,7 @@ namespace EasyVideoWin.Model
         {
             _log.Info("GetMicVolume");
             float value = this.EVSdkWrapper.EVEngineGetMicVolume();
-            _log.InfoFormat("GetMicVolume:{0}", value);
+            _log.InfoFormat("GetMicVolume done: {0}", value);
             return value;
         }
 
@@ -365,7 +365,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineSetLocalVideoWindow(id);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to set local video window, id:{0}, result:{1}", id, rst);
+                _log.InfoFormat("Failed to SetLocalVideoWindow, id:{0}, result:{1}", id, rst);
             }
             _log.Info("SetLocalVideoWindow done");
         }
@@ -376,7 +376,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineSetRemoteVideoWindow(ids, size);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to set remote video window, size:{0}, result:{1}", size, rst);
+                _log.InfoFormat("Failed to SetRemoteVideoWindow, size:{0}, result:{1}", size, rst);
             }
             _log.Info("SetRemoteVideoWindow done");
         }
@@ -387,7 +387,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineSetRemoteContentWindow(id);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to set remote content window, id:{0}, result:{1}", id, rst);
+                _log.InfoFormat("Failed to SetRemoteContentWindow, id:{0}, result:{1}", id, rst);
             }
             _log.Info("SetRemoteContentWindow done");
         }
@@ -398,7 +398,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineSetLocalContentWindow(id, mode);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to set local content window, id:{0}, mode={1} result:{2}", id, mode, rst);
+                _log.InfoFormat("Failed to SetLocalContentWindow, id:{0}, mode={1} result:{2}", id, mode, rst);
             }
             _log.Info("SetLocalContentWindow done");
         }
@@ -410,7 +410,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineEnablePreview(enable);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to enable preview, enable:{0}, result:{1}", enable, rst);
+                _log.InfoFormat("Failed to EnablePreview, enable:{0}, result:{1}", enable, rst);
             }
             _log.Info("EnablePreview done");
         }
@@ -421,7 +421,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineSetBandwidth(kbps);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to set bandwidth, bandwidth:{0}, result:{1}", kbps, rst);
+                _log.InfoFormat("Failed to SetBandwidth, bandwidth:{0}, result:{1}", kbps, rst);
             }
             _log.Info("SetBandwidth done");
         }
@@ -430,7 +430,7 @@ namespace EasyVideoWin.Model
         {
             _log.Info("GetBandwidth");
             uint bw = this.EVSdkWrapper.EVEngineGetBandwidth();
-            _log.InfoFormat("GetBandwidth done:{0}", bw);
+            _log.InfoFormat("GetBandwidth done: {0}", bw);
             return bw;
         }
 
@@ -440,7 +440,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineSetMaxRecvVideo(num);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to set max recv video, number:{0}, result:{1}", num, rst);
+                _log.InfoFormat("Failed to SetMaxRecvVideo, number:{0}, result:{1}", num, rst);
             }
             _log.Info("SetMaxRecvVideo done");
         }
@@ -462,7 +462,7 @@ namespace EasyVideoWin.Model
             _log.Info("JoinConference done");
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to join conference, conference number:{0}, display name:{1}, result:{2}", conferenceNumber, displayName, rst);
+                _log.InfoFormat("Failed to JoinConference, conference number:{0}, display name:{1}, result:{2}", conferenceNumber, displayName, rst);
                 return false;
             }
             return true;
@@ -485,7 +485,7 @@ namespace EasyVideoWin.Model
             _log.Info("JoinConference with server directly done");
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to join conference with location, server:{0}, port:{1} conference number:{2}, display name:{3}, result:{4}"
+                _log.InfoFormat("Failed to JoinConference, server:{0}, port:{1} conference number:{2}, display name:{3}, result:{4}"
                     , server
                     , port
                     , conferenceNumber
@@ -513,7 +513,7 @@ namespace EasyVideoWin.Model
             _log.Info("JoinConferenceWithLocation done");
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to join conference with location, location server:{0}, port:{1} conference number:{2}, display name:{3}, result:{4}"
+                _log.InfoFormat("Failed to JoinConferenceWithLocation, location server:{0}, port:{1} conference number:{2}, display name:{3}, result:{4}"
                     , locationServer
                     , port
                     , conferenceNumber
@@ -530,7 +530,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineLeaveConference();
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to leave conference, result:{0}", rst);
+                _log.InfoFormat("Failed to LeaveConference, result:{0}", rst);
             }
             _log.Info("LeaveConference done");
         }
@@ -549,7 +549,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineEnableCamera(enable);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to enable camera, enable:{0}, result:{1}", enable, rst);
+                _log.InfoFormat("Failed to EnableCamera, enable:{0}, result:{1}", enable, rst);
             }
             _log.Info("EnableCamera done");
         }
@@ -568,35 +568,35 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineEnableMic(enable);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to enable mic, enable:{0}, result:{1}", enable, rst);
+                _log.InfoFormat("Failed to EnableMic, enable:{0}, result:{1}", enable, rst);
             }
             _log.Info("EnableMic done");
         }
 
         public bool RemoteMuted()
         {
-            _log.Info("Request RemoteMuted");
+            _log.Info("RemoteMuted");
             bool muted = this.EVSdkWrapper.EVEngineRemoteMuted();
-            _log.InfoFormat("RemoteMuted:{0}", muted);
+            _log.InfoFormat("RemoteMuted: {0}", muted);
             return muted;
         }
 
         public void RequestRemoteUnmute(bool val)
         {
-            _log.InfoFormat("Request remote unmute:{0}", val);
+            _log.InfoFormat("RequestRemoteUnmute:{0}", val);
             int rst = this.EVSdkWrapper.EVEngineRequestRemoteUnmute(val);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to request remote unmute, value:{0}, result:{1}", val, rst);
+                _log.InfoFormat("Failed to RequestRemoteUnmute, value:{0}, result:{1}", val, rst);
             }
-            _log.Info("Done for request remote unmute");
+            _log.Info("RequestRemoteUnmute done");
         }
 
         public bool HighFPSEnabled()
         {
             _log.Info("HighFPSEnabled");
             bool rst = this.EVSdkWrapper.EVEngineHighFPSEnabled();
-            _log.InfoFormat("HighFPSEnabled: {0}", rst);
+            _log.InfoFormat("HighFPSEnabled done: {0}", rst);
             return rst;
         }
 
@@ -608,37 +608,37 @@ namespace EasyVideoWin.Model
             {
                 _log.InfoFormat("Failed to EnableHighFPS, enable:{0}, result:{1}", enable, rst);
             }
-            _log.Info("Done for EnableHighFPS");
+            _log.Info("EnableHighFPS done");
         }
 
         public bool HDEnabled()
         {
             _log.Info("Get HDEnabled");
             bool rst = this.EVSdkWrapper.EVEngineHDEnabled();
-            _log.InfoFormat("HDEnabled:{0}", rst);
+            _log.InfoFormat("HDEnabled: {0}", rst);
             return rst;
         }
 
         public void EnableHD(bool enable)
         {
-            _log.InfoFormat("EnableHD:{0}", enable);
+            _log.InfoFormat("EnableHD: {0}", enable);
             int rst = this.EVSdkWrapper.EVEngineEnableHD(enable);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
                 _log.InfoFormat("Failed to EnableHD, enable:{0}, result:{1}", enable, rst);
             }
-            _log.Info("Done for EnableHD");
+            _log.Info("EnableHD done");
         }
 
         public void SetLayout(ManagedEVSdk.Structs.EVLayoutRequestCli layout)
         {
-            _log.Info("Set layout");
+            _log.Info("SetLayout");
             int rst = this.EVSdkWrapper.EVEngineSetLayout(layout);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to set layout, result:{0}", rst);
+                _log.InfoFormat("Failed to SetLayout, result:{0}", rst);
             }
-            _log.Info("Done for Set layout");
+            _log.Info("SetLayout done");
         }
         
         public void GetStats(ref ManagedEVSdk.Structs.EVStatsCli stats)
@@ -647,7 +647,7 @@ namespace EasyVideoWin.Model
             int rst = this.EVSdkWrapper.EVEngineGetStats(ref stats);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to get stats, result:{0}", rst);
+                _log.InfoFormat("Failed to GetStats, result:{0}", rst);
             }
             _log.Info("GetStats done");
         }
@@ -655,35 +655,54 @@ namespace EasyVideoWin.Model
         //Send Content
         public void SendContent()
         {
-            _log.Info("Send content");
+            _log.Info("SendContent");
             int rst = this.EVSdkWrapper.EVEngineSendContent();
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to send content, result:{0}", rst);
+                _log.InfoFormat("Failed to SendContent, result:{0}", rst);
             }
-            _log.Info("Done for Send content");
+            _log.Info("SendContent done");
         }
 
         public void SendWhiteBoard()
         {
-            _log.Info("Send white board");
+            _log.Info("SendWhiteBoard");
             int rst = this.EVSdkWrapper.EVEngineSendWhiteBoard();
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to send white board, result:{0}", rst);
+                _log.InfoFormat("Failed to SendWhiteBoard, result:{0}", rst);
             }
-            _log.Info("Done for Send white board");
+            _log.Info("SendWhiteBoard done");
         }
 
         public void StopContent()
         {
-            _log.Info("Stop content");
+            _log.Info("StopContent");
             int rst = this.EVSdkWrapper.EVEngineStopContent();
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to stop content, result:{0}", rst);
+                _log.InfoFormat("Failed to StopContent, result:{0}", rst);
             }
-            _log.Info("Done for stop content");
+            _log.Info("StopContent done");
+        }
+
+        public void EnableContentAudio(bool enable)
+        {
+            _log.Info("EnableContentAudio");
+            int rst = this.EVSdkWrapper.EVEngineEnableContentAudio(enable);
+            if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
+            {
+                _log.InfoFormat("Failed to EnableContentAudio, result:{0}", rst);
+            }
+            _log.Info("EnableContentAudio done");
+        }
+
+        public bool ContentAudioEnabled()
+        {
+            _log.Info("ContentAudioEnabled");
+            bool rst = this.EVSdkWrapper.EVEngineContentAudioEnabled();
+            _log.InfoFormat("ContentAudioEnabled done: {0}", rst);
+            return rst;
         }
 
         #endregion

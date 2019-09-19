@@ -404,6 +404,16 @@ int EVSdkWrapper::EVEngineStopContent()
     return m_pEVEngine->stopContent();
 }
 
+int EVSdkWrapper::EVEngineEnableContentAudio(bool enable)
+{
+    return m_pEVEngine->enableContentAudio(enable);
+}
+
+bool EVSdkWrapper::EVEngineContentAudioEnabled()
+{
+    return m_pEVEngine->contentAudioEnabled();
+}
+
 void EVSdkWrapper::OnError(ev::engine::EVError& err)
 {
     Structs::EVErrorCli^ errorCli = gcnew Structs::EVErrorCli();

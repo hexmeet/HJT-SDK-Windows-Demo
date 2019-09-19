@@ -1017,12 +1017,12 @@ namespace EasyVideoWin.View
         private void SelectScreen()
         {
             int screenNum = System.Windows.Forms.Screen.AllScreens.Length;
-            if (screenNum == 1)
-            {
-                CloseWhiteboard();
-                SetScreenSelected(System.Windows.Forms.Screen.AllScreens[0]);
-            }
-            else
+            //if (screenNum == 1)
+            //{
+            //    CloseWhiteboard();
+            //    SetScreenSelected(System.Windows.Forms.Screen.AllScreens[0]);
+            //}
+            //else
             {
                 ScreenSelectionView _screenSel = new ScreenSelectionView();
                 System.Windows.Rect mainWindowRect = VideoPeopleWindow.Instance.GetWindowRect();

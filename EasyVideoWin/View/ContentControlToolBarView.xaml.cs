@@ -25,6 +25,8 @@ namespace EasyVideoWin.View
         private const int WS_MAXIMIZEBOX = 0x10000;
 
         public delegate void ListenerClickHandler(object sender, RoutedEventArgs e);
+        public event ListenerClickHandler ListenerEnableShareSoundClick = null;
+        public event ListenerClickHandler ListenerDisableShareSoundClick = null;
         public event ListenerClickHandler ListenerStartCursorClick = null;
         public event ListenerClickHandler ListenerStopCursorClick = null;
         public event ListenerClickHandler ListenerPenSettingClick = null;
@@ -46,13 +48,23 @@ namespace EasyVideoWin.View
 
         #endregion
         #region -- Constructors --
-        public ContentControlToolBarView()
+        public ContentControlToolBarView(bool showShareSoundBtn)
         {
             log.Debug("ContentControlToolBarView construction");
             InitializeComponent();
 
             this.SourceInitialized += Window_SourceInitialized;
             this.Loaded += ContentControlToolBarView_Loaded;
+
+            if (showShareSoundBtn)
+            {
+                RefreshShareSoundBtnStatus();
+            }
+            else
+            {
+                this.EnableShareSound.Visibility = Visibility.Collapsed;
+                this.DisableShareSound.Visibility = Visibility.Collapsed;
+            }
         }
 
 
@@ -64,9 +76,29 @@ namespace EasyVideoWin.View
 
         #region -- Public Methods --
 
+        public void RefreshShareSoundBtnStatus()
+        {
+            bool enabled = CallController.Instance.ContentAudioEnabled();
+            this.EnableShareSound.Visibility = enabled ? Visibility.Collapsed : Visibility.Visible;
+            this.DisableShareSound.Visibility = enabled ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         #endregion
 
         #region -- Private Methods --
+
+        private void EnableShareSound_Click(object sender, RoutedEventArgs e)
+        {
+            log.Info("ContentControlToolBarView EnableShareSound_Click");
+            ListenerEnableShareSoundClick?.Invoke(sender, e);
+        }
+
+        private void DisableShareSound_Click(object sender, RoutedEventArgs e)
+        {
+            log.Info("ContentControlToolBarView DisableShareSound_Click");
+            ListenerDisableShareSoundClick?.Invoke(sender, e);
+        }
+
         private void ContentControlToolBarView_Loaded(object sender, RoutedEventArgs e)
         {
             Utils.SetSoftwareRender(this);

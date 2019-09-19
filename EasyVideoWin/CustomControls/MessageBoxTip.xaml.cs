@@ -72,11 +72,11 @@ namespace EasyVideoWin.CustomControls
             }
         }
 
-        protected override void OnClosed(EventArgs e)
+        protected override void OnClosing(CancelEventArgs e)
         {
-            base.OnClosed(e);
-
-            log.Info("MessageBoxTip Closed");
+            log.InfoFormat("OnClosing, hash: {0}", this.GetHashCode());
+            base.OnClosing(e);
         }
+        
     }
 }

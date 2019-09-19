@@ -74,6 +74,7 @@ namespace EasyVideoWin.View
         private void SvcLoginJoinConfView_Loaded(object sender, RoutedEventArgs e)
         {
             RefreshControlValue();
+            UpdateMoreButton();
             //TryAnonymousJoinConf();
             LoginManager.Instance.PropertyChanged += LoginManager_PropertyChanged;
         }
@@ -246,30 +247,42 @@ namespace EasyVideoWin.View
         {
             if ("LoginProgress" == e.PropertyName)
             {
-                switch (LoginManager.Instance.LoginProgress)
+                if (LoginProgressEnum.EnterpriseJoinConf == LoginManager.Instance.LoginProgress)
                 {
-                    case LoginProgressEnum.EnterpriseJoinConf:
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            RefreshControlValue();
-                            this.comboBoxConfId.Margin = new Thickness(0, 6, 0, 0);
-                        });
-                        break;
-                    case LoginProgressEnum.CloudJoinConf:
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            RefreshControlValue();
-                            this.comboBoxConfId.Margin = new Thickness(0, 40, 0, 0);
-                        });
-                        break;
-                    default:
-                        break;
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        RefreshControlValue();
+                        this.comboBoxConfId.Margin = new Thickness(0, 6, 0, 0);
+                        UpdateMoreButton();
+                    });
                 }
+                else if(LoginProgressEnum.CloudJoinConf == LoginManager.Instance.LoginProgress)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        RefreshControlValue();
+                        this.comboBoxConfId.Margin = new Thickness(0, 40, 0, 0);
+                        UpdateMoreButton();
+                    });
+                }
+            }
+            else if ("CurrentLoginStatus" == e.PropertyName)
+            {
+                Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    UpdateMoreButton();
+                });
             }
             //else if ("IsNeedAnonymousJoinConf" == e.PropertyName)
             //{
             //    TryAnonymousJoinConf();
             //}
+        }
+
+        private void UpdateMoreButton()
+        {
+            this.moreDockPanel.Visibility = (LoginStatus.LoggedIn == LoginManager.Instance.CurrentLoginStatus || LoginProgressEnum.EnterpriseJoinConf != LoginManager.Instance.LoginProgress)
+                                              ? Visibility.Collapsed : Visibility.Visible;
         }
 
         //private void TryAnonymousJoinConf()
@@ -326,6 +339,11 @@ namespace EasyVideoWin.View
                 list.Add(confIdList[i].ConfId);
             }
             Utils.SetConfIdsSetting(list);
+        }
+
+        private void More_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            LoginManager.Instance.LoginProgress = LoginProgressEnum.AdvancedSetting;
         }
 
         #endregion

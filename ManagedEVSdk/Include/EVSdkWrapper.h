@@ -127,7 +127,8 @@ public:
     int EVEngineSendContent();
     int EVEngineSendWhiteBoard();
     int EVEngineStopContent();
-
+    int EVEngineEnableContentAudio(bool enable);
+    bool EVEngineContentAudioEnabled();
 
     // obsever
     void OnError(ev::engine::EVError& err);

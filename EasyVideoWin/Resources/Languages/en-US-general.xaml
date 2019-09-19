@@ -314,7 +314,7 @@
     <sys:String x:Key="NUMERICID_ALREADY_IN_USE">Numeric ID is already in use.</sys:String>
     <sys:String x:Key="INVALID_CONF_TIME">Invalid meeting time.</sys:String>
     <sys:String x:Key="INVALID_CONF_ID">Invalid meeting ID.</sys:String>
-    <sys:String x:Key="NOT_FOUND_SUITABLE_MRU">Not found applicable MRU.</sys:String>
+    <sys:String x:Key="NOT_FOUND_SUITABLE_MRU">No meeting port resources available.</sys:String>
     <sys:String x:Key="NOT_FOUND_SUITABLE_GATEWAY">Not found applicable Gateway.</sys:String>
     <sys:String x:Key="FAILED_TO_CONNECT_MRU">Failed to connect to MRU.</sys:String>
     <sys:String x:Key="NOT_ALLOW_DUPLICATED_NAME">Duplicated name.</sys:String>
@@ -387,7 +387,7 @@
     <sys:String x:Key="CAN_NOT_DELETE_DEPARTMENT_WITH_USERS_OR_ENDPOINTS">Can not delete a department which has users or endpoints!</sys:String>
     <sys:String x:Key="INVALID_ACS_CONFIGURATION">ACS configuration not valid!</sys:String>
     <sys:String x:Key="ONLY_ROOM_OWNER_CAN_ACTIVATE_ROOM">Only the owner can activate the meeting room.</sys:String>
-    <sys:String x:Key="NOT_ALLOWED_ANONYMOUS_PARTY">Anonymous call is not allowed for this meeting.</sys:String>
+    <sys:String x:Key="NOT_ALLOW_ANONYMOUS_PARTY">This meeting room does not allow anonymous calls.</sys:String>
         
     <sys:String x:Key="RESUME_PIP">Resume PIP</sys:String>
 
@@ -401,17 +401,17 @@
     <sys:String x:Key="SERVER_UNLICENSED">The called cloud platform is not activated.</sys:String>
     <sys:String x:Key="SERVER_LICENSE_EXPIRED">License expired.</sys:String>
     <sys:String x:Key="NEITHER_TEMPLATE_NOR_ONGOING_NOR_BINDED_ROOM">Invalid meeting ID or meeting has not started yet, please double check.</sys:String>
-    <sys:String x:Key="LOCK_TIMEOUT">Call timeout.</sys:String>
-    <sys:String x:Key="TEMPLATE_CONF_WITHOUT_CONFROOM">There is no meeting room bound to the called groupd.</sys:String>
+    <sys:String x:Key="LOCK_TIMEOUT">Call timeout, please retry.</sys:String>
+    <sys:String x:Key="TEMPLATE_CONF_WITHOUT_CONFROOM">There is no meeting room bound to the called group.</sys:String>
     <sys:String x:Key="ROOM_EXPIRED">Meeting room expired.</sys:String>
     <sys:String x:Key="ROOM_COMPLETELY_FULL">Meeting room is full.</sys:String>
-    <sys:String x:Key="INVALID_PASSWORD">Password is wrong.</sys:String>
-    <sys:String x:Key="NO_TIME_SPACE_TO_ACTIVATE_ROOM">There is no available meeting room that can be activated in the specified time span.</sys:String>
+    <sys:String x:Key="INVALID_PASSWORD">Please input valid password.</sys:String>
+    <sys:String x:Key="NO_TIME_SPACE_TO_ACTIVATE_ROOM">Unable to activate the room due to has an upcoming meeting.</sys:String>
     <sys:String x:Key="NOT_FOUND_SIGNALING_IP">There is no signaling IP in MRU.</sys:String>
     <sys:String x:Key="MIXED_MRU_COMPLETELY_FULL">The media resource is not available.</sys:String>
-    <sys:String x:Key="MAX_PORT_COUNT_USED_UP">The number of participants has reached the limit.</sys:String>
-    <sys:String x:Key="ORG_PORT_COUNT_USED_UP">The number of orgnization reaches the maximum.</sys:String>
-    <sys:String x:Key="EXCEEDED_CONFERENCE_PORT_COUNT_IN_LICENSE">The call number reaches the maxminum in license.</sys:String>
+    <sys:String x:Key="CONF_PORT_COUNT_USED_UP">The number of participants has reached the limit.</sys:String>
+    <sys:String x:Key="ORG_PORT_COUNT_USED_UP">The number of participants has reached the organization limit.</sys:String>
+    <sys:String x:Key="HAISHEN_PORT_COUNT_USED_UP">The number of participants has reached the platform limit.</sys:String>
     <sys:String x:Key="EXCEEDED_GATEWAY_AUDIO_PORT_COUNT_IN_LICENSE">The audio number of gateway reaches the maxinum.</sys:String>
     <sys:String x:Key="EXCEEDED_GATEWAY_VIDEO_PORT_COUNT_IN_LICENSE">The video number of gateway reaches the maxinum.</sys:String>
 
@@ -483,4 +483,7 @@
     <sys:String x:Key="DISABLE_PROMPT_DESCRIPTION">If checked, prompt information such as network status is not popup after joining conference.</sys:String>
     <sys:String x:Key="SUPPORT_1080P">Support 1080P</sys:String>
     <sys:String x:Key="NOT_AVAILABLE_FOR_ADMINISTRATORS">Administrator is not allowed to access app. Please use user account.</sys:String>
+    <sys:String x:Key="SHARE_COMPUTER_SOUND">Share Computer Sound</sys:String>
+    <sys:String x:Key="SHARE_SOUND">Share Sound</sys:String>
+    <sys:String x:Key="STOP_SHARING_SOUND">Stop Sharing Sound</sys:String>
 </ResourceDictionary>

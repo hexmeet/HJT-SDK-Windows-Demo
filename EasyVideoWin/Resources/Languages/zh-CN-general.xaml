@@ -314,7 +314,7 @@
     <sys:String x:Key="NUMERICID_ALREADY_IN_USE">该会议号码已被占用！</sys:String>
     <sys:String x:Key="INVALID_CONF_TIME">无效的会议时间</sys:String>
     <sys:String x:Key="INVALID_CONF_ID">无效的会议ID</sys:String>
-    <sys:String x:Key="NOT_FOUND_SUITABLE_MRU">云平台没有可用的媒体资源了</sys:String>
+    <sys:String x:Key="NOT_FOUND_SUITABLE_MRU">没有可用的会议端口资源</sys:String>
     <sys:String x:Key="NOT_FOUND_SUITABLE_GATEWAY">未找到合适的Gateway</sys:String>
     <sys:String x:Key="FAILED_TO_CONNECT_MRU">连接MRU失败</sys:String>
     <sys:String x:Key="NOT_ALLOW_DUPLICATED_NAME">不允许重名</sys:String>
@@ -387,7 +387,7 @@
     <sys:String x:Key="CAN_NOT_DELETE_DEPARTMENT_WITH_USERS_OR_ENDPOINTS">部门下面有用户或终端，不能删除！</sys:String>
     <sys:String x:Key="INVALID_ACS_CONFIGURATION">无效的ACS配置</sys:String>
     <sys:String x:Key="ONLY_ROOM_OWNER_CAN_ACTIVATE_ROOM">只允许会议室拥有者激活会议室</sys:String>
-    <sys:String x:Key="NOT_ALLOWED_ANONYMOUS_PARTY">该会议不允许匿名呼叫</sys:String>
+    <sys:String x:Key="NOT_ALLOW_ANONYMOUS_PARTY">该会议不允许匿名呼叫</sys:String>
 
     <sys:String x:Key="RESUME_PIP">恢复画中画</sys:String>
 
@@ -401,7 +401,7 @@
     <sys:String x:Key="SERVER_UNLICENSED">您呼叫的云平台尚未激活</sys:String>
     <sys:String x:Key="SERVER_LICENSE_EXPIRED">服务器许可证过期</sys:String>
     <sys:String x:Key="NEITHER_TEMPLATE_NOR_ONGOING_NOR_BINDED_ROOM">呼叫失败，会议号码不存在或者此会议还未开始，请检查后重试</sys:String>
-    <sys:String x:Key="LOCK_TIMEOUT">呼叫超时</sys:String>
+    <sys:String x:Key="LOCK_TIMEOUT">呼叫超时，请重试</sys:String>
     <sys:String x:Key="TEMPLATE_CONF_WITHOUT_CONFROOM">您呼叫的群组尚未绑定云会议室</sys:String>
     <sys:String x:Key="ROOM_EXPIRED">您呼叫的云会议室已过期</sys:String>
     <sys:String x:Key="ROOM_COMPLETELY_FULL">您呼叫的云会议室已满员</sys:String>
@@ -409,9 +409,9 @@
     <sys:String x:Key="NO_TIME_SPACE_TO_ACTIVATE_ROOM">当前云会议室有即将召开的会议，所以暂时无法激活本会议室</sys:String>
     <sys:String x:Key="NOT_FOUND_SIGNALING_IP">媒体资源单元没有合法的信令地址</sys:String>
     <sys:String x:Key="MIXED_MRU_COMPLETELY_FULL">媒体资源已用尽</sys:String>
-    <sys:String x:Key="MAX_PORT_COUNT_USED_UP">当前入会人数已达上限</sys:String>
-    <sys:String x:Key="ORG_PORT_COUNT_USED_UP">当前组织端口数已达上限</sys:String>
-    <sys:String x:Key="EXCEEDED_CONFERENCE_PORT_COUNT_IN_LICENSE">视频通话数量已达到云平台的许可上限</sys:String>
+    <sys:String x:Key="CONF_PORT_COUNT_USED_UP">当前入会人数已达上限</sys:String>
+    <sys:String x:Key="ORG_PORT_COUNT_USED_UP">当前与会人数已达组织端口上限</sys:String>
+    <sys:String x:Key="HAISHEN_PORT_COUNT_USED_UP">当前与会人数已达平台会议端口上限</sys:String>
     <sys:String x:Key="EXCEEDED_GATEWAY_AUDIO_PORT_COUNT_IN_LICENSE">网关语音通话数量已达到云平台的许可上限</sys:String>
     <sys:String x:Key="EXCEEDED_GATEWAY_VIDEO_PORT_COUNT_IN_LICENSE">网关视频通话数量已达到云平台的许可上限</sys:String>
 
@@ -483,4 +483,7 @@
     <sys:String x:Key="DISABLE_PROMPT_DESCRIPTION">勾选后，进入会议后，网络状况等提示信息将不再提示</sys:String>
     <sys:String x:Key="SUPPORT_1080P">支持 1080P</sys:String>
     <sys:String x:Key="NOT_AVAILABLE_FOR_ADMINISTRATORS">系统管理员无登录应用权限，请使用用户账号登录</sys:String>
+    <sys:String x:Key="SHARE_COMPUTER_SOUND">共享电脑声音</sys:String>
+    <sys:String x:Key="SHARE_SOUND">共享声音</sys:String>
+    <sys:String x:Key="STOP_SHARING_SOUND">停止共享声音</sys:String>
 </ResourceDictionary>
