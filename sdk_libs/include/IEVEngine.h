@@ -401,16 +401,19 @@ public:
     virtual int unregisterEventHandler(IEVEventHandler * handler) = 0;
 
     //Login
-    virtual int login(const char * server, unsigned int port, const char * username, const char * encrypted_password) = 0;
+    EV_DEPRECATED virtual int login(const char * server, unsigned int port, const char * username, const char * encrypted_password) = 0;
     virtual int loginWithLocation(const char * location_server, unsigned int port, const char * username, const char * encrypted_password) = 0;
     virtual int logout() = 0;
 
     //Conference & Layout
     virtual int setMaxRecvVideo(unsigned int num) = 0;
+    virtual int setLayoutCapacity(EV_LAYOUT_MODE mode, EV_LAYOUT_TYPE types[], unsigned int size) = 0;
     virtual int joinConference(const char * conference_number, const char * display_name, const char * password) = 0;
-    virtual int joinConference(const char * server, unsigned int port, const char * conference_number, const char * display_name, const char * password) = 0;
+    virtual int joinConference(const char * number, const char * display_name, const char * password, EV_SVC_CALL_TYPE type) = 0;
+    EV_DEPRECATED virtual int joinConference(const char * server, unsigned int port, const char * conference_number, const char * display_name, const char * password) = 0;
     virtual int joinConferenceWithLocation(const char * location_server, unsigned int port, const char * conference_number, const char * display_name, const char * password) = 0;
     virtual int leaveConference() = 0;
+    virtual int declineIncommingCall(const char * conference_number) = 0;
     virtual int setLayout(EVLayoutRequest & layout) = 0;
 
     //Set Windows
