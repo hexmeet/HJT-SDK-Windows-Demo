@@ -122,7 +122,7 @@ namespace EasyVideoWin.Model.CloudModel
 
             if (null != uriParams)
             {
-                foreach (var item in uriParams)
+                foreach (KeyValuePair<object, object> item in uriParams)
                 {
                     if (!addParam)
                     {

@@ -15,9 +15,11 @@ namespace EasyVideoWin.ViewModel
         private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private UserControl _conferenceView;
-        private UserControl _loginUserView;
+        private UserControl _contactView;
+        private UserControl _settingView;
         private UserControl _currentView;
         private bool _conferenceViewEnabled;
+        private bool _contactViewEnabled;
         private bool _loginUserViewEnabled;
         
         #endregion
@@ -33,7 +35,7 @@ namespace EasyVideoWin.ViewModel
         }
 
         public RelayCommand ShowConferenceCommand { get; set; }
-        public RelayCommand ShowAddressBookCommand { get; set; }
+        public RelayCommand ShowContactCommand { get; set; }
         public RelayCommand ShowLoginUserCommand { get; set; }
         
         public UserControl CurrentView
@@ -56,12 +58,17 @@ namespace EasyVideoWin.ViewModel
                 }
                 
                 ConferenceViewEnabled = false;
+                ContactViewEnabled = false;
                 LoginUserViewEnabled = false;
                 if (_conferenceView == _currentView)
                 {
                     ConferenceViewEnabled = true;
                 }
-                else if (_loginUserView == _currentView)
+                if (_contactView == _currentView)
+                {
+                    ContactViewEnabled = true;
+                }
+                else if (_settingView == _currentView)
                 {
                     LoginUserViewEnabled = true;
                 }
@@ -80,7 +87,20 @@ namespace EasyVideoWin.ViewModel
                 OnPropertyChanged("ConferenceViewEnabled");
             }
         }
-        
+
+        public bool ContactViewEnabled
+        {
+            get
+            {
+                return _contactViewEnabled;
+            }
+            set
+            {
+                _contactViewEnabled = value;
+                OnPropertyChanged("ContactViewEnabled");
+            }
+        }
+
         public bool LoginUserViewEnabled
         {
             get
@@ -93,32 +113,38 @@ namespace EasyVideoWin.ViewModel
                 OnPropertyChanged("LoginUserViewEnabled");
             }
         }
-        
-        Visibility _failureVisibility;
-        public Visibility RegisterFailureVisibility
+
+        private string _registerStatusText;
+        public string RegisterStatusText
         {
             get
             {
-                return _failureVisibility;
+                return _registerStatusText;
             }
             set
             {
-                _failureVisibility = value;
-                OnPropertyChanged("RegisterFailureVisibility");
+                if (_registerStatusText != value)
+                {
+                    _registerStatusText = value;
+                    OnPropertyChanged("RegisterStatusText");
+                }
             }
         }
 
-        Visibility _successVisibility;
-        public Visibility RegisterSuccessVisibility
+        private string _registerStatusImg;
+        public string RegisterStatusImg
         {
             get
             {
-                return _successVisibility;
+                return _registerStatusImg;
             }
             set
             {
-                _successVisibility = value;
-                OnPropertyChanged("RegisterSuccessVisibility");
+                if (_registerStatusImg != value)
+                {
+                    _registerStatusImg = value;
+                    OnPropertyChanged("RegisterStatusImg");
+                }
             }
         }
 
@@ -130,6 +156,15 @@ namespace EasyVideoWin.ViewModel
             }
         }
 
+        public Visibility ContactsVisibility
+        {
+            get
+            {
+                return null != LoginManager.Instance.LoginUserInfo && LoginManager.Instance.LoginUserInfo.featureSupport.contactWebPage
+                        ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
         #endregion
 
         #region -- Constructor --
@@ -137,10 +172,12 @@ namespace EasyVideoWin.ViewModel
         public MainViewViewModel()
         {
             ShowConferenceCommand = new RelayCommand(ShowConference);
+            ShowContactCommand = new RelayCommand(ShowContact);
             ShowLoginUserCommand = new RelayCommand(ShowLoginUser);
             
-            _conferenceView = (UserControl)Activator.CreateInstance(typeof(EasyVideoWin.View.ConferenceView));
-            _loginUserView = (UserControl)Activator.CreateInstance(typeof(EasyVideoWin.View.SettingView));
+            _conferenceView = new View.WebBrowserWrapperView(Enums.WebBrowserUrlType.CONFERENCES, (MainWindow)Application.Current.MainWindow);
+            _contactView = new View.WebBrowserWrapperView(Enums.WebBrowserUrlType.CONTACTS, (MainWindow)Application.Current.MainWindow, false);
+            _settingView = (UserControl)Activator.CreateInstance(typeof(EasyVideoWin.View.SettingView));
             
             CurrentView = _conferenceView;
             LoginManager.Instance.PropertyChanged += LoginManager_PropertyChanged;
@@ -163,7 +200,12 @@ namespace EasyVideoWin.ViewModel
                     {
                         if (null == _conferenceView)
                         {
-                            _conferenceView = (UserControl)Activator.CreateInstance(typeof(EasyVideoWin.View.ConferenceView));
+                            _conferenceView = new View.WebBrowserWrapperView(Enums.WebBrowserUrlType.CONFERENCES, (MainWindow)Application.Current.MainWindow);
+                        }
+
+                        if (null == _contactView)
+                        {
+                            _contactView = new View.WebBrowserWrapperView(Enums.WebBrowserUrlType.CONTACTS, (MainWindow)Application.Current.MainWindow, false);
                         }
                         CurrentView = _conferenceView;
                     });
@@ -174,9 +216,14 @@ namespace EasyVideoWin.ViewModel
                     Application.Current.Dispatcher.InvokeAsync(() => {
                         if (null != _conferenceView)
                         {
-                            var confView = _conferenceView as EasyVideoWin.View.ConferenceView;
-                            confView.Dispose();
+                            (_conferenceView as IDisposable)?.Dispose();
                             _conferenceView = null;
+                        }
+
+                        if (null != _contactView)
+                        {
+                            (_contactView as IDisposable)?.Dispose();
+                            _contactView = null;
                         }
                     });
                 }
@@ -193,23 +240,32 @@ namespace EasyVideoWin.ViewModel
             {
                 UpdateRegisterStatus(LoginManager.Instance.IsRegistered);
             }
+            else if ("LoginUserInfo" == e.PropertyName)
+            {
+                OnPropertyChanged("ContactsVisibility");
+            }
         }
         
         private void UpdateRegisterStatus(bool isRegistered)
         {
-            log.InfoFormat("Register status changed, is registered {0}", isRegistered);
-            RegisterSuccessVisibility = isRegistered ? Visibility.Visible : Visibility.Collapsed;
-            RegisterFailureVisibility = isRegistered ? Visibility.Collapsed : Visibility.Visible;
+            log.InfoFormat("UpdateRegisterStatus, isRegistered: {0}", isRegistered);
+            RegisterStatusText = isRegistered ? LanguageUtil.Instance.GetValueByKey("REGISTER_SUCCESS") : LanguageUtil.Instance.GetValueByKey("REGISTER_FAILURE");
+            RegisterStatusImg = isRegistered ? "pack://application:,,,/Resources/Icons/icon_register_success.png" : "pack://application:,,,/Resources/Icons/icon_register_failure.png";
         }
 
         private void ShowConference(object parameter)
         {
             CurrentView = _conferenceView;
         }
-        
+
+        private void ShowContact(object parameter)
+        {
+            CurrentView = _contactView;
+        }
+
         private void ShowLoginUser(object parameter)
         {
-            CurrentView = _loginUserView;
+            CurrentView = _settingView;
         }
         
         #endregion

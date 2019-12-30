@@ -29,13 +29,12 @@ namespace EasyVideoWin
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool TerminateProcess(IntPtr hProcess, uint uExitCode);
 
+        // do not remove the code below or static method in LoginWindow is not initialized.
         private LoginWindow _loginWindow;
         private bool _notLogin = true;
         
         private MainWindowViewModel _viewModel;
         
-        private IncomingCallPromptDialog _incomingCallPromptDialog;
-        private System.Timers.Timer _incomingCallPromptTimer = null;
         private bool _flashWindowStarted = false;
         private MessageBoxTip _messageBoxTip = null;
         private string _messageTipExtraInfo = null;
@@ -56,20 +55,54 @@ namespace EasyVideoWin
             _viewModel = this.DataContext as MainWindowViewModel;
 
             LoginManager.Instance.PropertyChanged += LoginManager_PropertyChanged;
+            this.IsVisibleChanged += MainWindow_IsVisibleChanged;
         }
-        
+
+        private void MainWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (
+                   CallStatus.PeerCancelled == CallController.Instance.CurrentCallStatus
+                && (CallStatus.P2pIncoming == CallController.Instance.PreviousCallStatus || CallStatus.ConfIncoming == CallController.Instance.PreviousCallStatus)
+            )
+            {
+                CallController.Instance.CurrentCallStatus = CallStatus.Idle;
+                PromptWindow promptWindow = new PromptWindow(this);
+                promptWindow.ShowPromptByTime(LanguageUtil.Instance.GetValueByKey("CALL_ENDED_BY_OTHER_USER"), 3000);
+            }
+
+            if (
+                   CallStatus.TimeoutSelfCancelled == CallController.Instance.CurrentCallStatus
+                && (   CallStatus.P2pIncoming == CallController.Instance.PreviousCallStatus
+                    || CallStatus.P2pOutgoing == CallController.Instance.PreviousCallStatus
+                    || CallStatus.ConfIncoming == CallController.Instance.PreviousCallStatus)
+            )
+            {
+                CallController.Instance.CurrentCallStatus = CallStatus.Idle;
+                PromptWindow promptWindow = new PromptWindow(this);
+                promptWindow.ShowPromptByTime(LanguageUtil.Instance.GetValueByKey("CALL_TIMEOUT"), 3000);
+            }
+
+            if (CallStatus.PeerDeclined == CallController.Instance.CurrentCallStatus && CallStatus.P2pOutgoing == CallController.Instance.PreviousCallStatus)
+            {
+                CallController.Instance.CurrentCallStatus = CallStatus.Idle;
+                PromptWindow promptWindow = new PromptWindow(this);
+                promptWindow.ShowPromptByTime(LanguageUtil.Instance.GetValueByKey("CALL_DECLINED"), 3000);
+            }
+        }
+
         private void OnCallStatusChanged(object sender, CallStatus status)
         {
-            log.Info("OnCallStatusChanged start.");
+            log.Info("OnCallStatusChanged start");
             App.Current.Dispatcher.InvokeAsync(() => {
-                log.Info("Begin to handle call status in UI thread.");
-                if (CallStatus.Connected == status)
+                log.Info("Begin to handle call status");
+                if (
+                       CallStatus.ConfIncoming == status
+                    || CallStatus.P2pIncoming == status
+                    || CallStatus.P2pOutgoing == status
+                    || CallStatus.Connected == status
+                )
                 {
                     StopFlashWindow();
-                    if (null != _incomingCallPromptDialog)
-                    {
-                        _incomingCallPromptDialog.Visibility = Visibility.Collapsed;
-                    }
                     SystemSleepManager.PreventSleep();
                 }
                 else
@@ -81,10 +114,10 @@ namespace EasyVideoWin
                     }
                 }
 
-                log.Info("Handled call status in UI thread.");
+                log.Info("Handled call status");
             });
 
-            log.Info("OnCallStatusChanged end.");
+            log.Info("OnCallStatusChanged end");
         }
 
         public void BringToForeground()
@@ -226,7 +259,6 @@ namespace EasyVideoWin
         {
             log.Info("OnClosed");
             CallController.Instance.CallStatusChanged -= OnCallStatusChanged;
-            EVSdkManager.Instance.EventJoinConferenceIndication -= EVSdkWrapper_EventJoinConferenceIndication;
             if (CallController.Instance.CurrentCallStatus != CallStatus.Idle && CallController.Instance.CurrentCallStatus != CallStatus.Ended)
             {
                 CallController.Instance.TerminateCall();
@@ -244,89 +276,9 @@ namespace EasyVideoWin
         
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            EVSdkManager.Instance.EventJoinConferenceIndication += EVSdkWrapper_EventJoinConferenceIndication;
             _viewModel.RefreshSoftwareUpdateWindow();
         }
-
-        private void EVSdkWrapper_EventJoinConferenceIndication(ManagedEVSdk.Structs.EVCallInfoCli callInfo)
-        {
-            log.Info("EventJoinConferenceIndication");
-            if (!(LoginStatus.LoggedIn == LoginManager.Instance.CurrentLoginStatus && (CallStatus.Ended == CallController.Instance.CurrentCallStatus || CallStatus.Idle == CallController.Instance.CurrentCallStatus)))
-            {
-                log.Info("Login status or call status is not expected. EventJoinConferenceIndication end");
-                return;
-            }
-            Application.Current.Dispatcher.InvokeAsync(() =>
-            {
-                log.Info("EventJoinConferenceIndication arrived and CloseMessageBoxTip");
-                CloseMessageBoxTip();
-                if (Utils.GetAutoAnswer())
-                {
-                    _viewModel.StartJoinConference(callInfo.conference_number, LoginManager.Instance.DisplayName, callInfo.password, this);
-                    log.Info("Auto answer. EventJoinConferenceIndication end");
-                    return;
-                }
-
-                if (null == _incomingCallPromptDialog)
-                {
-                    _incomingCallPromptDialog = new IncomingCallPromptDialog();
-                }
-
-                if (Visibility.Visible == _incomingCallPromptDialog.Visibility || _incomingCallPromptDialog.IsActive)
-                {
-                    // There is an incoming call and another call is coming.
-                    log.Info("Another call coming. EventJoinConferenceIndication end");
-                    return;
-                }
-
-                _incomingCallPromptDialog.SetPromptInfo(callInfo.peer, callInfo.conference_number);
-                _incomingCallPromptDialog.Owner = this;
-                StartIncomingCallPromptTimer();
-                _incomingCallPromptDialog.ShowDialog();
-                StopIncomingCallPromptTimer();
-                if (_incomingCallPromptDialog.IsAccept)
-                {
-                    _viewModel.StartJoinConference(callInfo.conference_number, LoginManager.Instance.DisplayName, callInfo.password, this);
-                }
-            });
-            log.Info("EventJoinConferenceIndication end");
-        }
         
-        private void StartIncomingCallPromptTimer()
-        {
-            if (null == _incomingCallPromptTimer)
-            {
-                _incomingCallPromptTimer = new System.Timers.Timer();
-                _incomingCallPromptTimer.Elapsed += OnTimerIncomingCallPrompt;
-                _incomingCallPromptTimer.AutoReset = false;
-                _incomingCallPromptTimer.Interval = 30 * 1000;
-            }
-
-            StartFlashWindow();
-            CallController.Instance.PlayRingtone();
-            _incomingCallPromptTimer.Enabled = true;
-        }
-
-        private void OnTimerIncomingCallPrompt(object source, System.Timers.ElapsedEventArgs e)
-        {
-            if (Visibility.Visible == _incomingCallPromptDialog.Visibility)
-            {
-                System.Windows.Application.Current.Dispatcher.Invoke(() =>
-                {
-                    _incomingCallPromptDialog.IsAccept = false;
-                    _incomingCallPromptDialog.Visibility = Visibility.Collapsed;
-                });
-            }
-        }
-
-        private void StopIncomingCallPromptTimer()
-        {
-            CallController.Instance.StopRingtone();
-
-            StopFlashWindow();
-            _incomingCallPromptTimer.Enabled = false;
-        }
-
         private void LoginManager_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if ("CurrentLoginStatus" == e.PropertyName)

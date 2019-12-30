@@ -1,0 +1,32 @@
+﻿<Window x:Class="EasyVideoWin.View.SelectMoreContentModeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:EasyVideoWin.View"
+        mc:Ignorable="d"
+        Title="SelectMoreContentModeWindow" Width="158" Height="150" SizeToContent="Manual" ShowInTaskbar="False"
+        WindowStyle="None" ResizeMode="NoResize" Background="Transparent" AllowsTransparency="True" 
+        VerticalAlignment="Bottom" HorizontalAlignment="Center">
+    <Viewbox VerticalAlignment="Bottom" Stretch="None">
+        <Border CornerRadius="4" Background="#000">
+            <StackPanel x:Name="morePanel" Width="140" VerticalAlignment="Bottom" >
+                <Grid x:Name="switch2AudioModeGrid" Height="50" VerticalAlignment="Bottom">
+                    <Label Height="30" Content="{DynamicResource BOTTOM_BAR_SWITCH_AUDIO}" Foreground="#ffffff" FontSize="14"
+                       VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                       MouseLeftButtonDown="Switch2AudioModeBtn_Click" Cursor="Hand" MouseEnter="MouseEnter_ItemLabel" MouseLeave="MouseLeave_ItemLabel"/>
+                </Grid>
+                <Grid x:Name="requestSpeakGrid" Height="50" VerticalAlignment="Bottom">
+                    <Label Height="30" Content="{DynamicResource BOTTOM_BAR_REQUEST}" Foreground="#ffffff" FontSize="14"
+                       VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                       MouseLeftButtonDown="RequestSpeakBtn_Click" Cursor="Hand" MouseEnter="MouseEnter_ItemLabel" MouseLeave="MouseLeave_ItemLabel"/>
+                </Grid>
+                <Grid x:Name="changeNameGrid" Height="50" VerticalAlignment="Bottom">
+                    <Label Height="30" Content="{DynamicResource CHANGE_NAME}" Foreground="#ffffff" FontSize="14"
+                       VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                       MouseLeftButtonDown="ChangeNameBtn_Click" Cursor="Hand" MouseEnter="MouseEnter_ItemLabel" MouseLeave="MouseLeave_ItemLabel"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+    </Viewbox>
+</Window>

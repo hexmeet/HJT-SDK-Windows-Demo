@@ -18,6 +18,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using EasyVideoWin.Enums;
+using EasyVideoWin.CustomControls;
 
 namespace EasyVideoWin.View
 {
@@ -40,13 +42,13 @@ namespace EasyVideoWin.View
             , WhiteBoardWindow
             , MediaStatistics
         }
-
+        
         private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         public static LayoutBackgroundWindow _instance = new LayoutBackgroundWindow();
 
         private const string SPEAKER_BORDER_COLOR                   = "#ffae00";
         private const string LOVAL_VIDEO_BORDER_COLOR               = "#4381ff";
-        private const int LAYOUT_OPERATIONBAR_HEIGHT                = 68;
+        private const int LAYOUT_OPERATIONBAR_HEIGHT                = 60;
         private const int MESSAGE_OVERLAY_HEIGHT                    = 64;
         private const int SMALL_VIDEO_WINDOW_WIDTH                  = 176;
         private const int SMALL_VIDEO_WINDOW_HEIGHT                 = 99;
@@ -66,7 +68,7 @@ namespace EasyVideoWin.View
         private LayoutCellWindow[] _layoutNormalCells;
         private LayoutCellWindow _currentSpeakerCell;
         private LayoutCellWindow _movingLayoutCell = null;
-        private bool _isSpeakerMode = true;
+        private LayoutModeType _layoutMode = LayoutModeType.NEW_SPEAKER_MODE;
         private int _sourceInitializedCellsCount = 0;
         private Dictionary<IntPtr, LayoutCellWindow> _dictLayoutCellHandle = new Dictionary<IntPtr, LayoutCellWindow>();
         private int _layoutSpeakerIdx;
@@ -88,10 +90,13 @@ namespace EasyVideoWin.View
         private bool _isFocusVideoMode = false;
         private LayoutCancelFocusVideoWindow _cancelFocusVideoWindow = new LayoutCancelFocusVideoWindow();
         private LayoutRecordingIndicationWindow _recordingIndicationWindow = new LayoutRecordingIndicationWindow();
+        private LayoutSpeakerPromptWindow _speakerPromptWindow = new LayoutSpeakerPromptWindow();
+        private LayoutExitAudioModeWindow _exitAudioModeWindow = new LayoutExitAudioModeWindow();
         private ManagedEVSdk.Structs.EVRecordingInfoCli _recordingIndication = new ManagedEVSdk.Structs.EVRecordingInfoCli();
         private MessageOverlayWindow _messageOverlayWindow = new MessageOverlayWindow();
-        private ConfManagementWindow _confManagermentWindow = null; // new ConfManagementWindow();
-        
+        private ConfManagementWindow _confManagermentWindow = new ConfManagementWindow();
+        private DialoutPeerInfoWindow _dialoutPeerInfoWindow = new DialoutPeerInfoWindow();
+
         private System.Timers.Timer _timerMessageOverlayRoll = new System.Timers.Timer();
         private int _messageOverlayDisplayRepetitions;
         private int _messageOverlayDisplayRolledCount;
@@ -111,6 +116,8 @@ namespace EasyVideoWin.View
         private IntPtr _handle;
         private ModalPromptDlg _modalPromptDlg = null;
         private bool _disablePrompt = false;
+        private MediaModeType _mediaMode = MediaModeType.VIDEO_NORMAL;
+        private bool _isRemoteMuted = false;
 
         #endregion
 
@@ -124,17 +131,31 @@ namespace EasyVideoWin.View
             }
         }
 
-        public bool IsSpeakerMode
+        public LayoutModeType LayoutMode
         {
             get
             {
-                return _isSpeakerMode;
+                return _layoutMode;
             }
         }
 
         public ManagedEVSdk.Structs.EVLayoutIndicationCli LayoutIndication { get; set; } = new ManagedEVSdk.Structs.EVLayoutIndicationCli();
-        
-        public bool IsRemoteMuted { get; set; }
+
+        public bool IsRemoteMuted
+        {
+            get
+            {
+                return _isRemoteMuted;
+            }
+            set
+            {
+                if (_isRemoteMuted != value)
+                {
+                    _isRemoteMuted = value;
+                    _layoutOperationbar.IsRemoteMuted = value;
+                }
+            }
+        }
 
         public bool IsDisposed { get; private set; } = false;
         
@@ -143,6 +164,35 @@ namespace EasyVideoWin.View
             get
             {
                 return _layoutOperationbar;
+            }
+        }
+        
+        public MediaModeType MediaMode
+        {
+            get
+            {
+                return _mediaMode;
+            }
+            set
+            {
+                if (_mediaMode != value)
+                {
+                    log.InfoFormat("MediaMode changed from {0} to {1}", _mediaMode, value);
+                    _mediaMode = value;
+                    OnMediaModeChanged();
+                }
+            }
+        }
+
+        private int LayoutSpeakerIdx
+        {
+            get
+            {
+                return _layoutSpeakerIdx;
+            }
+            set
+            {
+                _layoutSpeakerIdx = value;
             }
         }
 
@@ -172,12 +222,14 @@ namespace EasyVideoWin.View
 
             _layoutOperationbar.EventInitScreen += LayoutOperationbar_EventInitScreen;
             _layoutOperationbar.EventRequestSpeaker += LayoutOperationbar_EventRequestSpeaker;
+            _layoutOperationbar.EventSwitch2AudioMode += LayoutOperationbar_EventSwitch2AudioMode;
+            _layoutOperationbar.EventDisplayNameChanged += LayoutOperationbar_EventDisplayNameChanged;
+            _exitAudioModeWindow.EventSwitch2VideoMode += ExitAudioModeWindow_EventSwitch2VideoMode;
 
             this.Activated += LayoutBackgroundWindow_Activated;
             this.Deactivated += LayoutBackgroundWindow_Deactivated;
         }
         
-
         #endregion
 
         #region -- Public Methods --
@@ -197,7 +249,7 @@ namespace EasyVideoWin.View
 
             for (int i = 0; i < _layoutCells.Length; ++i)
             {
-                var cell = _layoutCells[i] = new LayoutCellWindow();
+                LayoutCellWindow cell = _layoutCells[i] = new LayoutCellWindow();
                 cell.Activated += LayoutCell_Activated;
                 cell.MouseMove += LayoutCell_MouseMove;
                 cell.MouseDown += LayoutCell_MouseDown;
@@ -243,7 +295,7 @@ namespace EasyVideoWin.View
             _recordingIndicationWindow.HideWindow();
             _recordingIndicationWindow.SetProperWindowSize(width, height);
             _recordingIndicationWindow.Owner = _baseWindow;
-
+            
             width = _messageOverlayWindow.Width;
             height = MESSAGE_OVERLAY_HEIGHT;
             _messageOverlayWindow.SetProperWindowSize(0, 0);
@@ -255,7 +307,23 @@ namespace EasyVideoWin.View
             _messageOverlayWindow.Owner = _baseWindow;
             _timerMessageOverlayRoll.Interval = 10;
             _timerMessageOverlayRoll.Elapsed += TimerMessageOverlayRoll_Elapsed;
-            
+
+            width = _speakerPromptWindow.Width;
+            height = _speakerPromptWindow.Height;
+            _speakerPromptWindow.SetProperWindowSize(0, 0);
+            _speakerPromptWindow.Show();
+            _speakerPromptWindow.HideWindow();
+            _speakerPromptWindow.SetProperWindowSize(width, height);
+            _speakerPromptWindow.Owner = _messageOverlayWindow;
+
+            width = _exitAudioModeWindow.Width;
+            height = _exitAudioModeWindow.Height;
+            _exitAudioModeWindow.SetProperWindowSize(0, 0);
+            _exitAudioModeWindow.Show();
+            _exitAudioModeWindow.HideWindow();
+            _exitAudioModeWindow.SetProperWindowSize(width, height);
+            _exitAudioModeWindow.Owner = _messageOverlayWindow;
+
             _localVideoCell.SourceInitialized += LocalVideoCell_SourceInitialized;
             _localVideoCell.MouseMove += LayoutCell_MouseMove;
             //_localVideoCell.MouseDown += LayoutCell_MouseDown;
@@ -291,6 +359,12 @@ namespace EasyVideoWin.View
             _localVideoCellOperationbar.HideWindow();
             _localVideoCellOperationbar.Hide();
 
+            width = _dialoutPeerInfoWindow.Width;
+            height = _dialoutPeerInfoWindow.Height;
+            _dialoutPeerInfoWindow.SetProperWindowSize(0, 0);
+            _dialoutPeerInfoWindow.Show();
+            _dialoutPeerInfoWindow.HideWindow();
+            _dialoutPeerInfoWindow.SetProperWindowSize(width, height);
 
             _timerHideOperationbar.Elapsed += new System.Timers.ElapsedEventHandler((object source, System.Timers.ElapsedEventArgs args) =>
             {
@@ -304,7 +378,7 @@ namespace EasyVideoWin.View
                     }
                     _localVideoCellOperationbar.HideWindow();
                     _layoutOperationbar.HideWindow();
-                    UpdateLayoutOperationbarsPosition();
+                    UpdateLayoutOperationbarsPosition(LayoutIndication);
 
                     _timerHideOperationbar.Stop();
                     log.Info("Handle timer operation bar end");
@@ -400,14 +474,13 @@ namespace EasyVideoWin.View
                 SetMessageOverlayWindow2ProperPos();
             }
 
-            ChangeSvcLayoutMode(_isSpeakerMode, isDpiChanged);
-
-            SetCancelFocusVideoWindow2ProperPos();
+            ChangeSvcLayoutMode(_layoutMode, LayoutIndication, isDpiChanged);
+            SetExitAudioModeWindow2ProperPos();
             
             _layoutOperationbar.HideWindow();
             if (_autoHidePartyName)
             {
-                if (_isSpeakerMode)
+                if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
                 {
                     if (null != _speakerModeMainCell && !_speakerModeMainCell.Operationbar.IsWindowHidden)
                     {
@@ -421,9 +494,11 @@ namespace EasyVideoWin.View
             }
             else
             {
-                ShowAllLayoutCellOperationbars();
+                ShowAllLayoutCellOperationbars(LayoutIndication);
             }
-            
+
+            SetDialoutPeerInfoWindow2ProperPos();
+
             log.Info("Show window end.");
         }
         
@@ -433,6 +508,8 @@ namespace EasyVideoWin.View
 
             _cancelFocusVideoWindow.HideWindow();
             _recordingIndicationWindow.HideWindow();
+            _speakerPromptWindow.HideWindow();
+            _exitAudioModeWindow.HideWindow();
             for (int i = 0; i < _layoutCells.Length; ++i)
             {
                 _layoutCells[i].HideWindow();
@@ -444,7 +521,8 @@ namespace EasyVideoWin.View
             _localVideoCellOperationbar.HideWindow();
             _normalCellsSection.HideWindow();
             _messageOverlayWindow.HideWindow();
-            
+            _dialoutPeerInfoWindow.HideWindow();
+
             if (isCallEnded)
             {
                 OnCallEnded();
@@ -458,11 +536,13 @@ namespace EasyVideoWin.View
         {
             log.InfoFormat("Call ended and set the controls to default. visibility:{0}", this.Visibility);
             // set to speaker mode and clear the layout cell to avoid to see the last frame when reconnect
-            _isSpeakerMode = true;
+            _layoutMode = LayoutModeType.NEW_SPEAKER_MODE;
             _isFocusVideoMode = false;
             _disableChangeLayout = false;
             _cancelFocusVideoWindow.HideWindow();
             _recordingIndicationWindow.HideWindow();
+            _speakerPromptWindow.HideWindow();
+            _exitAudioModeWindow.HideWindow();
             _recordingIndication.state = ManagedEVSdk.Structs.EV_RECORDING_STATE_CLI.EV_RECORDING_STATE_NONE;
             PromptWindow.Instance.CloseWindow();
             _messageOverlayWindow.ContentText = "";
@@ -471,10 +551,8 @@ namespace EasyVideoWin.View
             {
                 if (Visibility.Visible == _confManagermentWindow.Visibility)
                 {
-                    _confManagermentWindow.Close();
+                    _confManagermentWindow.Visibility = Visibility.Collapsed;
                 }
-                _confManagermentWindow.Dispose();
-                _confManagermentWindow = null;
             }
             if (null != _modalPromptDlg && Visibility.Visible == _modalPromptDlg.Visibility)
             {
@@ -482,7 +560,7 @@ namespace EasyVideoWin.View
                 _modalPromptDlg.Visibility = Visibility.Collapsed;
             }
             log.InfoFormat("Before hide layout cells, window visibility:{0}", this.Visibility);
-            for (var i = 0; i < _layoutCells.Length; ++i)
+            for (int i = 0; i < _layoutCells.Length; ++i)
             {
                 log.InfoFormat("hide layout cell:{0}, visibility:{1}", i, _layoutCells[i].Visibility);
                 _layoutCells[i].Owner = null;
@@ -493,12 +571,15 @@ namespace EasyVideoWin.View
             }
             log.InfoFormat("After hide layout cells, window visibility:{0}", this.Visibility);
             _normalCellsSection.SetProperWindowSize(0, 0);
-            _layoutSpeakerIdx = -1;
+            LayoutSpeakerIdx = -1;
             LayoutIndication = new ManagedEVSdk.Structs.EVLayoutIndicationCli();
             IsRemoteMuted = false;
+            MediaMode = MediaModeType.VIDEO_NORMAL;
             _layoutOperationbar.TreatmentOnCallEnded();
             this.Owner = null;
             _localVideoCell.Operationbar.IsMicMuted = false;
+
+            _dialoutPeerInfoWindow.HideWindow();
 
             log.Info("Call ended and collect garbage");
             SystemMonitorUtil.Instance.CollectGarbage();
@@ -517,7 +598,7 @@ namespace EasyVideoWin.View
         {
             _autoHidePartyName = Utils.GetAutoHidePartyName();
 
-            _layoutOperationbar.ShowNormalCellsBtnVisibility = Visibility.Collapsed;
+            _layoutOperationbar.IsNormalCellShown = true;
             _showNormalCellsSection = true;
             if (null == _confManagermentWindow)
             {
@@ -631,6 +712,7 @@ namespace EasyVideoWin.View
             if (   
                    Visibility.Visible == this.Visibility
                 && CallStatus.Connected != CallController.Instance.CurrentCallStatus
+                && CallStatus.P2pOutgoing != CallController.Instance.CurrentCallStatus
             )
             {
                 string info = null;
@@ -644,14 +726,14 @@ namespace EasyVideoWin.View
                 }
 
                 // for unknown reason, the window changed to visible by system invoke
-                log.InfoFormat("For unknown reason, the window changed to visible by system invoke when not Connected or Streaming. Stack info:{0}", info);
+                log.InfoFormat("For unknown reason, the window changed to visible by system invoke when not Connected or Streaming. CurrentCallStatus: {0}, Stack info:{1}", CallController.Instance.CurrentCallStatus, info);
                 //this.Hide();
             }
         }
 
         private void MainWindow_DpiChanged()
         {
-            if (CallStatus.Connected != CallController.Instance.CurrentCallStatus)
+            if (CallStatus.Connected != CallController.Instance.CurrentCallStatus && CallStatus.P2pOutgoing != CallController.Instance.CurrentCallStatus)
             {
                 return;
             }
@@ -661,7 +743,7 @@ namespace EasyVideoWin.View
         
         private void OnVideoPeopleWindowStateChanged(object sender, EventArgs e)
         {
-            if (CallStatus.Connected != CallController.Instance.CurrentCallStatus)
+            if (CallStatus.Connected != CallController.Instance.CurrentCallStatus && CallStatus.P2pOutgoing != CallController.Instance.CurrentCallStatus)
             {
                 return;
             }
@@ -696,7 +778,7 @@ namespace EasyVideoWin.View
                 log.InfoFormat("LayoutBackgroundWindow_MouseMove, show layout operation bar, visibility:{0}", this.Visibility);
             }
 
-            SetShowStatus4LayoutOperationbar(true);
+            SetShowStatus4LayoutOperationbar(true, LayoutIndication);
         }
 
         private void LayoutBackgroundWindow_MouseDown(object sender, MouseButtonEventArgs e)
@@ -707,7 +789,7 @@ namespace EasyVideoWin.View
                 log.Info("LayoutBackgroundWindow_MouseDown, show layout operation bar.");
             }
 
-            SetShowStatus4LayoutOperationbar(_layoutOperationbar.IsWindowHidden);
+            SetShowStatus4LayoutOperationbar(_layoutOperationbar.IsWindowHidden, LayoutIndication);
         }
         
         private void LayoutCell_MouseDown(object sender, MouseButtonEventArgs e)
@@ -721,7 +803,7 @@ namespace EasyVideoWin.View
             _timeTicksLastMouseLeftButtonDown = nowTicks;
 
             LayoutCellWindow cell = sender as LayoutCellWindow;
-            if (_isSpeakerMode)
+            if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
             {
                 if (_speakerModeMainCell != cell)
                 {
@@ -733,10 +815,10 @@ namespace EasyVideoWin.View
             {
                 log.Info("LayoutCell_MouseDown, show layout operation bar.");
             }
-            SetShowStatus4LayoutOperationbar(_layoutOperationbar.IsWindowHidden);
+            SetShowStatus4LayoutOperationbar(_layoutOperationbar.IsWindowHidden, LayoutIndication);
             if (!_layoutOperationbar.IsWindowHidden)
             {
-                ShowLayoutCellOperationbar(cell);
+                ShowLayoutCellOperationbar(LayoutIndication, cell);
             }
         }
 
@@ -748,7 +830,7 @@ namespace EasyVideoWin.View
             }
             
             LayoutCellWindow cell = sender as LayoutCellWindow;
-            if (_isSpeakerMode)
+            if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
             {
                 if (_speakerModeMainCell == cell)
                 {
@@ -756,7 +838,7 @@ namespace EasyVideoWin.View
                     {
                         log.Info("LayoutCell_MouseMove, show layout operation bar.");
                     }
-                    SetShowStatus4LayoutOperationbar(true);
+                    SetShowStatus4LayoutOperationbar(true, LayoutIndication);
                 }
             }
             else
@@ -765,10 +847,10 @@ namespace EasyVideoWin.View
                 {
                     log.Info("LayoutCell_MouseMove, show layout operation bar.");
                 }
-                SetShowStatus4LayoutOperationbar(true);
+                SetShowStatus4LayoutOperationbar(true, LayoutIndication);
             }
 
-            ShowLayoutCellOperationbar(cell);
+            ShowLayoutCellOperationbar(LayoutIndication, cell);
             
             SetTopWindows();
 
@@ -783,7 +865,7 @@ namespace EasyVideoWin.View
             //SetShowStatus4LayoutOperationbar(true);
         }
         
-        private void ShowLayoutCellOperationbar(LayoutCellWindow cell, bool forceUpdate = false)
+        private void ShowLayoutCellOperationbar(ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication, LayoutCellWindow cell, bool forceUpdate = false)
         {
             if (null == cell)
             {
@@ -800,19 +882,19 @@ namespace EasyVideoWin.View
             }
 
             uint sitesSize = 0;
-            if (null != LayoutIndication)
+            if (null != layoutIndication)
             {
-                sitesSize = LayoutIndication.sites_size;
+                sitesSize = layoutIndication.sites_size;
             }
 
             if (cell != _localVideoCell)
             {
-                var i = 0;
+                int i = 0;
                 for (; i < sitesSize; ++i)
                 {
-                    if (LayoutIndication.sites[i].device_id == cell.DeviceId)
+                    if (layoutIndication.sites[i].device_id == cell.DeviceId)
                     {
-                        cell.Operationbar.IsMicMuted = LayoutIndication.sites[i].mic_muted;
+                        cell.Operationbar.IsMicMuted = layoutIndication.sites[i].mic_muted;
                         break;
                     }
                 }
@@ -909,7 +991,7 @@ namespace EasyVideoWin.View
                 IntPtr[] handles = new IntPtr[MAX_LAYOUT_CELL_COUNT];
                 for (int i=0; i< MAX_LAYOUT_CELL_COUNT; ++i)
                 {
-                    var handle = _layoutCells[i].Handle;
+                    IntPtr handle = _layoutCells[i].Handle;
                     handles[i] = handle;
                     _dictLayoutCellHandle.Add(handle, _layoutCells[i]);
                 }
@@ -930,16 +1012,21 @@ namespace EasyVideoWin.View
             RestartTimerHideOperationbar();
         }
         
-        private void SetShowStatus4LayoutOperationbar(bool show)
+        private void SetShowStatus4LayoutOperationbar(bool show, ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication)
         {
             if (show)
             {
-                SetProperPosition4LayoutOperationbarAndTitlebar();
+                SetProperPosition4LayoutOperationbarAndTitlebar(layoutIndication);
                 if (VideoPeopleWindow.Instance.FullScreenStatus)
                 {
                     _titlebar.ShowWindow();
                 }
-                _layoutOperationbar.ShowWindow();
+                
+                if (CallStatus.Connected == CallController.Instance.CurrentCallStatus)
+                {
+                    _layoutOperationbar.ShowWindow();
+                }
+                
                 _timerHideOperationbar.Stop();
                 _timerHideOperationbar.Start();
             }
@@ -949,7 +1036,7 @@ namespace EasyVideoWin.View
                 _layoutOperationbar.HideWindow();
                 if (_autoHidePartyName)
                 {
-                    if (_isSpeakerMode)
+                    if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
                     {
                         if (!_speakerModeMainCell.Operationbar.IsWindowHidden)
                         {
@@ -962,7 +1049,7 @@ namespace EasyVideoWin.View
                     }
                 }
             }
-            UpdateLayoutOperationbarsPosition();
+            UpdateLayoutOperationbarsPosition(layoutIndication);
         }
 
         private void RestartTimerHideOperationbar()
@@ -1049,7 +1136,7 @@ namespace EasyVideoWin.View
             }
             
             // set windows top in order
-            if (_isSpeakerMode)
+            if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
             {
                 Utils.SetWindow2Top(_normalCellsSection.Handle);
                 SetSoftwareUpdateWindowTop();
@@ -1082,24 +1169,196 @@ namespace EasyVideoWin.View
             log.Info("Set SoftwareUpdateWindow to top");
             Utils.SetWindow2Top(SoftwareUpdateWindow.Instance);
         }
-        
-        private void SetLayout4GalleryMode(bool isDpiChanged = false)
+
+        private void SetLayout4TraditionalSpeakerMode(ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication, bool isDpiChanged = false)
         {
-            if (null == LayoutIndication)
+            log.Info("SetLayout4TraditionalSpeakerMode");
+            SetTiledLayout(false, layoutIndication, isDpiChanged);
+        }
+
+        private void SetLayout4GalleryMode(ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication, bool isDpiChanged = false)
+        {
+            log.Info("SetLayout4GalleryMode");
+            SetTiledLayout(true, layoutIndication, isDpiChanged);
+        }
+
+        private void PlaceCells4TraditionalSpeakerMode(ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication, ref Dictionary<LayoutCellWindow, int> usedSites)
+        {
+            log.InfoFormat("PlaceCells4TraditionalSpeakerMode, _layoutSpeakerIdx: {0}", LayoutSpeakerIdx);
+            uint sitesLength = layoutIndication.sites_size;
+            ManagedEVSdk.Structs.EVSiteCli[] sites = layoutIndication.sites;
+            if (1 == sitesLength)
             {
+                PlaceCells4GalleryMode(layoutIndication, ref usedSites);
                 return;
             }
-
-            int speakerIdx                          = _layoutSpeakerIdx;
-            uint sitesLength                        = LayoutIndication.sites_size;
-            ManagedEVSdk.Structs.EVSiteCli[] sites  = LayoutIndication.sites;
-            log.Info("Set layout for gallery mode.");
-            if (_isFocusVideoMode)
+            else if (sitesLength >= 2 && sitesLength < 6)
             {
-                _isFocusVideoMode = false;
-                _cancelFocusVideoWindow.HideWindow();
+                _cellBorderHeight = CELL_BORDER_LENGTH;
+                _cellBorderWidth = CELL_BORDER_LENGTH;
+                double bigCellHeight = (this.Height - _cellBorderHeight * 3) * 3.0 / 4.0;
+                double bigCellWidth = bigCellHeight * 16.0 / 9.0;
+                double smallCellHeight = this.Height - bigCellHeight - _cellBorderHeight * 3;
+                double smallCellWidth = smallCellHeight * 16.0 / 9.0;
+                double left = 0, top = 0, width = 0, height = 0;
+                double reviseLeft = (this.Width - smallCellWidth * (sitesLength - 1) - _cellBorderHeight * sitesLength) / 2.0;
+                for (int i = 0; i < sitesLength; ++i)
+                {
+                    if (WindowState.Minimized != VideoPeopleWindow.Instance.WindowState)
+                    {
+                        if (0 == i)
+                        {
+                            // big cell
+                            left = this.Left + (this.Width - bigCellWidth) / 2;
+                            top = this.Top + _cellBorderHeight;
+                            width = bigCellWidth;
+                            height = bigCellHeight;
+                        }
+                        else
+                        {
+                            // small cells
+                            left = this.Left + reviseLeft + smallCellWidth * (i - 1) + _cellBorderWidth * i;
+                            top = this.Top + bigCellHeight + _cellBorderHeight * 2;
+                            width = smallCellWidth;
+                            height = smallCellHeight;
+                        }
+                    }
+                    SetStatusAndPos4TiledLayoutCell(layoutIndication, i, left, top, width, height, ref usedSites);
+                }
+            }
+            else if (6 == sitesLength)
+            {
+                _cellBorderHeight = CELL_BORDER_LENGTH;
+                double bigCellHeight = (this.Height - _cellBorderHeight * 3) * 2.0 / 3.0;
+                double bigCellWidth = bigCellHeight * 16.0 / 9.0;
+                double smallCellHeight = (bigCellHeight - _cellBorderHeight) / 2.0;
+                double smallCellWidth = smallCellHeight * 16.0 / 9.0;
+                _cellBorderWidth = (bigCellWidth - smallCellWidth * 2);
+                if (_cellBorderWidth <= 0)
+                {
+                    _cellBorderWidth = CELL_BORDER_LENGTH;
+                }
+                double left = 0, top = 0, width = 0, height = 0;
+                double reviseLeft = (this.Width - bigCellWidth - smallCellWidth - _cellBorderWidth * 3) / 2.0;
+                for (int i = 0; i < sitesLength; ++i)
+                {
+                    if (WindowState.Minimized != VideoPeopleWindow.Instance.WindowState)
+                    {
+                        if (0 == i)
+                        {
+                            // big cell
+                            left = this.Left + reviseLeft + _cellBorderWidth;
+                            top = this.Top + _cellBorderHeight;
+                            width = bigCellWidth;
+                            height = bigCellHeight;
+                        }
+                        else if (1 == i || 2 == i)
+                        {
+                            // 2 small cells in the right
+                            left = this.Left + reviseLeft + bigCellWidth + _cellBorderWidth * 2;
+                            top = this.Top + smallCellHeight * (i - 1) + _cellBorderHeight * i;
+                            width = smallCellWidth;
+                            height = smallCellHeight;
+                        }
+                        else
+                        {
+                            // 3 small cells in the bottom
+                            left = this.Left + reviseLeft + smallCellWidth * (i - 2 - 1) + _cellBorderWidth * (i - 2);
+                            top = this.Top + bigCellHeight + _cellBorderHeight * 2;
+                            width = smallCellWidth;
+                            height = smallCellHeight;
+                        }
+                    }
+                    SetStatusAndPos4TiledLayoutCell(layoutIndication, i, left, top, width, height, ref usedSites);
+                }
+            }
+            else
+            {
+                if (sitesLength > 8)
+                {
+                    sitesLength = 8; // max 8 for layout 1+7
+                }
+                _cellBorderHeight = CELL_BORDER_LENGTH;
+                double bigCellHeight = (this.Height - _cellBorderHeight * 3) * 3.0 / 4.0;
+                double bigCellWidth = bigCellHeight * 16.0 / 9.0;
+                double smallCellHeight = (bigCellHeight - _cellBorderHeight * 2) / 3.0;
+                double smallCellWidth = smallCellHeight * 16.0 / 9.0;
+                _cellBorderWidth = (bigCellWidth - smallCellWidth * 3) / 2.0;
+                if (_cellBorderWidth <= 0)
+                {
+                    _cellBorderWidth = CELL_BORDER_LENGTH;
+                }
+                double left = 0, top = 0, width = 0, height = 0;
+                double reviseLeft = (this.Width - bigCellWidth - smallCellWidth - _cellBorderWidth * 3) / 2.0;
+                for (int i = 0; i < sitesLength; ++i)
+                {
+                    if (WindowState.Minimized != VideoPeopleWindow.Instance.WindowState)
+                    {
+                        if (0 == i)
+                        {
+                            // big cell
+                            left = this.Left + reviseLeft + _cellBorderWidth;
+                            top = this.Top + _cellBorderHeight;
+                            width = bigCellWidth;
+                            height = bigCellHeight;
+                        }
+                        else if (i > 0 && i < 4)
+                        {
+                            // 3 small cells in the right
+                            left = this.Left + reviseLeft + bigCellWidth + _cellBorderWidth * 2;
+                            top = this.Top + smallCellHeight * (i - 1) + _cellBorderHeight * i;
+                            width = smallCellWidth;
+                            height = smallCellHeight;
+                        }
+                        else
+                        {
+                            // 4 small cells in the bottom
+                            left = this.Left + reviseLeft + smallCellWidth * (i - 3 - 1) + _cellBorderWidth * (i - 3);
+                            top = this.Top + bigCellHeight + _cellBorderHeight * 2;
+                            width = smallCellWidth;
+                            height = smallCellHeight;
+                        }
+                    }
+                    SetStatusAndPos4TiledLayoutCell(layoutIndication, i, left, top, width, height, ref usedSites);
+                }
+            }
+        }
+
+        private void SetStatusAndPos4TiledLayoutCell(ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication, int siteIdx, double left, double top, double width, double height, ref Dictionary<LayoutCellWindow, int> usedSites)
+        {
+            LayoutCellWindow cell = _dictLayoutCellHandle[layoutIndication.sites[siteIdx].window];
+            cell.Owner = this;
+            cell.WindowState = WindowState.Normal;
+            cell.CellName = layoutIndication.sites[siteIdx].name;
+            cell.DeviceId = layoutIndication.sites[siteIdx].device_id;
+            if (WindowState.Minimized == VideoPeopleWindow.Instance.WindowState)
+            {
+                cell.HideWindow();
+            }
+            else
+            {
+                if (cell.SetProperWindowPos(left, top, width, height))
+                {
+                    log.InfoFormat("SetStatusAndPos4TiledLayoutCell position, name:{0}, left:{1}, top:{2}, width:{3}, height:{4}", cell.CellName, left, top, width, height);
+                }
+                else
+                {
+                    log.InfoFormat("The position of SetStatusAndPos4TiledLayoutCell is not changed, cell name={0}", cell.CellName);
+                }
             }
 
+            if (siteIdx == LayoutSpeakerIdx)
+            {
+                SetSpeakerCellBorder(cell);
+            }
+            Utils.SetWindow2NoTopMost(cell.Handle);
+            usedSites.Add(cell, 0);
+        }
+
+        private void PlaceCells4GalleryMode(ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication, ref Dictionary<LayoutCellWindow, int> usedSites)
+        {
+            uint sitesLength = layoutIndication.sites_size;
+            ManagedEVSdk.Structs.EVSiteCli[] sites = layoutIndication.sites;
             int row = 0;
             int col = 0;
             if (1 == sitesLength)
@@ -1107,7 +1366,7 @@ namespace EasyVideoWin.View
                 row = 1;
                 col = 1;
             }
-            else if (2 == sitesLength )
+            else if (2 == sitesLength)
             {
                 row = 1;
                 col = 2;
@@ -1142,7 +1401,7 @@ namespace EasyVideoWin.View
             double cellHeight = 0;
             double revisedTop = 0;
             double ratio = 1; // this.Width / Utils.MAIN_WINDOW_DESIGN_WIDTH;
-            
+
             if (1 == sitesLength)
             {
                 // don't set border for 1X1 layout
@@ -1154,7 +1413,7 @@ namespace EasyVideoWin.View
             }
             cellWidth = (this.Width - _cellBorderWidth * (col + 1)) / col;
             cellHeight = cellWidth * 9.0 / 16.0;
-            
+
             _cellBorderHeight = (this.Height - cellHeight * row) / (row + 1);
 
             if (row != col)
@@ -1163,52 +1422,55 @@ namespace EasyVideoWin.View
                 _cellBorderHeight = CELL_BORDER_LENGTH;
             }
 
-            Dictionary<LayoutCellWindow, int> usedSites = new Dictionary<LayoutCellWindow, int>();
-            for (var i=0; i<sitesLength; ++i)
+            for (int i = 0; i < sitesLength; ++i)
             {
-                var cell = _dictLayoutCellHandle[sites[i].window];
-                cell.Owner = this;
-                cell.WindowState = WindowState.Normal;
-                cell.CellName = sites[i].name;
-                cell.DeviceId = sites[i].device_id;
-                if (WindowState.Minimized == VideoPeopleWindow.Instance.WindowState)
+                double left = 0;
+                double top = 0;
+                if (WindowState.Minimized != VideoPeopleWindow.Instance.WindowState)
                 {
-                    cell.HideWindow();
-                }
-                else
-                {
-                    var currentWidth = cellWidth;
-                    var currentHeight = cellHeight;
                     int posJ = i % col;
                     int posI = (i - posJ) / col;
-                    var currentLeft = this.Left + currentWidth * posJ + _cellBorderWidth * (posJ + 1);
-                    var currentTop = this.Top + revisedTop * ratio + currentHeight * posI + _cellBorderHeight * (posI + 1);
-                    if (cell.SetProperWindowPos(currentLeft, currentTop, currentWidth, currentHeight))
-                    {
-                        log.InfoFormat("Set gallery cell position, name:{0}, left:{1}, top:{2}, width:{3}, height:{4}", cell.CellName, currentLeft, currentTop, currentWidth, currentHeight);
-                    }
-                    else
-                    {
-                        log.InfoFormat("The position of cell is not changed, cell name={0}", cell.CellName);
-                    }
+                    left = this.Left + cellWidth * posJ + _cellBorderWidth * (posJ + 1);
+                    top = this.Top + revisedTop * ratio + cellHeight * posI + _cellBorderHeight * (posI + 1);
                 }
 
-                if (i == speakerIdx)
-                {
-                    SetSpeakerCellBorder(cell);
-                }
-                Utils.SetWindow2NoTopMost(cell.Handle);
-                usedSites.Add(cell, 0);
+                SetStatusAndPos4TiledLayoutCell(layoutIndication, i, left, top, cellWidth, cellHeight, ref usedSites);
+            }
+        }
+
+        private void SetTiledLayout(bool isGalleryMode, ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication, bool isDpiChanged = false)
+        {
+            log.Info("SetTiledLayout");
+            if (null == layoutIndication)
+            {
+                log.Info("Failed to SetTiledLayout for null layoutIndication");
+                return;
+            }
+            
+            if (_isFocusVideoMode)
+            {
+                _isFocusVideoMode = false;
+                SetCancelFocusVideoWindow2ProperPos();
             }
 
-            if (speakerIdx < 0)
+            Dictionary<LayoutCellWindow, int> usedSites = new Dictionary<LayoutCellWindow, int>();
+            if (isGalleryMode)
+            {
+                PlaceCells4GalleryMode(layoutIndication, ref usedSites);
+            }
+            else
+            {
+                PlaceCells4TraditionalSpeakerMode(layoutIndication, ref usedSites);
+            }
+
+            if (LayoutSpeakerIdx < 0)
             {
                 HideSpeakerCellBorder();
             }
 
             for (int i = 0; i < _layoutCells.Length; ++i)
             {
-                var cell = _layoutCells[i];
+                LayoutCellWindow cell = _layoutCells[i];
                 cell.MouseEnter -= LayoutCell_MouseEnter;
                 cell.MouseLeave -= LayoutCell_MouseLeave;
                 cell.Operationbar.MouseEnter -= LayoutCell_MouseEnter;
@@ -1223,7 +1485,7 @@ namespace EasyVideoWin.View
             _layoutNormalCells[0] = _localVideoCell;
             if (!isDpiChanged)
             {
-                ShowNormalCells();
+                ShowNormalCells(layoutIndication);
             }
             
             //SetNormalCellBorder(_layoutNormalCells[0], 0, ratio);
@@ -1238,17 +1500,17 @@ namespace EasyVideoWin.View
             }
             else
             {
-                UpdateLayoutOperationbarsPosition();
+                UpdateLayoutOperationbarsPosition(layoutIndication);
             }
             
             SetTopWindows();
 
-            log.Info("SetLayout4GalleryMode end.");
+            log.Info("SetTiledLayout end.");
         }
 
         private void HideAllCellOperationbars()
         {
-            for (var i=0; i<_layoutCells.Length; ++i)
+            for (int i=0; i<_layoutCells.Length; ++i)
             {
                 if (!_layoutCells[i].Operationbar.IsWindowHidden)
                 {
@@ -1282,7 +1544,7 @@ namespace EasyVideoWin.View
 
         private void LayoutCell_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (!_isSpeakerMode)
+            if (LayoutModeType.NEW_SPEAKER_MODE != _layoutMode)
             {
                 return;
             }
@@ -1294,14 +1556,14 @@ namespace EasyVideoWin.View
 
             for (int i=0; i< _dictLayoutCellHandle.Count; ++i)
             {
-                var item = _dictLayoutCellHandle.ElementAt(i);
+                KeyValuePair<IntPtr, LayoutCellWindow> item = _dictLayoutCellHandle.ElementAt(i);
                 if (item.Value == cell)
                 {
                     _isFocusVideoMode = true;
                     // put _cancelFocusVideoWindow above _messageOverlayWindow to make sure to operate the _cancelFocusVideoWindow
                     _cancelFocusVideoWindow.Owner = _messageOverlayWindow; // this._speakerModeMainCell;
                     SetCancelFocusVideoWindow2ProperPos();
-                    SvcSetLayout(ManagedEVSdk.Structs.EV_LAYOUT_PAGE_CLI.EV_LAYOUT_CURRENT_PAGE, _isSpeakerMode, item.Key);
+                    SvcSetLayout(ManagedEVSdk.Structs.EV_LAYOUT_PAGE_CLI.EV_LAYOUT_CURRENT_PAGE, _layoutMode, item.Key);
                     break;
                 }
             }
@@ -1310,8 +1572,8 @@ namespace EasyVideoWin.View
         private void CancelFocusVideoWindow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             _isFocusVideoMode = false;
-            _cancelFocusVideoWindow.HideWindow();
-            SvcSetLayout(ManagedEVSdk.Structs.EV_LAYOUT_PAGE_CLI.EV_LAYOUT_CURRENT_PAGE, _isSpeakerMode, IntPtr.Zero);
+            SetCancelFocusVideoWindow2ProperPos();
+            SvcSetLayout(ManagedEVSdk.Structs.EV_LAYOUT_PAGE_CLI.EV_LAYOUT_CURRENT_PAGE, _layoutMode, IntPtr.Zero);
         }
 
         private void LayoutCell_OnWindowMoved(object sender, double x, double y)
@@ -1334,7 +1596,7 @@ namespace EasyVideoWin.View
             if (currentCell == _movingLayoutCell)
             {
                 int idx = 0;
-                for (var i=0; i< _layoutNormalCells.Length; ++i)
+                for (int i=0; i< _layoutNormalCells.Length; ++i)
                 {
                     if (_layoutNormalCells[i] == currentCell)
                     {
@@ -1349,7 +1611,7 @@ namespace EasyVideoWin.View
 
                 _normalCellsSection.ResetDecorationBorders();
                 left = currentCell.Left;
-                for (var i = 0; i < _layoutNormalCells.Length; ++i)
+                for (int i = 0; i < _layoutNormalCells.Length; ++i)
                 {
                     LayoutCellWindow cell = _layoutNormalCells[i];
                     SetNormalCellBorder(cell, i);
@@ -1374,7 +1636,7 @@ namespace EasyVideoWin.View
 
             for (int i = 0; i < _layoutNormalCells.Length; ++i)
             {
-                var cell = _layoutNormalCells[i];
+                LayoutCellWindow cell = _layoutNormalCells[i];
                 if (_autoHidePartyName && !cell.Operationbar.IsWindowHidden && _localVideoCell != cell)
                 {
                     cell.Operationbar.HideWindow();
@@ -1389,9 +1651,9 @@ namespace EasyVideoWin.View
 
         private void LayoutOperationbar_ShowNormalCellsChanged(object sender, EventArgs e)
         {
-            _layoutOperationbar.ShowNormalCellsBtnVisibility = Visibility.Collapsed;
+            _layoutOperationbar.IsNormalCellShown = true;
             _showNormalCellsSection = true;
-            ShowNormalCells();
+            ShowNormalCells(LayoutIndication);
         }
 
 
@@ -1425,18 +1687,18 @@ namespace EasyVideoWin.View
             {
                 _normalCellsSection.HideWindow();
 
-                for (var i=0; i< _layoutNormalCells.Length; ++i)
+                for (int i=0; i< _layoutNormalCells.Length; ++i)
                 {
                     _layoutNormalCells[i].HideWindow();
                 }
-                _layoutOperationbar.ShowNormalCellsBtnVisibility = Visibility.Visible;
+                _layoutOperationbar.IsNormalCellShown = false;
                 _showNormalCellsSection = false;
             }
         }
 
         private void NormalCellsSection_DpiChanged()
         {
-            ShowNormalCells();
+            ShowNormalCells(LayoutIndication);
         }
 
         private void NormalCellsSection_CellsNavigateChanged(bool isUp)
@@ -1452,7 +1714,7 @@ namespace EasyVideoWin.View
 
             ManagedEVSdk.Structs.EV_LAYOUT_PAGE_CLI page = isUp ? ManagedEVSdk.Structs.EV_LAYOUT_PAGE_CLI.EV_LAYOUT_PREV_PAGE
                                                                 : ManagedEVSdk.Structs.EV_LAYOUT_PAGE_CLI.EV_LAYOUT_NEXT_PAGE;
-            SvcSetLayout(page, _isSpeakerMode, IntPtr.Zero);
+            SvcSetLayout(page, _layoutMode, IntPtr.Zero);
         }
 
         private void SetInitialPosOfNormalCellsSection()
@@ -1483,7 +1745,7 @@ namespace EasyVideoWin.View
             cell.HideWindow();
         }
 
-        private void ShowNormalCells()
+        private void ShowNormalCells(ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication)
         {
             if (null == _layoutNormalCells)
             {
@@ -1498,19 +1760,20 @@ namespace EasyVideoWin.View
                 _layoutCells[i].MouseLeftButtonDown -= LayoutCell_MouseLeftButtonDown;
             }
 
-            if (!_showNormalCellsSection)
+            if (!_showNormalCellsSection || CallStatus.P2pOutgoing == CallController.Instance.CurrentCallStatus)
             {
                 HideLayoutCell(_localVideoCell);
 
-                if (_isSpeakerMode)
+                if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
                 {
                     for (int i = 1; i < _layoutCells.Length; ++i)
                     {
-                        var cell = _layoutCells[i];
+                        LayoutCellWindow cell = _layoutCells[i];
                         HideLayoutCell(cell);
                     }
                 }
 
+                _normalCellsSection.HideWindow();
                 return;
             }
 
@@ -1563,7 +1826,7 @@ namespace EasyVideoWin.View
             }
 
             Dictionary<LayoutCellWindow, int> usedSites = new Dictionary<LayoutCellWindow, int>();
-            if (_isSpeakerMode)
+            if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
             {
                 usedSites.Add(_speakerModeMainCell, 0);
             }
@@ -1583,7 +1846,7 @@ namespace EasyVideoWin.View
                 double top = _normalCellsSection.Top + (SMALL_VIDEO_WINDOW_HEIGHT + CELL_BORDER_LENGTH) * ratio * i + (CELL_BORDER_LENGTH + NORMAL_CELLS_SECTION_BAR_HEIGHT) * ratio; //_normalCellsSection.Top + SMALL_VIDEO_WINDOW_HEIGHT * ratio * i + (i + 1) * 2 * ratio;
                 log.InfoFormat("Prepare to set cell position, name={0}, set to: left={1}, top={2}, current: left={3}, top={4}", cell.CellName, left, top, cell.Left, cell.Top);
                 // force update the cell position in gallery mode for maybe the position of cell is not correct when change the position fo normal cell section and change window state from max to normal
-                if (cell.SetProperWindowPos(left, top, width, height, !_isSpeakerMode))
+                if (cell.SetProperWindowPos(left, top, width, height, LayoutModeType.NEW_SPEAKER_MODE != _layoutMode))
                 {
                     log.InfoFormat("Set normal cell position, name: {0}, left:{1}, top:{2}, width:{3}, height:{4}", cell.CellName, left, top, width, height);
                 }
@@ -1594,7 +1857,7 @@ namespace EasyVideoWin.View
                 
                 if (!_autoHidePartyName)
                 {
-                    ShowLayoutCellOperationbar(cell, true);
+                    ShowLayoutCellOperationbar(layoutIndication, cell, true);
                 }
                 cell.MouseLeftButtonDown += LayoutCell_MouseLeftButtonDown;
                 if (!HasActiveWindow())
@@ -1610,11 +1873,11 @@ namespace EasyVideoWin.View
                 usedSites.Add(cell, 0);
             }
             log.Info("Hide not used cells for normal cells section.");
-            if (_isSpeakerMode)
+            if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
             {
                 for (int i = 0; i < _layoutCells.Length; ++i)
                 {
-                    var cell = _layoutCells[i];
+                    LayoutCellWindow cell = _layoutCells[i];
                     if (!usedSites.ContainsKey(cell))
                     {
                         HideLayoutCell(cell);
@@ -1624,15 +1887,17 @@ namespace EasyVideoWin.View
 
             if (_localVideoCell.Operationbar.IsMicMuted)
             {
-                ShowLayoutCellOperationbar(_localVideoCell, true);
+                ShowLayoutCellOperationbar(layoutIndication, _localVideoCell, true);
             }
             log.Info("Show normal cells end.");
         }
         
-        private void SetLayout4SpeakerMode(bool isDpiChanged = false)
+        private void SetLayout4SpeakerMode(ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication, bool isDpiChanged = false)
         {
-            if (null == LayoutIndication)
+            log.Info("SetLayout4SpeakerMode");
+            if (null == layoutIndication)
             {
+                log.Info("Failed to SetLayout4SpeakerMode for null layoutIndication");
                 return;
             }
             //for (int i = 0; i < _layoutCells.Length; ++i)
@@ -1644,10 +1909,15 @@ namespace EasyVideoWin.View
             //{
             //    return;
             //}
-            int speakerIdx                          = _layoutSpeakerIdx;
-            uint sitesLength                        = LayoutIndication.sites_size;
-            ManagedEVSdk.Structs.EVSiteCli[] sites  = LayoutIndication.sites;
-            log.Info("Set layout for speaker mode.");
+            int speakerIdx                          = LayoutSpeakerIdx;
+            uint sitesLength                        = layoutIndication.sites_size;
+            if (sitesLength > NORMAL_CELLS_SHOW_MAX_COUNT)
+            {
+                log.ErrorFormat("Normal cells count exceed the max count, sitesLength: {0}, NORMAL_CELLS_SHOW_MAX_COUNT: {1}", sitesLength, NORMAL_CELLS_SHOW_MAX_COUNT);
+                sitesLength = NORMAL_CELLS_SHOW_MAX_COUNT;
+            }
+
+            ManagedEVSdk.Structs.EVSiteCli[] sites  = layoutIndication.sites;
             _speakerModeMainCell = _dictLayoutCellHandle[sites[0].window];
             _speakerModeMainCell.CellName = sites[0].name;
             _speakerModeMainCell.DeviceId = sites[0].device_id;
@@ -1662,7 +1932,7 @@ namespace EasyVideoWin.View
             
             _layoutNormalCells = new LayoutCellWindow[sitesLength];
             _layoutNormalCells[0] = _localVideoCell;
-            for (var i = 1; i < sitesLength; ++i)
+            for (int i = 1; i < sitesLength; ++i)
             {
                 _layoutNormalCells[i] = _dictLayoutCellHandle[sites[i].window];
                 _layoutNormalCells[i].CellName = sites[i].name;
@@ -1699,7 +1969,7 @@ namespace EasyVideoWin.View
                 }
                 if (!_autoHidePartyName)
                 {
-                    ShowLayoutCellOperationbar(_speakerModeMainCell, true);
+                    ShowLayoutCellOperationbar(layoutIndication, _speakerModeMainCell, true);
                 }
             }
             // currently do not show speaker border for main cell
@@ -1715,7 +1985,7 @@ namespace EasyVideoWin.View
             
             if (!isDpiChanged)
             {
-                ShowNormalCells();
+                ShowNormalCells(layoutIndication);
             }
             
         }
@@ -1747,56 +2017,79 @@ namespace EasyVideoWin.View
         
         private void EVSdkWrapper_EventLayoutIndication(ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication)
         {
-            log.Info("EventLayoutIndication");
-            LayoutIndication    = layoutIndication;
-            _layoutSpeakerIdx   = layoutIndication.speaker_index;
+            log.InfoFormat("EVSdkWrapper_EventLayoutIndication, layoutIndication.sites_size: {0}, LayoutIndication.sites_size: {1}, speaker_name to: {2}", layoutIndication.sites_size, LayoutIndication.sites_size, layoutIndication.speaker_name);            
             Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                log.InfoFormat("Layout indication, is speaker mode: {0}, sites length: {1}, setting_mode: {2}, mode: {3}", _isSpeakerMode, LayoutIndication.sites_size, layoutIndication.setting_mode, layoutIndication.mode);
-                if (LayoutIndication.sites_size <= 0)
+                log.InfoFormat("EventLayoutIndication, _layoutMode: {0}, sites_size: {1}, setting_mode: {2}, mode: {3}", _layoutMode, layoutIndication.sites_size, layoutIndication.setting_mode, layoutIndication.mode);
+                if (layoutIndication.sites_size <= 0)
                 {
-                    log.Info("sites size is not larger than 0. EventLayoutIndication end");
+                    log.Info("sites_size is not larger than 0. EventLayoutIndication done");
                     return;
                 }
 
-                for (var i=0; i< LayoutIndication.sites_size; ++i)
+                for (int i=0; i< layoutIndication.sites_size; ++i)
                 {
-                    log.InfoFormat("Site device_id: {0}, name: {1}, mic_muted: {2}", LayoutIndication.sites[i].device_id, LayoutIndication.sites[i].name, LayoutIndication.sites[i].mic_muted);
+                    log.InfoFormat("sites {0} -- device_id: {1}, name: {2}, mic_muted: {3}", i, layoutIndication.sites[i].device_id, layoutIndication.sites[i].name, layoutIndication.sites[i].mic_muted);
                 }
 
-                _isSpeakerMode = ManagedEVSdk.Structs.EV_LAYOUT_MODE_CLI.EV_LAYOUT_GALLERY_MODE != layoutIndication.mode;
-                _layoutOperationbar.IsSpeakerMode = _isSpeakerMode;
-                _speakerBorder.Visibility = Visibility.Collapsed;
-
-                if (_isSpeakerMode)
+                if (ManagedEVSdk.Structs.EV_LAYOUT_MODE_CLI.EV_LAYOUT_GALLERY_MODE == layoutIndication.mode)
                 {
-                    SetLayout4SpeakerMode();
+                    _layoutMode = LayoutModeType.GALLERY_MODE;
                 }
                 else
                 {
-                    SetLayout4GalleryMode();
+                    if (
+                           ManagedEVSdk.Structs.EV_LAYOUT_MODE_CLI.EV_LAYOUT_SPEAKER_MODE == layoutIndication.setting_mode
+                        || ManagedEVSdk.Structs.EV_LAYOUT_MODE_CLI.EV_LAYOUT_SPECIFIED_MODE == layoutIndication.setting_mode
+                    )
+                    {
+                        _layoutMode = LayoutModeType.NEW_SPEAKER_MODE;
+                    }
+                    else
+                    {
+                        _layoutMode = LayoutModeType.TRADITIONAL_SPEAKER_MODE;
+                    }
                 }
 
-                OnDisableLayoutChanged(!LayoutIndication.mode_settable);
-                log.InfoFormat("Handle Layout indication end, IsActive: {0}", this.IsActive);
+                log.InfoFormat("Set _layoutMode to: {0}", _layoutMode);
+                _layoutOperationbar.LayoutMode = _layoutMode;
+                _speakerBorder.Visibility = Visibility.Collapsed;
+                LayoutSpeakerIdx = layoutIndication.speaker_index;
+                switch (_layoutMode)
+                {
+                    case LayoutModeType.GALLERY_MODE:
+                        SetLayout4GalleryMode(layoutIndication);
+                        break;
+                    case LayoutModeType.NEW_SPEAKER_MODE:
+                        SetLayout4SpeakerMode(layoutIndication);
+                        break;
+                    case LayoutModeType.TRADITIONAL_SPEAKER_MODE:
+                        SetLayout4TraditionalSpeakerMode(layoutIndication);
+                        break;
+                }
+                
+                OnDisableLayoutChanged(!layoutIndication.mode_settable);
+                LayoutIndication = layoutIndication;
+                OnSpeakerChanged(layoutIndication.speaker_name, layoutIndication.speaker_index);
+                log.InfoFormat("EventLayoutIndication done, IsActive: {0}", this.IsActive);
             });
-            log.Info("EventLayoutIndication end");
+            log.Info("EVSdkWrapper_EventLayoutIndication done");
         }
 
         private void EVSdkWrapper_EventLayoutSpeakerIndication(ManagedEVSdk.Structs.EVLayoutSpeakerIndicationCli speakerIndication)
         {
-            log.InfoFormat("EventLayoutSpeakerIndication, speaker idx: {0}, name: {1}", speakerIndication.speaker_index, speakerIndication.speaker_name);
-            if (speakerIndication.speaker_index > LayoutIndication.sites_size)
-            {
-                log.Info("Can not update speaker for speaker index is larger than sites size. EventLayoutSpeakerIndication end");
-                return;
-            }
-
+            log.InfoFormat("EventLayoutSpeakerIndication, speaker_index: {0}, speaker_name: {1}", speakerIndication.speaker_index, speakerIndication.speaker_name);
+            
             Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                log.Info("Handle speaker indication begin.");
+                log.Info("EventLayoutSpeakerIndication");
+                if (speakerIndication.speaker_index > LayoutIndication.sites_size)
+                {
+                    log.Info("Can not update speaker for speaker index is larger than sites size. EventLayoutSpeakerIndication end");
+                    return;
+                }
                 _speakerBorder.Visibility = Visibility.Collapsed;
-                if (_isSpeakerMode)
+                if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
                 {
                     _normalCellsSection.ResetDecorationBorders();
                     if (0 == speakerIndication.speaker_index)
@@ -1814,26 +2107,27 @@ namespace EasyVideoWin.View
                         _currentSpeakerCell = _dictLayoutCellHandle[LayoutIndication.sites[speakerIndication.speaker_index].window];
                     }
 
-                    for (var i = 0; i < 4 && i < _layoutNormalCells.Length; ++i)
+                    for (int i = 0; i < 4 && i < _layoutNormalCells.Length; ++i)
                     {
                         SetNormalCellBorder(_layoutNormalCells[i], i);
                     }
 
-                    _layoutSpeakerIdx = speakerIndication.speaker_index;
+                    LayoutSpeakerIdx = speakerIndication.speaker_index;
                 }
                 else
                 {
-                    _layoutSpeakerIdx = speakerIndication.speaker_index;
-                    if (_layoutSpeakerIdx < 0)
+                    LayoutSpeakerIdx = speakerIndication.speaker_index;
+                    if (LayoutSpeakerIdx < 0)
                     {
                         HideSpeakerCellBorder();
                     }
                     else
                     {
-                        var speakerCell = _dictLayoutCellHandle[LayoutIndication.sites[_layoutSpeakerIdx].window];
+                        LayoutCellWindow speakerCell = _dictLayoutCellHandle[LayoutIndication.sites[LayoutSpeakerIdx].window];
                         SetSpeakerCellBorder(speakerCell);
                     }
                 }
+                OnSpeakerChanged(speakerIndication.speaker_name, speakerIndication.speaker_index);
                 log.Info("EventLayoutSpeakerIndication end.");
             });
         }
@@ -1843,8 +2137,8 @@ namespace EasyVideoWin.View
             _speakerBorder.BorderThickness = new Thickness(_cellBorderWidth + 2, _cellBorderHeight + 2, _cellBorderWidth + 2, _cellBorderHeight + 2);
             _speakerBorder.Width = speakerCell.Width + _cellBorderWidth * 2;
             _speakerBorder.Height = speakerCell.Height + _cellBorderHeight * 2;
-            var borderLeft = speakerCell.Left - this.Left - _cellBorderWidth;
-            var borderTop = speakerCell.Top - this.Top - _cellBorderHeight;
+            double borderLeft = speakerCell.Left - this.Left - _cellBorderWidth;
+            double borderTop = speakerCell.Top - this.Top - _cellBorderHeight;
             _speakerBorder.Margin = new Thickness(borderLeft, borderTop, 0, 0);
             _speakerBorder.Visibility = Visibility.Visible;
         }
@@ -1899,7 +2193,7 @@ namespace EasyVideoWin.View
                 this.Top = top;
             }
 
-            if (_isSpeakerMode)
+            if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
             {
                 if (null != _speakerModeMainCell)
                 {
@@ -1927,20 +2221,24 @@ namespace EasyVideoWin.View
             _layoutOperationbar.HideWindow();
             if (!isHidden)
             {
-                UpdateLayoutOperationbarsPosition();
+                UpdateLayoutOperationbarsPosition(LayoutIndication);
             }
             //_layoutOperationbar.MoveWindowPos(x, y);
             //_normalCellsSection.MoveWindowPos(x, y);
             _cancelFocusVideoWindow.MoveWindowPos(x, y);
             _recordingIndicationWindow.MoveWindowPos(x, y);
+            _speakerPromptWindow.MoveWindowPos(x, y);
+            _exitAudioModeWindow.MoveWindowPos(x, y);
             _messageOverlayWindow.MoveWindowPos(x, y);
+            _dialoutPeerInfoWindow.MoveWindowPos(x, y);
 
             //ShowToolWindow();
             //HideShareToolWindow?.Invoke();
         }
         
-        public void LayoutOperationbar_SvcLayoutModeChanged(bool isSpeakerMode, bool isDpiChanged=false)
+        public void LayoutOperationbar_SvcLayoutModeChanged(LayoutModeType layoutMode, bool isDpiChanged=false)
         {
+            log.InfoFormat("LayoutOperationbar_SvcLayoutModeChanged, layoutMode: {0}, isDpiChanged: {1}, Current _layoutMode: {2}", layoutMode, isDpiChanged, _layoutMode);
             if (_disableChangeLayout)
             {
                 ShowPromptWindow(LanguageUtil.Instance.GetValueByKey("LAYOUT_CHANGE_DISABLED"), 5000);
@@ -1948,57 +2246,72 @@ namespace EasyVideoWin.View
             }
 
             //ChangeSvcLayoutMode(isSpeakerMode, isDpiChanged);
-            if (_isSpeakerMode != isSpeakerMode)
+            if (_layoutMode != layoutMode)
             {
-                SvcSetLayout(ManagedEVSdk.Structs.EV_LAYOUT_PAGE_CLI.EV_LAYOUT_CURRENT_PAGE, isSpeakerMode, IntPtr.Zero);
+                //if (LayoutModeType.TRADITIONAL_SPEAKER_MODE == layoutMode)
+                //{
+                //    _layoutMode = LayoutModeType.TRADITIONAL_SPEAKER_MODE;
+                //}
+
+                SvcSetLayout(ManagedEVSdk.Structs.EV_LAYOUT_PAGE_CLI.EV_LAYOUT_CURRENT_PAGE, layoutMode, IntPtr.Zero);
             }
 
             if (!_autoHidePartyName)
             {
-                ShowAllLayoutCellOperationbars();
+                ShowAllLayoutCellOperationbars(LayoutIndication);
             }
         }
 
-        private void ChangeSvcLayoutMode(bool isSpeakerMode, bool isDpiChanged)
+        private void ChangeSvcLayoutMode(LayoutModeType layoutMode, ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication, bool isDpiChanged)
         {
-            _layoutOperationbar.IsSpeakerMode = isSpeakerMode;
-            if (LayoutIndication.sites_size <= 0)
+            _layoutOperationbar.LayoutMode = layoutMode;
+            if (layoutIndication.sites_size <= 0)
             {
-                for (var i = 0; i < _layoutCells.Length; ++i)
+                for (int i = 0; i < _layoutCells.Length; ++i)
                 {
                     _layoutCells[i].HideWindow();
                 }
                 return;
             }
-            if (_isSpeakerMode != isSpeakerMode)
+            if (_layoutMode != layoutMode)
             {
-                _layoutSpeakerIdx = -1;
-                SvcSetLayout(ManagedEVSdk.Structs.EV_LAYOUT_PAGE_CLI.EV_LAYOUT_CURRENT_PAGE, isSpeakerMode, IntPtr.Zero);
+                LayoutSpeakerIdx = -1;
+                SvcSetLayout(ManagedEVSdk.Structs.EV_LAYOUT_PAGE_CLI.EV_LAYOUT_CURRENT_PAGE, layoutMode, IntPtr.Zero);
             }
-            _isSpeakerMode = isSpeakerMode;
+            _layoutMode = layoutMode;
             _speakerBorder.Visibility = Visibility.Collapsed;
-            if (_isSpeakerMode)
+            if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
             {
-                SetLayout4SpeakerMode(isDpiChanged);
+                SetLayout4SpeakerMode(layoutIndication, isDpiChanged);
             }
-            else
+            else if (LayoutModeType.GALLERY_MODE == _layoutMode)
             {
-                SetLayout4GalleryMode(isDpiChanged);
+                SetLayout4GalleryMode(layoutIndication, isDpiChanged);
+            }
+            else if (LayoutModeType.TRADITIONAL_SPEAKER_MODE == _layoutMode)
+            {
+                SetLayout4TraditionalSpeakerMode(layoutIndication, isDpiChanged);
             }
         }
 
-        private void SvcSetLayout(ManagedEVSdk.Structs.EV_LAYOUT_PAGE_CLI page, bool isSpeakerMode, IntPtr focusVideoWindow)
+        private void SvcSetLayout(ManagedEVSdk.Structs.EV_LAYOUT_PAGE_CLI page, LayoutModeType layoutMode, IntPtr focusVideoWindow)
         {
+            log.InfoFormat("SvcSetLayout, page: {0}, layoutMode: {1}: focusVideoWindow: {2}", page, layoutMode, focusVideoWindow);
             ManagedEVSdk.Structs.EVLayoutRequestCli layoutRequest = new ManagedEVSdk.Structs.EVLayoutRequestCli();
-            if (isSpeakerMode)
+            if (LayoutModeType.NEW_SPEAKER_MODE == layoutMode)
             {
                 layoutRequest.mode = ManagedEVSdk.Structs.EV_LAYOUT_MODE_CLI.EV_LAYOUT_SPEAKER_MODE;
                 layoutRequest.max_type = ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI.EV_LAYOUT_TYPE_5_4T_1B;
             }
-            else
+            else if (LayoutModeType.GALLERY_MODE == layoutMode)
             {
                 layoutRequest.mode = ManagedEVSdk.Structs.EV_LAYOUT_MODE_CLI.EV_LAYOUT_GALLERY_MODE;
                 layoutRequest.max_type = Utils.GetEnable4x4Layout() ? ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI.EV_LAYOUT_TYPE_16 : ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI.EV_LAYOUT_TYPE_9;
+            }
+            else
+            {
+                layoutRequest.mode = ManagedEVSdk.Structs.EV_LAYOUT_MODE_CLI.EV_LAYOUT_AUTO_MODE;
+                layoutRequest.max_type = ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI.EV_LAYOUT_TYPE_8;
             }
             layoutRequest.page = page;
             layoutRequest.max_resolution = new ManagedEVSdk.Structs.EVVideoSizeCli() { width = 0, height = 0 };
@@ -2033,30 +2346,23 @@ namespace EasyVideoWin.View
         private void EVSdkWrapper_EventLayoutSiteIndication(ManagedEVSdk.Structs.EVSiteCli site)
         {
             log.Info("EventLayoutSiteIndication");
-            if (site.is_local)
-            {
-                if (IsRemoteMuted != site.remote_muted)
-                {
-                    OnPartyRemoteMutedChanged(site.remote_muted);
-                    IsRemoteMuted = site.remote_muted;
-                }
-                log.Info("Local site. EventLayoutSiteIndication end");
-                return;
-            }
 
-            for (var i=0; i<LayoutIndication.sites_size; ++i)
-            {
-                if (LayoutIndication.sites[i].device_id == site.device_id)
+            Application.Current.Dispatcher.InvokeAsync(() => {
+                log.InfoFormat("EventLayoutSiteIndication, device_id: {0}, is_local: {1}, remote_muted: {2}, mic_muted: {3}, name: {4}", site.device_id, site.is_local, site.remote_muted, site.mic_muted, site.name);
+                if (site.is_local)
                 {
-                    if (LayoutIndication.sites[i].mic_muted != site.mic_muted)
+                    if (IsRemoteMuted != site.remote_muted)
                     {
-                        OnPartyMicMutedChanged(site.device_id, site.mic_muted);
+                        OnPartyRemoteMutedChanged(site.remote_muted);
+                        IsRemoteMuted = site.remote_muted;
                     }
-                    LayoutIndication.sites[i] = site;
-                    break;
+                    _localVideoCell.CellName = site.name;
                 }
-            }
-            log.Info("EventLayoutSiteIndication end");
+
+                OnLayoutSiteChanged(site);
+            });
+            
+            log.Info("EventLayoutSiteIndication done");
         }
         
         private void SetMessageOverlay(ManagedEVSdk.Structs.EVMessageOverlayCli messageOverlay)
@@ -2173,7 +2479,7 @@ namespace EasyVideoWin.View
                 return;
             }
 
-            if (CallStatus.Connected != CallController.Instance.CurrentCallStatus)
+            if (CallStatus.Connected != CallController.Instance.CurrentCallStatus && CallStatus.P2pOutgoing != CallController.Instance.CurrentCallStatus)
             {
                 log.Info("Do not show prompt window for call status is not connected.");
                 return;
@@ -2192,7 +2498,7 @@ namespace EasyVideoWin.View
             Window activeWin = null;
             if (_layoutOperationbar.IsReceiveContentWinActive)
             {
-                var win = _layoutOperationbar.GetReceiveContentWindow();
+                VideoContentWindow win = _layoutOperationbar.GetReceiveContentWindow();
                 masterWin = win;
                 activeWin = win;
                 promptWindow.Owner = win;
@@ -2200,7 +2506,7 @@ namespace EasyVideoWin.View
             }
             else if (_layoutOperationbar.IsWhiteboardActive)
             {
-                var win = _layoutOperationbar.GetContentWhiteboardWindow();
+                ContentWhiteboard win = _layoutOperationbar.GetContentWhiteboardWindow();
                 masterWin = win;
                 activeWin = win;
                 promptWindow.Owner = win;
@@ -2222,9 +2528,15 @@ namespace EasyVideoWin.View
             }
             else
             {
-                log.InfoFormat("VideoPeopleWindow as owner of prompt window. this.IsActive: {0}", this.IsActive);
+                log.InfoFormat("VideoPeopleWindow as owner of prompt window. this.IsActive: {0}, _layoutOperationbar.HasActiveSubDialog: {1}", this.IsActive, _layoutOperationbar.HasActiveSubDialog);
+                if (_layoutOperationbar.HasActiveSubDialog)
+                {
+                    log.Info("_layoutOperationbar.HasActiveSubDialog is true and do not show the prompt window");
+                    return;
+                }
                 masterWin = VideoPeopleWindow.Instance;
                 promptWindow.Owner = _layoutOperationbar;
+
                 if (VideoPeopleWindow.Instance.IsActive || this.IsActive)
                 {
                     log.Info("VideoPeopleWindow is activated.");
@@ -2237,69 +2549,71 @@ namespace EasyVideoWin.View
 
         private void OnPartyRemoteMutedChanged(bool isMuted)
         {
-            Application.Current.Dispatcher.InvokeAsync(() => {
-                log.Info("Handle party retmote muted changed begin");
-                if (isMuted)
+            if (isMuted)
+            {
+                ShowPromptWindow(LanguageUtil.Instance.GetValueByKey("CHAIRMAN_MUTE_ENDPOINT_INFO"), 7000);
+            }
+            else
+            {
+                bool isMicEnabled = CallController.Instance.IsMicEnabled();
+                log.InfoFormat("Received remote mic unmuted, IsMicEnabled: {0}", isMicEnabled);
+                if (isMicEnabled)
                 {
-                    _layoutOperationbar.RequestSpeakVisibility = Visibility.Visible;
-                    ShowPromptWindow(LanguageUtil.Instance.GetValueByKey("CHAIRMAN_MUTE_ENDPOINT_INFO"), 7000);
-                }
-                else
-                {
-                    _layoutOperationbar.RequestSpeakVisibility = Visibility.Collapsed;
                     ShowPromptWindow(LanguageUtil.Instance.GetValueByKey("CHAIRMAN_UNMUTE_ENDPOINT_INFO"), 5000);
                 }
-                log.Info("Handle party retmote muted changed end");
-            });
-        }
-
-        private void OnPartyMicMutedChanged(ulong deviceId, bool isMicMuted)
-        {
-            if (deviceId == LoginManager.Instance.DeviceId)
-            {
-                return;
             }
-            log.Info("OnPartyMicMutedChanged");
-            Application.Current.Dispatcher.InvokeAsync(() => {
-                log.InfoFormat("Begin to handle mic muted changed, login device id:{0}", LoginManager.Instance.DeviceId);
-                for (var j = 0; j < _layoutCells.Length; ++j)
+        }
+        
+        private void OnLayoutSiteChanged(ManagedEVSdk.Structs.EVSiteCli site)
+        {
+            log.InfoFormat("OnLayoutSiteChanged, login deviceId:{0}, party deviceId: {1}", LoginManager.Instance.DeviceId, site.device_id);
+            for (int i = 0; i < LayoutIndication.sites_size; ++i)
+            {
+                if (LayoutIndication.sites[i].device_id != site.device_id)
                 {
-                    if (_layoutCells[j].DeviceId == deviceId)
+                    continue;
+                }
+
+                //if (site.device_id != LoginManager.Instance.DeviceId)
+                {
+                    for (int j = 0; j < _layoutCells.Length; ++j)
                     {
-                        _layoutCells[j].Operationbar.IsMicMuted = isMicMuted;
+                        if (_layoutCells[j].DeviceId != site.device_id)
+                        {
+                            continue;
+                        }
+
+                        _layoutCells[j].Operationbar.CellName = site.name;
+                        _layoutCells[j].Operationbar.IsMicMuted = site.mic_muted;
                         break;
                     }
                 }
 
-                log.InfoFormat("Handled mic muted, party device id:{0}, isMicMuted:{1}", deviceId, isMicMuted);
-            });
+                LayoutIndication.sites[i] = site;
+                break;
+            }
         }
         
         private void OnDisableLayoutChanged(bool disable)
         {
             _disableChangeLayout = disable;
-            if (disable)
+            if (disable && _isFocusVideoMode)
             {
-                if (_isFocusVideoMode)
-                {
-                    log.Info("Handle party disable changed begin");
-                    _isFocusVideoMode = false;
-                    _cancelFocusVideoWindow.HideWindow();
-                    log.Info("Handle party disable changed end");
-                }
-
-                if (!_isSpeakerMode)
-                {
-                    _isSpeakerMode = true;
-                    _layoutOperationbar.IsSpeakerMode = true;
-                }
+                log.Info("Handle party disable changed begin");
+                _isFocusVideoMode = false;
+                SetCancelFocusVideoWindow2ProperPos();
+                log.Info("Handle party disable changed end");
             }
         }
 
         private void EVSdkWrapper_EventWarn(ManagedEVSdk.Structs.EVWarnCli warn)
         {
             log.InfoFormat("EventWarn, code:{0}, msg:{1}", warn.code, warn.msg);
-            if (ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_NO_AUDIO_CAPTURE_CARD != warn.code && _disablePrompt)
+            bool isPromptWarn =    ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_NETWORK_POOR                == warn.code
+                                || ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_NETWORK_VERY_POOR           == warn.code
+                                || ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_BANDWIDTH_INSUFFICIENT      == warn.code
+                                || ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_BANDWIDTH_VERY_INSUFFICIENT == warn.code;
+            if (_disablePrompt && isPromptWarn)
             {
                 return;
             }
@@ -2308,7 +2622,7 @@ namespace EasyVideoWin.View
             {
                 if (ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_NO_AUDIO_CAPTURE_CARD == warn.code)
                 {
-                    if (CallStatus.Connected != CallController.Instance.CurrentCallStatus)
+                    if (CallStatus.Connected != CallController.Instance.CurrentCallStatus && CallStatus.P2pOutgoing != CallController.Instance.CurrentCallStatus)
                     {
                         log.Info("Do not show no mic window for call status is not connected.");
                         return;
@@ -2336,6 +2650,27 @@ namespace EasyVideoWin.View
                 }
                 else
                 {
+                    if (ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_UNMUTE_AUDIO_INDICATION == warn.code)
+                    {
+                        MessageBoxConfirm confirmBox = new MessageBoxConfirm(null);
+                        confirmBox.Owner = this;
+                        confirmBox.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), LanguageUtil.Instance.GetValueByKey("REMOTE_UNMUTED_INDICATION"));
+                        confirmBox.ConfirmEvent += (sender, e) =>
+                        {
+                            this.Activate();
+                            _layoutOperationbar.UnmuteAudio();
+                            confirmBox.Close();
+                        };
+                        confirmBox.CloseEvent += (sender, e) =>
+                        {
+                            this.Activate();
+                        };
+
+                        confirmBox.ShowDialog();
+                        
+                        return;
+                    }
+
                     string prompt = null;
                     switch (warn.code)
                     {
@@ -2350,6 +2685,9 @@ namespace EasyVideoWin.View
                             break;
                         case ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_BANDWIDTH_VERY_INSUFFICIENT:
                             prompt = LanguageUtil.Instance.GetValueByKey("BANDWIDTH_VERY_INSUFFICIENT");
+                            break;
+                        case ManagedEVSdk.Structs.EV_WARN_CLI.EV_WARN_UNMUTE_AUDIO_NOT_ALLOWED:
+                            prompt = LanguageUtil.Instance.GetValueByKey("CAN_NOT_UNMUTE_REMOTE");
                             break;
                     }
 
@@ -2380,24 +2718,14 @@ namespace EasyVideoWin.View
         {
             log.InfoFormat("EventRecordingIndication, state={0}, is live={1}", recordingInfo.state, recordingInfo.live);
             _recordingIndication = recordingInfo;
-            if (ManagedEVSdk.Structs.EV_RECORDING_STATE_CLI.EV_RECORDING_STATE_ON == recordingInfo.state)
-            {
-                Application.Current.Dispatcher.InvokeAsync(() =>
+            Application.Current.Dispatcher.InvokeAsync(() => {
+                if (ManagedEVSdk.Structs.EV_RECORDING_STATE_CLI.EV_RECORDING_STATE_ON == recordingInfo.state)
                 {
                     _recordingIndicationWindow.TypeTitle = recordingInfo.live ? "LIVE" : "REC";
-                    SetRecordingIndicationWindow2ProperPos();
-                    log.Info("Show recording flag.");
-                });
-            }
-            else
-            {
-                Application.Current.Dispatcher.InvokeAsync(() =>
-                {
-                    _recordingIndicationWindow.HideWindow();
-                    SetCancelFocusVideoWindow2ProperPos();
-                    log.Info("Hide recording flag.");
-                });
-            }
+                }
+                SetRecordingIndicationWindow2ProperPos();
+            });
+            
             log.Info("EventRecordingIndication end");
         }
 
@@ -2408,25 +2736,54 @@ namespace EasyVideoWin.View
                 return;
             }
 
-            if (ManagedEVSdk.Structs.EV_RECORDING_STATE_CLI.EV_RECORDING_STATE_ON != _recordingIndication.state)
+            if (ManagedEVSdk.Structs.EV_RECORDING_STATE_CLI.EV_RECORDING_STATE_ON == _recordingIndication.state)
             {
-                return;
+                _recordingIndicationWindow.SetProperWindowPos(this.Left + CANCEL_FOCUS_VIDEO_WINDOW_LEFT, this.Top + CANCEL_FOCUS_VIDEO_WINDOW_TOP);
             }
-
-            _recordingIndicationWindow.SetProperWindowPos(this.Left + CANCEL_FOCUS_VIDEO_WINDOW_LEFT, this.Top + CANCEL_FOCUS_VIDEO_WINDOW_TOP);
+            else
+            {
+                _recordingIndicationWindow.HideWindow();
+            }
+            
             SetCancelFocusVideoWindow2ProperPos();
         }
 
         private void SetCancelFocusVideoWindow2ProperPos()
         {
-            if (!_isFocusVideoMode)
+            if (WindowState.Minimized == VideoPeopleWindow.Instance.WindowState)
             {
                 return;
             }
 
+            if (_isFocusVideoMode)
+            {
+                _cancelFocusVideoWindow.SetProperWindowPos(GetHorizontalPosOfNext2Recording(), this.Top + CANCEL_FOCUS_VIDEO_WINDOW_TOP);
+            }
+            else
+            {
+                _cancelFocusVideoWindow.HideWindow();
+            }
+
+            SetSpeakerPromptWindow2ProperPos();
+        }
+        
+        private void SetSpeakerPromptWindow2ProperPos()
+        {
+            if (string.IsNullOrEmpty(_speakerPromptWindow.SpeakerName))
+            {
+                _speakerPromptWindow.HideWindow();
+            }
+            else
+            {
+                _speakerPromptWindow.SetProperWindowPos(GetHorizontalPosOfNext2CancelFocusVideo(), this.Top + CANCEL_FOCUS_VIDEO_WINDOW_TOP);
+            }
+        }
+
+        private double GetHorizontalPosOfNext2Recording()
+        {
             if (_recordingIndicationWindow.IsWindowHidden)
             {
-                _cancelFocusVideoWindow.SetProperWindowPos(this.Left + CANCEL_FOCUS_VIDEO_WINDOW_LEFT, this.Top + CANCEL_FOCUS_VIDEO_WINDOW_TOP);
+                return this.Left + CANCEL_FOCUS_VIDEO_WINDOW_LEFT;
             }
             else
             {
@@ -2435,19 +2792,72 @@ namespace EasyVideoWin.View
                 {
                     width = _recordingIndicationWindow.ActualWidth;
                 }
-                double left = _recordingIndicationWindow.Left + width + 14;
-                _cancelFocusVideoWindow.SetProperWindowPos(left, this.Top + CANCEL_FOCUS_VIDEO_WINDOW_TOP);
+
+                return _recordingIndicationWindow.Left + width + 14;
             }
         }
 
-        private void SetProperPosition4LayoutOperationbarAndTitlebar()
+        private double GetHorizontalPosOfNext2CancelFocusVideo()
+        {
+            if (_cancelFocusVideoWindow.IsWindowHidden)
+            {
+                return GetHorizontalPosOfNext2Recording();
+            }
+            else
+            {
+                double width = _cancelFocusVideoWindow.Width;
+                if (_cancelFocusVideoWindow.ActualWidth > width)
+                {
+                    width = _cancelFocusVideoWindow.ActualWidth;
+                }
+
+                return _cancelFocusVideoWindow.Left + width + 14;
+            }
+        }
+
+        private void SetExitAudioModeWindow2ProperPos()
+        {
+            if (WindowState.Minimized == VideoPeopleWindow.Instance.WindowState)
+            {
+                return;
+            }
+
+            if (MediaModeType.AUDIO_ONLY != _mediaMode)
+            {
+                return;
+            }
+
+            System.Windows.Rect masterWindowRect = VideoPeopleWindow.Instance.GetWindowRect();
+            double left = masterWindowRect.Left + (masterWindowRect.Width - _exitAudioModeWindow.Width) / 2;
+            double top = masterWindowRect.Top + (masterWindowRect.Height - _exitAudioModeWindow.Height) / 2;
+            _exitAudioModeWindow.SetProperWindowPos(left, top);
+        }
+
+        private void SetDialoutPeerInfoWindow2ProperPos()
+        {
+            if (CallStatus.P2pOutgoing == CallController.Instance.CurrentCallStatus)
+            {
+                System.Windows.Rect masterWindowRect = VideoPeopleWindow.Instance.GetWindowRect();
+                double left = masterWindowRect.Left + (masterWindowRect.Width - _dialoutPeerInfoWindow.Width) / 2;
+                double top = masterWindowRect.Top + (masterWindowRect.Height - _dialoutPeerInfoWindow.Height) / 2;
+                _dialoutPeerInfoWindow.Owner = _layoutOperationbar;
+                _dialoutPeerInfoWindow.SetProperWindowPos(left, top);
+                _dialoutPeerInfoWindow.UpdateAvatarImage(CallController.Instance.PeerAvatarUrl, CallController.Instance.PeerDisplayName);
+            }
+            else
+            {
+                _dialoutPeerInfoWindow.HideWindow();
+            }
+        }
+
+        private void SetProperPosition4LayoutOperationbarAndTitlebar(ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication)
         {
             Rect mainWindowRect = VideoPeopleWindow.Instance.GetWindowRect();
 
             // if the following values for layout operation bar don't be int, the position will be not correct when change main window between min/restore operation in max window style.
-            var width = Math.Round(mainWindowRect.Width);
-            var height = LAYOUT_OPERATIONBAR_HEIGHT;
-            var left = Math.Round(mainWindowRect.Left);
+            double width = Math.Round(mainWindowRect.Width);
+            double height = LAYOUT_OPERATIONBAR_HEIGHT;
+            double left = Math.Round(mainWindowRect.Left);
             double top = 0;
             if (WindowState.Maximized == VideoPeopleWindow.Instance.WindowState)
             {
@@ -2467,21 +2877,26 @@ namespace EasyVideoWin.View
             {
                 top = Math.Round(this.Top + this.Height - height);
             }
-            if (_layoutOperationbar.SetProperWindowPos(left, top, width, height))
+            
+            if (CallStatus.Connected == CallController.Instance.CurrentCallStatus)
             {
-                log.InfoFormat("Set _layoutOperationbar position, left:{0}, top:{1}, width:{2}, height:{3}", left, top, width, height);
-            }
-            if (!_autoHidePartyName)
-            {
-                if (_isSpeakerMode)
+                if (_layoutOperationbar.SetProperWindowPos(left, top, width, height))
                 {
-                    ShowLayoutCellOperationbar(_speakerModeMainCell, true);
+                    log.InfoFormat("Set _layoutOperationbar position, left:{0}, top:{1}, width:{2}, height:{3}", left, top, width, height);
                 }
-                else
+                if (!_autoHidePartyName)
                 {
-                    ShowAllLayoutCellOperationbars();
+                    if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
+                    {
+                        ShowLayoutCellOperationbar(layoutIndication, _speakerModeMainCell, true);
+                    }
+                    else
+                    {
+                        ShowAllLayoutCellOperationbars(layoutIndication);
+                    }
                 }
             }
+            
             if (VideoPeopleWindow.Instance.FullScreenStatus)
             {
                 if (_titlebar.SetProperWindowPos(left, mainWindowRect.Top, width, VideoPeopleWindow.Instance.TitlebarHeight))
@@ -2491,13 +2906,13 @@ namespace EasyVideoWin.View
             }
         }
 
-        private void ShowAllLayoutCellOperationbars()
+        private void ShowAllLayoutCellOperationbars(ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication)
         {
-            for (var i=0; i<_layoutCells.Length; ++i)
+            for (int i=0; i<_layoutCells.Length; ++i)
             {
                 if (!_layoutCells[i].IsWindowHidden)
                 {
-                    ShowLayoutCellOperationbar(_layoutCells[i], true);
+                    ShowLayoutCellOperationbar(layoutIndication, _layoutCells[i], true);
                 }
                 else
                 {
@@ -2509,17 +2924,17 @@ namespace EasyVideoWin.View
             }
         }
 
-        private void UpdateLayoutOperationbarsPosition()
+        private void UpdateLayoutOperationbarsPosition(ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication)
         {
             if (!_autoHidePartyName)
             {
-                if (_isSpeakerMode)
+                if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
                 {
-                    ShowLayoutCellOperationbar(_speakerModeMainCell, true);
+                    ShowLayoutCellOperationbar(layoutIndication, _speakerModeMainCell, true);
                 }
                 else
                 {
-                    ShowAllLayoutCellOperationbars();
+                    ShowAllLayoutCellOperationbars(layoutIndication);
                 }
             }
 
@@ -2657,7 +3072,7 @@ namespace EasyVideoWin.View
             else
             {
                 bool found = false;
-                for (var i = 0; i < speakers.Length; ++i)
+                for (int i = 0; i < speakers.Length; ++i)
                 {
                     if (currentSpeaker.id == speakers[i].id)
                     {
@@ -2690,7 +3105,7 @@ namespace EasyVideoWin.View
             else
             {
                 bool found = false;
-                for (var i = 0; i < mics.Length; ++i)
+                for (int i = 0; i < mics.Length; ++i)
                 {
                     if (currentMic.id == mics[i].id)
                     {
@@ -2715,7 +3130,7 @@ namespace EasyVideoWin.View
             {
                 Application.Current.Dispatcher.InvokeAsync(() => {
                     _localVideoCell.Operationbar.IsMicMuted = _layoutOperationbar.IsAudioMuted;
-                    if (_localVideoCell.Operationbar.IsMicMuted)
+                    if (_localVideoCell.Operationbar.IsMicMuted && MediaModeType.VIDEO_NORMAL == MediaMode)
                     {
                         _localVideoCell.Operationbar.ShowWindow();
                     }
@@ -2732,6 +3147,81 @@ namespace EasyVideoWin.View
         {
             log.InfoFormat("LayoutBackgroundWindow_Activated, IsActive: {0}", this.IsActive);
         }
+
+        private void LayoutOperationbar_EventSwitch2AudioMode()
+        {
+            MediaMode = EVSdkManager.Instance.VideoActive();
+        }
+
+        private void ExitAudioModeWindow_EventSwitch2VideoMode()
+        {
+            MediaMode = EVSdkManager.Instance.VideoActive();
+        }
+        
+        private void OnMediaModeChanged()
+        {
+            _layoutOperationbar.MediaMode = MediaMode;
+            Application.Current.Dispatcher.InvokeAsync(() => {
+                if (MediaModeType.AUDIO_ONLY == MediaMode)
+                {
+                    SetExitAudioModeWindow2ProperPos();
+
+                    if (_layoutOperationbar.IsNormalCellShown)
+                    {
+                        NormalCellsSection_CustomWindowStateChanged(WindowState.Minimized);
+                    }
+                }
+                else
+                {
+                    _exitAudioModeWindow.HideWindow();
+                    LayoutOperationbar_ShowNormalCellsChanged(this, null);
+                }
+            });
+        }
+
+        private void ShowSpeakerName(string speakerName)
+        {
+            _speakerPromptWindow.SpeakerName = speakerName;
+
+            if (WindowState.Minimized == VideoPeopleWindow.Instance.WindowState)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(speakerName))
+            {
+                _speakerPromptWindow.HideWindow();
+                return;
+            }
+
+            if (_speakerPromptWindow.IsWindowHidden)
+            {
+                SetSpeakerPromptWindow2ProperPos();
+            }
+        }
+
+        private void OnSpeakerChanged(string speakerName, int speakerIdx)
+        {
+            if (MediaModeType.VIDEO_NORMAL == _mediaMode && speakerIdx >= 0)
+            {
+                log.InfoFormat("Do not show speaker name in video mode for spaker_index is: {0}", speakerIdx);
+                ShowSpeakerName("");
+            }
+            else
+            {
+                ShowSpeakerName(speakerName);
+            }
+        }
+
+        private void LayoutOperationbar_EventDisplayNameChanged(string displayName)
+        {
+            _localVideoCell.CellName = displayName;
+        }
+
+
+        #endregion
+
+        #region -- interface implementation --
 
         public Window GetWindow()
         {

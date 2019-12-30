@@ -135,7 +135,7 @@ namespace EasyVideoWin.View
             _controlToolBar = new ContentControlToolBarView(true);
             _highlighterWin = new BrushHighlighterWindow();
 
-            var color = ColorConverter.ConvertFromString("#01FFFFFF");
+            object color = ColorConverter.ConvertFromString("#01FFFFFF");
             _approximateTransparentBrush = new SolidColorBrush((Color)color);
 
             InitCursorInfo();
@@ -212,7 +212,7 @@ namespace EasyVideoWin.View
                 return;
             }
 
-            var bounds = _selScreen.Bounds;
+            System.Drawing.Rectangle bounds = _selScreen.Bounds;
 
             bool result = Utils.SetWindowPosTopMost(Handle, bounds.X, bounds.Y, bounds.Width, bounds.Height);
             log.InfoFormat("Set WindowPosition->{0},x:{1},y:{2},width:{3},height:{4}", result, bounds.X, bounds.Y, bounds.Width, bounds.Height);
@@ -839,7 +839,7 @@ namespace EasyVideoWin.View
         private void SetInkCanvasTransparent()
         {
             this.inkCanvas1.Opacity = 1d;
-            var color = ColorConverter.ConvertFromString("#01FFFFFF");
+            object color = ColorConverter.ConvertFromString("#01FFFFFF");
             this.Background = _approximateTransparentBrush;
         }
 

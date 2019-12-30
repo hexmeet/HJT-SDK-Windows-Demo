@@ -35,7 +35,7 @@ namespace EasyVideoWin.Model
         {
             ObservableCollection<string> validValues = new ObservableCollection<string>();
             EVDeviceCli[] mics = EVSdkManager.Instance.GetDevices(EV_DEVICE_TYPE_CLI.EV_DEVICE_AUDIO_CAPTURE);
-            for (var i=0; i<mics.Length; ++i)
+            for (int i=0; i<mics.Length; ++i)
             {
                 validValues.Add(Utils.Utf8Byte2DefaultStr(mics[i].name));
             }
@@ -47,7 +47,7 @@ namespace EasyVideoWin.Model
         {
             ObservableCollection<string> validValues = new ObservableCollection<string>();
             EVDeviceCli[] speakers = EVSdkManager.Instance.GetDevices(EV_DEVICE_TYPE_CLI.EV_DEVICE_AUDIO_PLAYBACK);
-            for (var i = 0; i < speakers.Length; ++i)
+            for (int i = 0; i < speakers.Length; ++i)
             {
                 validValues.Add(Utils.Utf8Byte2DefaultStr(speakers[i].name));
             }
@@ -59,7 +59,7 @@ namespace EasyVideoWin.Model
         {
             ObservableCollection<string> validValues = new ObservableCollection<string>();
             EVDeviceCli[] cameras = EVSdkManager.Instance.GetDevices(EV_DEVICE_TYPE_CLI.EV_DEVICE_VIDEO_CAPTURE);
-            for (var i = 0; i < cameras.Length; ++i)
+            for (int i = 0; i < cameras.Length; ++i)
             {
                 validValues.Add(Utils.Utf8Byte2DefaultStr(cameras[i].name));
             }
@@ -70,7 +70,7 @@ namespace EasyVideoWin.Model
         public void SetMicrophone(string microphoneName)
         {
             EVDeviceCli[] mics = EVSdkManager.Instance.GetDevices(EV_DEVICE_TYPE_CLI.EV_DEVICE_AUDIO_CAPTURE);
-            for (var i=0; i < mics.Length; ++i)
+            for (int i=0; i < mics.Length; ++i)
             {
                 if (microphoneName == Utils.Utf8Byte2DefaultStr(mics[i].name))
                 {
@@ -83,7 +83,7 @@ namespace EasyVideoWin.Model
         public void SetSpeaker(string speakerName)
         {
             EVDeviceCli[] speakers = EVSdkManager.Instance.GetDevices(EV_DEVICE_TYPE_CLI.EV_DEVICE_AUDIO_PLAYBACK);
-            for (var i = 0; i < speakers.Length; ++i)
+            for (int i = 0; i < speakers.Length; ++i)
             {
                 if (speakerName == Utils.Utf8Byte2DefaultStr(speakers[i].name))
                 {
@@ -96,7 +96,7 @@ namespace EasyVideoWin.Model
         public void SetCamera(string cameraName)
         {
             EVDeviceCli[] cameras = EVSdkManager.Instance.GetDevices(EV_DEVICE_TYPE_CLI.EV_DEVICE_VIDEO_CAPTURE);
-            for (var i = 0; i < cameras.Length; ++i)
+            for (int i = 0; i < cameras.Length; ++i)
             {
                 if (cameraName == Utils.Utf8Byte2DefaultStr(cameras[i].name))
                 {

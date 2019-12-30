@@ -105,7 +105,6 @@ namespace EasyVideoWin.ViewModel
             MediaStatisticsCommand = new RelayCommand(MediaStatistics);
 
             CallController.Instance.CallStatusChanged += OnCallStatusChanged;
-            CallController.Instance.PropertyChanged += OnCallControllerPropertyChanged;
             EVSdkManager.Instance.EventNetworkQuality += EVSdkWrapper_EventNetworkQuality;
         }
         
@@ -123,19 +122,27 @@ namespace EasyVideoWin.ViewModel
             switch (status)
             {
                 case CallStatus.Ended:
+                case CallStatus.Idle:
                     StopRefreshCallDurationTimer();
+                    ConferenceNumber = "";
                     break;
                 case CallStatus.Dialing:
                     CallDuration = "00:00:00";
                     CallQuality = 5;
+                    // ConferenceNumber = CallController.Instance.IsP2pCall ? CallController.Instance.PeerDisplayName : CallController.Instance.ConferenceNumber;
+                    ConferenceNumber = CallController.Instance.IsP2pCall ? "" : CallController.Instance.ConferenceNumber;
+                    log.InfoFormat("Update ConferenceNumber: {0}", ConferenceNumber);
+                    break;
+                case CallStatus.P2pOutgoing:
                     break;
                 case CallStatus.Connected:
                     StartRefreshCallDurationTimer();
                     break;
             }
+            
             log.Info("OnCallStatusChanged end.");
         }
-
+        
         private void StartRefreshCallDurationTimer()
         {
             if (null == _refreshCallDurationTimer)
@@ -171,16 +178,6 @@ namespace EasyVideoWin.ViewModel
                 .Append(":")
                 .Append(duration.Seconds < 10 ? ("0" + duration.Seconds.ToString()) : duration.Seconds.ToString());
             CallDuration = sb.ToString();
-        }
-
-
-        private void OnCallControllerPropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
-            if ("ConferenceNumber" == args.PropertyName)
-            {
-                log.InfoFormat("Call controller dialing addr changed: {0}", CallController.Instance.ConferenceNumber);
-                ConferenceNumber = CallController.Instance.ConferenceNumber;
-            }
         }
         
         private void MediaStatistics(object parameter)

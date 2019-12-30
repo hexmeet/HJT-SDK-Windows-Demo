@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="EasyVideoWin.CustomControls.LayoutOperationbarTextButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:EasyVideoWin.CustomControls"
+             mc:Ignorable="d">
+    <Button Name="button" Click="button_Click" Background="#313131" Height="60" Width="130" Cursor="Hand"
+            Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:LayoutOperationbarTextButton}}, Path=Command}"
+            CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:LayoutOperationbarTextButton}}, Path=CommandParameter}">
+        <Button.Style>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="btnBorder" Background="#313131">
+                                <Label Name="btnText" 
+                                        Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:LayoutOperationbarTextButton}}, Path=ButtonText}"
+                                        Foreground="#ff4747"
+                                        FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="btnBorder" Property="Background" Value="#4c4b49"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Button.Style>
+    </Button>
+</UserControl>

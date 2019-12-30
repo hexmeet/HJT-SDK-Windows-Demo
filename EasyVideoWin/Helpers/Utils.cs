@@ -31,9 +31,10 @@ namespace EasyVideoWin.Helpers
         public const string DEFAULT_IMG_TMP_SCREEN = "EasyVideo\\SnapShot\\tmpScreen.bmp";
         public const string DEFAULT_IMG_TMP_SCREEN_PATH = "EasyVideo\\SnapShot\\";
         public const string DEFAULT_BACKGROUND_IMG_FILE_NAME = "Resources\\Icons\\background.jpg";
+        public const string AUDIO_MODE_BACKGROUND_IMG_FILE_NAME = "Resources\\Icons\\bg_audio-mode.jpg";
         private const string ROOT_CA_FILE_NAME = "rootca.pem";
         public const string DEFAULT_USER_HEADER_FILE_NAME = "Resources\\Icons\\default_user_header.jpg";
-        private const string CONFLICT_LOG_NAME = "HexMeetHJTApp-conflict.log";
+        private const string CONFLICT_LOG_NAME = "App-conflict.log";
         private const string CEF_CACHE_PATH = "CefCache";
         private const string CEF_LOG_NAME = "CEF.log";
         public const string INSTALL_PACKAGE_PATH = "Install";
@@ -44,13 +45,13 @@ namespace EasyVideoWin.Helpers
         public static readonly string AES_KEY = "JA56!*?>afa%^fgFACD$#$<:'F$&klac";
         public static readonly string AES_IV = ";lGFF56?>{]')*}A";
         public static readonly string LANGUAGE = "language";
-        public static readonly string INVALID_DISPLAY_NAME_CHAR = "[\"<>]+";
-        public static readonly int DISPLAY_NAME_MAX_LENGTH = 16;
+        public static readonly string INVALID_DISPLAY_NAME_REGEX = "[\"<>]+";
+        public static readonly int DISPLAY_NAME_MAX_LENGTH = 32;
 
         public static System.Windows.Media.Brush DefaultForeGround = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#919191"));
         public static System.Windows.Media.Brush SelectedForeGround = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#ffffff"));
-        public static System.Windows.Media.Brush DefaultBackGround = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#313131"));
-        public static System.Windows.Media.Brush SelectedBackGround = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#4c4b49"));
+        public static System.Windows.Media.Brush DefaultBackGround = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#000000"));
+        public static System.Windows.Media.Brush SelectedBackGround = new SolidColorBrush((System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#4381ff"));
 
         private static string _screenPicturePath = null;
 
@@ -330,7 +331,7 @@ namespace EasyVideoWin.Helpers
         public static Bitmap GetScreenSnapshot()
         {
             Rectangle rc = SystemInformation.VirtualScreen;
-            var bitmap = new Bitmap(rc.Width, rc.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap bitmap = new Bitmap(rc.Width, rc.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
             using (Graphics g = Graphics.FromImage(bitmap))
             {
@@ -593,6 +594,12 @@ namespace EasyVideoWin.Helpers
         {
             string path = GetAppInstalledPath();
             return Path.Combine(path, DEFAULT_BACKGROUND_IMG_FILE_NAME);
+        }
+
+        public static string GetAudioModeBackground()
+        {
+            string path = GetAppInstalledPath();
+            return Path.Combine(path, AUDIO_MODE_BACKGROUND_IMG_FILE_NAME);
         }
 
         public static string GetRootCAPath()
@@ -1403,7 +1410,7 @@ namespace EasyVideoWin.Helpers
         
         public static int HideWindowInAltTab(Window window)
         {
-            var hwnd = new System.Windows.Interop.WindowInteropHelper(window).Handle;
+            IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(window).Handle;
             //return SetWindowLong(hwnd, GWL_EXSTYLE, (GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW);
             return HideWindowInAltTab(hwnd);
         }
@@ -1416,8 +1423,8 @@ namespace EasyVideoWin.Helpers
         public static void SetSoftwareRender(Visual visual)
         {
             // Software render to avoid OOM
-            var hwndSource = (System.Windows.Interop.HwndSource)PresentationSource.FromVisual(visual);
-            var hwndTarget = hwndSource.CompositionTarget;
+            System.Windows.Interop.HwndSource hwndSource = (System.Windows.Interop.HwndSource)PresentationSource.FromVisual(visual);
+            HwndTarget hwndTarget = hwndSource.CompositionTarget;
             hwndTarget.RenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
 
             if (RenderMode.SoftwareOnly != RenderOptions.ProcessRenderMode)
@@ -1461,7 +1468,7 @@ namespace EasyVideoWin.Helpers
 
         public static string Utf8Byte2DefaultStr(byte[] bufUtf8)
         {
-            log.Info("Utf8 Byte to default string.");
+            log.Info("Utf8Byte2DefaultStr");
             if (null == bufUtf8)
             {
                 return "";
@@ -1469,7 +1476,7 @@ namespace EasyVideoWin.Helpers
             
             byte[] bufferUnicode = Encoding.Convert(Encoding.UTF8, Encoding.Unicode, bufUtf8, 0, bufUtf8.Length);
             string strUnicode = Encoding.Unicode.GetString(bufferUnicode, 0, bufferUnicode.Length);
-            log.InfoFormat("Default encode string: {0}", strUnicode);
+            log.InfoFormat("Default string: {0}", strUnicode);
             return strUnicode;
         }
     }   

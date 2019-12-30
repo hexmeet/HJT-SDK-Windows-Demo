@@ -81,7 +81,7 @@ namespace EasyVideoWin.Helpers
 
         public bool UpdateLanguage(LanguageType languageType)
         {
-            var requestedlanguageFilePathList = GetFilePathByType(languageType);
+            List<string> requestedlanguageFilePathList = GetFilePathByType(languageType);
             List<ResourceDictionary> dictionaryList = new List<ResourceDictionary>();
             foreach (ResourceDictionary dictionary in Application.Current.Resources.MergedDictionaries)
             {
@@ -89,7 +89,7 @@ namespace EasyVideoWin.Helpers
             }
 
             List<ResourceDictionary> resourceList = new List<ResourceDictionary>();
-            foreach (var requestedlanguageFilePath in requestedlanguageFilePathList)
+            foreach (string requestedlanguageFilePath in requestedlanguageFilePathList)
             {
                 ResourceDictionary resourceDictionary = dictionaryList.FirstOrDefault(d => d.Source.OriginalString.Equals(requestedlanguageFilePath));
                 if (null == resourceDictionary)
@@ -116,7 +116,7 @@ namespace EasyVideoWin.Helpers
                 return "";
             }
 
-            for (var i = 0; i < _languageResources.Count; ++i)
+            for (int i = 0; i < _languageResources.Count; ++i)
             {
                 if (_languageResources[i].Contains(key))
                 {

@@ -268,7 +268,7 @@ namespace EasyVideoWin.ViewModel
         public void InitData()
         {
             uint callRate = SettingManager.Instance.GetCurrentCallRate();
-            for (var i=0; i<CallRateSource.Count; ++i)
+            for (int i=0; i<CallRateSource.Count; ++i)
             {
                 if (CallRateSource.ElementAt(i).Key == callRate)
                 {
@@ -278,7 +278,7 @@ namespace EasyVideoWin.ViewModel
             }
             
             LanguageType curLanguage = LanguageUtil.Instance.CurrentLanguage;
-            for (var i = 0; i < LanguageSource.Count; ++i)
+            for (int i = 0; i < LanguageSource.Count; ++i)
             {
                 if (LanguageSource.ElementAt(i).Key == curLanguage)
                 {

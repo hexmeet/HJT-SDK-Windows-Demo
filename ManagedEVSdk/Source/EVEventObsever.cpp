@@ -47,6 +47,10 @@ void EVEventObsever::onCallConnected(ev::engine::EVCallInfo & info) {
     EVSdkWrapper::GetEVSdkWrapper(m_nId)->OnCallConnected(info);
 }
 
+void EVEventObsever::onCallPeerConnected(ev::engine::EVCallInfo & info) {
+    EVSdkWrapper::GetEVSdkWrapper(m_nId)->OnCallPeerConnected(info);
+}
+
 void EVEventObsever::onCallEnd(ev::engine::EVCallInfo & info) {
     EVSdkWrapper::GetEVSdkWrapper(m_nId)->OnCallEnd(info);
 }
@@ -102,6 +106,15 @@ void EVEventObsever::onWhiteBoardIndication(ev::engine::EVWhiteBoardInfo & info)
 
 void EVEventObsever::onParticipant(int number) {
     EVSdkWrapper::GetEVSdkWrapper(m_nId)->OnParticipant(number);
+}
+
+void EVEventObsever::onMicMutedShow(int micMuted)
+{
+    EVSdkWrapper::GetEVSdkWrapper(m_nId)->OnMicMutedShow(micMuted);
+}
+
+void EVEventObsever::onPeerImageUrl(const char * imageUrl) {
+    EVSdkWrapper::GetEVSdkWrapper(m_nId)->OnPeerImageUrl(imageUrl);
 }
 
 } // ManagedEVSdk

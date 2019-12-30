@@ -99,7 +99,7 @@
     <sys:String x:Key="THE_FILE_IS_SAVED_TO">The snapshot has been saved in </sys:String>
     <sys:String x:Key="ARE_YOU_SURE_TO_STOP_SHARING">Are you sure to stop sharing?</sys:String>
     <sys:String x:Key="WHITEBOARD">Whiteboard</sys:String>
-    <sys:String x:Key="SHARESCREEN">Sharescreen</sys:String>
+    <sys:String x:Key="SHARESCREEN">Share screen</sys:String>
     <sys:String x:Key="S_WHITEBOARD">{0}'s Whiteboard</sys:String>
     <!-- audio device selector -->
     <sys:String x:Key="LOUDSPEAKER">Speaker</sys:String>
@@ -222,6 +222,7 @@
     <!-- call-->
     <sys:String x:Key="FAIL_TO_CALL_FOR_BAD_NETWORK">Failed. Network is not reachable</sys:String>
     <sys:String x:Key="FAIL_TO_CALL_FOR_REGISTER_FAILURE">Failed. Registration failure</sys:String>
+    <sys:String x:Key="SWITCH_VIDEO">Switch to video</sys:String>
     <!-- request speak-->
     <sys:String x:Key="REQUEST_SPEAK">Speech request</sys:String>
     <sys:String x:Key="SENDING_REQUEST_SPEAK">Speech request has been sent</sys:String>
@@ -230,19 +231,20 @@
     <sys:String x:Key="BOTTOM_BAR_MUTE">Mute</sys:String>
     <sys:String x:Key="BOTTOM_BAR_UNMUTE">Unmute</sys:String>
     <sys:String x:Key="BOTTOM_BAR_VIDEO_ON">On</sys:String>
-    <sys:String x:Key="BOTTOM_BAR_VIDEO_OFF">Off</sys:String>
+    <sys:String x:Key="BOTTOM_BAR_VIDEO_OFF">Stop Video</sys:String>
     <sys:String x:Key="BOTTOM_BAR_SHARE">Share</sys:String>
     <sys:String x:Key="BOTTOM_BAR_SETTING">Devices</sys:String>
-    <sys:String x:Key="BOTTOM_BAR_REQUEST">Apply</sys:String>
+    <sys:String x:Key="BOTTOM_BAR_REQUEST">Speech Request</sys:String>
     <sys:String x:Key="BOTTOM_BAR_HANGUP">Hang Up</sys:String>
     <sys:String x:Key="BOTTOM_BAR_SHOW_WINDOW">Show Share</sys:String>
-
+    <sys:String x:Key="BOTTOM_BAR_SWITCH_AUDIO">Audio Mode</sys:String>
+    
     <sys:String x:Key="SPEAKER_VIEW">Speaker</sys:String>
     <sys:String x:Key="GALLERY_VIEW">Gallery</sys:String>
     <sys:String x:Key="ACCEPT">Accept</sys:String>
     <sys:String x:Key="DECLINE">Decline</sys:String>
     <sys:String x:Key="INVITED_JOIN_CONF_PROMPT">You are invited to join the meeting：{0}</sys:String>
-    <sys:String x:Key="ADMIN_INVITE_YOU_JOIN_CONF_PROMPT">{0} is inviting you to join the meeting: {1}</sys:String>
+    <sys:String x:Key="ADMIN_INVITE_YOU_JOIN_CONF_PROMPT">is inviting you to join the meeting: {0}</sys:String>
     <sys:String x:Key="CALL">Call</sys:String>
     <sys:String x:Key="CANCEL_FOCUS_VIDEO">Cancel Pinned Video</sys:String>
 
@@ -266,10 +268,10 @@
     <sys:String x:Key="RESERVATION">Reservation</sys:String>
     <sys:String x:Key="MY_CONFERENCE">My Meetings</sys:String>
     <sys:String x:Key="CONFERENCE_MANAGEMENT">Management</sys:String>
-    <sys:String x:Key="CHAIRMAN_MUTE_ENDPOINT_INFO">You have been muted by the meeting manager.</sys:String>
-    <sys:String x:Key="CHAIRMAN_UNMUTE_ENDPOINT_INFO">You have been unmuted by the meeting manager.</sys:String>
+    <sys:String x:Key="CHAIRMAN_MUTE_ENDPOINT_INFO">You have been muted by meeting host.</sys:String>
+    <sys:String x:Key="CHAIRMAN_UNMUTE_ENDPOINT_INFO">You are unmuted, other participants can hear you now.</sys:String>
     <sys:String x:Key="CONFERENCE_NEED_PASSWORD">Please input the meeting password.</sys:String>
-    <sys:String x:Key="NAME_DISPLAYED_IN_CONF_MAX_LENGTH">The length of username can not exceed 16.</sys:String>
+    <sys:String x:Key="NAME_DISPLAYED_IN_CONF_MAX_LENGTH">The length of username can not exceed {0}.</sys:String>
     <sys:String x:Key="NAME_DISPLAYED_IN_CONF_INCORRECT_PROMPT">The username can not contain &quot;, &lt;, &gt;.</sys:String>
     <sys:String x:Key="PORT_OPTIONAL">Port(Optional)</sys:String>
     <sys:String x:Key="ADVANCED_SETTING">Advanced Settings</sys:String>
@@ -389,7 +391,7 @@
     <sys:String x:Key="ONLY_ROOM_OWNER_CAN_ACTIVATE_ROOM">Only the owner can activate the meeting room.</sys:String>
     <sys:String x:Key="NOT_ALLOW_ANONYMOUS_PARTY">This meeting room does not allow anonymous calls.</sys:String>
         
-    <sys:String x:Key="RESUME_PIP">Resume PIP</sys:String>
+    <sys:String x:Key="RESUME_PIP">Show PIP</sys:String>
 
     <!-- Call error message -->
     <sys:String x:Key="SERVICE_EXCEPTION">Service exception.</sys:String>
@@ -414,13 +416,16 @@
     <sys:String x:Key="HAISHEN_PORT_COUNT_USED_UP">The number of participants has reached the platform limit.</sys:String>
     <sys:String x:Key="EXCEEDED_GATEWAY_AUDIO_PORT_COUNT_IN_LICENSE">The audio number of gateway reaches the maxinum.</sys:String>
     <sys:String x:Key="EXCEEDED_GATEWAY_VIDEO_PORT_COUNT_IN_LICENSE">The video number of gateway reaches the maxinum.</sys:String>
-
+    <sys:String x:Key="PARTY_OFFLINE">The other party is not online.</sys:String>
+    <sys:String x:Key="FAILED_JOIN_CONF_FOR_LOCKED">Join failed, conference is locked.</sys:String>
+    <sys:String x:Key="CALL_FAILED_FOR_PARTY_IN_CALL">Call failed due to the party is in call.</sys:String>
+    
     <sys:String x:Key="INVALID_CONFERENCE_ID">Meeting Number can only contain number.</sys:String>
     <sys:String x:Key="PIC_1280_720_LARGE">When the image is converted to one of resolution 1280x720, the size is larger than 5M. Please have it adjusted and try again!</sys:String>
     <sys:String x:Key="TRYING_TO_LOAD">Trying to load...</sys:String>
     <sys:String x:Key="FAILED_LOAD">Failed to load, please check your network.</sys:String>
     <sys:String x:Key="RELOAD">Reload</sys:String>
-    <sys:String x:Key="LAYOUT_CHANGE_DISABLED">Can not change layout for this call.</sys:String>
+    <sys:String x:Key="LAYOUT_CHANGE_DISABLED">Not allowed to change layout</sys:String>
     <sys:String x:Key="REGISTRATION_FAILED_CALL_AGAIN">Registration failed. Please call again.</sys:String>
     <sys:String x:Key="ORGANIZATION">Organization</sys:String>
     <sys:String x:Key="DEPARTMENT">Department</sys:String>
@@ -486,4 +491,15 @@
     <sys:String x:Key="SHARE_COMPUTER_SOUND">Share Computer Sound</sys:String>
     <sys:String x:Key="SHARE_SOUND">Share Sound</sys:String>
     <sys:String x:Key="STOP_SHARING_SOUND">Stop Sharing Sound</sys:String>
+    <sys:String x:Key="LAYOUT_SWITCH">Layout</sys:String>
+    <sys:String x:Key="CALLING">Calling...</sys:String>
+    <sys:String x:Key="INVITING_YOU">Inviting you</sys:String>
+    <sys:String x:Key="CAN_NOT_UNMUTE_REMOTE">Not allowed to unmute.</sys:String>
+    <sys:String x:Key="REMOTE_UNMUTED_INDICATION">Meeting manager is unmuting you, do you agree?</sys:String>
+    <sys:String x:Key="SPEAKER_SPEAKING">{0} is speaking</sys:String>
+    <sys:String x:Key="CALL_ENDED_BY_OTHER_USER">The other party has hung up.</sys:String>
+    <sys:String x:Key="CALL_TIMEOUT">Call timeout, terminate the call.</sys:String>
+    <sys:String x:Key="CALL_DECLINED">Call failed due to the party is busy.</sys:String>
+    <sys:String x:Key="CHANGE_NAME">Rename</sys:String>
+    <sys:String x:Key="INPUT_NEW_DISPLAY_NAME">Input a new display name:</sys:String>
 </ResourceDictionary>

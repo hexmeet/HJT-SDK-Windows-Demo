@@ -35,7 +35,6 @@ namespace EasyVideoWin.View
         private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static MyInfoWindow _instance = new MyInfoWindow();
         private MessageBoxConfirm _logoutPromptMessageBox = null;
-        private const string INVALID_NAME_REGEX = "[\"<>]+";
         private IntPtr _handle = IntPtr.Zero;
         MyInfoWindowViewModel _viewModel;
 
@@ -171,7 +170,7 @@ namespace EasyVideoWin.View
             }
             else
             {
-                if (Regex.IsMatch(newName, INVALID_NAME_REGEX))
+                if (Regex.IsMatch(newName, Utils.INVALID_DISPLAY_NAME_REGEX))
                 {
                     MessageBoxTip tip = new MessageBoxTip(this);
                     tip.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), LanguageUtil.Instance.GetValueByKey("UPDATE_USER_NAME"), LanguageUtil.Instance.GetValueByKey("CONFIRM"));

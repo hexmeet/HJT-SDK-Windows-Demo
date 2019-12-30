@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MessageBoxConfirm" Height="180" Width="360" WindowStyle="None" BorderThickness="1" ResizeMode="NoResize" ShowInTaskbar="False"
         FontFamily="Arial, Microsoft YaHei"
-        Background="#ffffff" AllowsTransparency="True" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded">
+        Background="#ffffff" AllowsTransparency="True" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
     <Window.Effect>
         <DropShadowEffect BlurRadius="24" Color="#858484" Direction="90" ShadowDepth="2"/>
     </Window.Effect>

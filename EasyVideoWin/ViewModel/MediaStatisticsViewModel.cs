@@ -95,7 +95,7 @@ namespace EasyVideoWin.ViewModel
             EVStatsCli mediaStats   = new EVStatsCli();
             EVSdkManager.Instance.GetStats(ref mediaStats);
             List<MediaStatisticsItem> tempList = new List<MediaStatisticsItem>();
-            for (var i = 0; i < mediaStats.size; ++i)
+            for (int i = 0; i < mediaStats.size; ++i)
             {
                 EVStreamStatsCli streamStats = mediaStats.stats[i];
                 MediaStatisticsItem item = new MediaStatisticsItem()

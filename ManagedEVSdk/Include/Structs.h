@@ -15,6 +15,46 @@ static const unsigned int EV_STREAM_SIZE_CLI = 20;
 
 [System::Serializable]
 [System::FlagsAttribute]
+public enum class EV_CALL_TYPE_CLI {
+    EV_CALL_UNKNOWN = 0,
+    EV_CALL_SIP = 1,
+    EV_CALL_H323 = 2,
+    EV_CALL_SVC = 3
+};
+
+[System::Serializable]
+[System::FlagsAttribute]
+public enum class EV_SVC_CALL_TYPE_CLI {
+    EV_SVC_CALL_CONF = 0,
+    EV_SVC_CALL_P2P = 1
+};
+
+[System::Serializable]
+[System::FlagsAttribute]
+public enum class EV_SVC_CALL_ACTION_CLI {
+    EV_SVC_NO_ACTION = 0,
+    EV_SVC_INCOMING_CALL_RING,
+    EV_SVC_INCOMING_CALL_CANCEL
+};
+
+[System::Serializable]
+[System::FlagsAttribute]
+public enum class EV_CALL_DIR_CLI {
+    EV_CALL_OUTGOING = 0,
+    EV_CALL_INCOMING = 1
+};
+
+[System::Serializable]
+[System::FlagsAttribute]
+public enum class EV_CALL_STATUS_CLI {
+    EV_CALL_STATUS_SUCCESS = 0,
+    EV_CALL_STATUS_ABORTED = 1,
+    EV_CALL_STATUS_MISSED = 2,
+    EV_CALL_STATUS_DECLINED = 3
+};
+
+[System::Serializable]
+[System::FlagsAttribute]
 public enum class EV_STREAM_TYPE_CLI
 {
     EV_STREAM_AUDIO         = 0
@@ -77,6 +117,8 @@ public enum class EV_WARN_CLI {
     , EV_WARN_BANDWIDTH_INSUFFICIENT        = 2
     , EV_WARN_BANDWIDTH_VERY_INSUFFICIENT   = 3
     , EV_WARN_NO_AUDIO_CAPTURE_CARD         = 4
+    , EV_WARN_UNMUTE_AUDIO_NOT_ALLOWED      = 5
+    , EV_WARN_UNMUTE_AUDIO_INDICATION       = 6
 };
 
 [System::Serializable]
@@ -130,6 +172,7 @@ public ref struct EVDeviceCli
     unsigned int            id;
     EV_DEVICE_TYPE_CLI      type;
     array<System::Byte>^    name;
+    System::String^         desc;
 
     void Unmanaged2ManagedStruct(ev::engine::EVDevice& evDevice);
 };
@@ -307,6 +350,18 @@ public ref struct EVStatsCli {
 //////////////////////////////
 
 [System::Serializable]
+public ref struct EVFeatureSupportCli
+{
+    bool    contactWebPage;
+    bool    p2pCall;
+    bool    chatInConference;
+    bool    switchingToAudioConference;
+    bool    sitenameIsChangeable;
+
+    void Unmanaged2ManagedStruct(ev::engine::EVFeatureSupport& evFeatureSupport);
+};
+
+[System::Serializable]
 public ref struct EVUserInfoCli
 {
 	System::String^         username;
@@ -323,18 +378,23 @@ public ref struct EVUserInfoCli
     uint64_t                deviceId;
     System::String^         orgPortAllocMode;
     uint64_t                orgPortCount;
+    EVFeatureSupportCli^    featureSupport;
 
 	void Unmanaged2ManagedStruct(ev::engine::EVUserInfo& evUserInfo);
 };
 
 [System::Serializable]
 public ref struct EVCallInfoCli {
-    bool                isAudioOnly;
-    bool                contentEnabled;
-    System::String^     peer;
-    System::String^     conference_number;
-    System::String^     password;
-    EVErrorCli^         err;
+    bool                    isAudioOnly;
+    bool                    contentEnabled;
+    System::String^         peer;
+    System::String^         conference_number;
+    System::String^         password;
+    EVErrorCli^             err;
+    bool                    isBigConference;
+    bool                    isRemoteMuted;
+    EV_SVC_CALL_TYPE_CLI    svcCallType;
+    EV_SVC_CALL_ACTION_CLI  svcCallAction;
 
     void Unmanaged2ManagedStruct(ev::engine::EVCallInfo& evCallInfo);
 };

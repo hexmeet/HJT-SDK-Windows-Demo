@@ -26,8 +26,8 @@ namespace EasyVideoWin.View
         public event ListenerSelectedShareContentHandler ListenerSelectedShareContent = null;
         private SelectShareContentModeWindowViewModel _viewModel = null;
         private const int INITIAL_HEIGHT = 100;
-        private const int INITIAL_WIDTH = 136;
-
+        private const int INITIAL_WIDTH = 140;
+        
         public int InitialHeight
         {
             get
@@ -75,12 +75,12 @@ namespace EasyVideoWin.View
         //    }
         //}
 
-        private void Window_MouseMove_Whiteboard(object sender, MouseEventArgs e)
+        private void Window_MouseEnter_Whiteboard(object sender, MouseEventArgs e)
         {
             this.InteractionWhiteboard.Background = Utils.SelectedBackGround;
         }
 
-        private void Window_MouseMove_ScreenShare(object sender, MouseEventArgs e)
+        private void Window_MouseEnter_ScreenShare(object sender, MouseEventArgs e)
         {
             this.ScreenShare.Background = Utils.SelectedBackGround;
         }
@@ -93,7 +93,7 @@ namespace EasyVideoWin.View
         private void Window_MouseLeave_ScreenShare(object sender, MouseEventArgs e)
         {
             this.ScreenShare.Background = Utils.DefaultBackGround;
-        }        
+        }
     }
 
     public enum ShareContentMode

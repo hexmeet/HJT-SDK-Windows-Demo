@@ -167,7 +167,7 @@ namespace EasyVideoWin.CustomControls
         /// <param name="e">The <see cref="System.Windows.DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
         private void OnVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var isVisible = (bool)e.NewValue;
+            bool isVisible = (bool)e.NewValue;
 
             if (isVisible)
             {

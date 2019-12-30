@@ -86,7 +86,7 @@ namespace EasyVideoWin.View
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var layer = AdornerLayer.GetAdornerLayer(finalPic);
+            AdornerLayer layer = AdornerLayer.GetAdornerLayer(finalPic);
             _IMAdorner = new IMAdorner(finalPic, this);
             layer.Add(_IMAdorner);
 
@@ -102,7 +102,7 @@ namespace EasyVideoWin.View
 
         private void MasterImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var img = sender as ContentControl;
+            ContentControl img = sender as ContentControl;
             if (img == null) return;
 
             this.oldCursor = this.Cursor;
@@ -115,7 +115,7 @@ namespace EasyVideoWin.View
 
         private void MasterImage_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            var img = sender as ContentControl;
+            ContentControl img = sender as ContentControl;
             if (img == null) return;
 
             this.Cursor = this.oldCursor;
@@ -373,7 +373,7 @@ namespace EasyVideoWin.View
             try
             {
                 // get the current DPI of the monitor of the window
-                var monitor = DpiUtil.MonitorFromWindow(hwnd, DpiUtil.MONITOR_DEFAULTTONEAREST);
+                IntPtr monitor = DpiUtil.MonitorFromWindow(hwnd, DpiUtil.MONITOR_DEFAULTTONEAREST);
                 uint _current_dpiX = 96;
                 uint _current_dpiY = 96;
                 DpiUtil.GetDpiForMonitor(monitor, (int)DpiUtil.DpiType.Effective, out _current_dpiX, out _current_dpiY);
@@ -392,11 +392,11 @@ namespace EasyVideoWin.View
 
         private void UpdateWindowSize()
         {
-            var old_Pos_Width = Math.Abs(this.Left) + this.Width;
-            var old_Pos_Height = Math.Abs(this.Top) + this.Height;
+            double old_Pos_Width = Math.Abs(this.Left) + this.Width;
+            double old_Pos_Height = Math.Abs(this.Top) + this.Height;
 
-            var new_Pos_Width = Math.Abs(this.Left) + this.Width;
-            var new_Pos_Height = Math.Abs(this.Top) + this.Height;
+            double new_Pos_Width = Math.Abs(this.Left) + this.Width;
+            double new_Pos_Height = Math.Abs(this.Top) + this.Height;
 
             int _relScaleX = (int)(old_Pos_Width - new_Pos_Width);
             int _relScaleY = (int)(old_Pos_Height - new_Pos_Height);

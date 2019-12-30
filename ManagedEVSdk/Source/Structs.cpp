@@ -34,6 +34,15 @@ void EVVideoSizeCli::Unmanaged2ManagedStruct(ev::engine::EVVideoSize& evVideoSiz
     height  = evVideoSize.height;
 }
 
+void EVFeatureSupportCli::Unmanaged2ManagedStruct(ev::engine::EVFeatureSupport& evFeatureSupport)
+{
+    contactWebPage              = evFeatureSupport.contactWebPage;
+    p2pCall                     = evFeatureSupport.p2pCall;
+    chatInConference            = evFeatureSupport.chatInConference;
+    switchingToAudioConference  = evFeatureSupport.switchingToAudioConference;
+    sitenameIsChangeable        = evFeatureSupport.sitenameIsChangeable;
+}
+
 void EVUserInfoCli::Unmanaged2ManagedStruct(ev::engine::EVUserInfo& evUserInfo)
 {
 	username                = msclr::interop::marshal_as<System::String^>(evUserInfo.username);
@@ -50,16 +59,22 @@ void EVUserInfoCli::Unmanaged2ManagedStruct(ev::engine::EVUserInfo& evUserInfo)
     deviceId                = evUserInfo.deviceId;
     orgPortAllocMode        = Utils::Utf8Str2ManagedStr(evUserInfo.orgPortAllocMode);
     orgPortCount            = evUserInfo.orgPortCount;
+    featureSupport          = gcnew EVFeatureSupportCli();
+    featureSupport->Unmanaged2ManagedStruct(evUserInfo.featureSupport);
 }
 
 void EVCallInfoCli::Unmanaged2ManagedStruct(ev::engine::EVCallInfo& evCallInfo)
 {
     isAudioOnly         = evCallInfo.isAudioOnly;
     contentEnabled      = evCallInfo.contentEnabled;
-    peer                = msclr::interop::marshal_as<System::String^>(evCallInfo.peer);
+    peer                = EasyVideoWin::ManagedEVSdk::Utils::Utf8Str2ManagedStr(evCallInfo.peer);
     conference_number   = msclr::interop::marshal_as<System::String^>(evCallInfo.conference_number);
     password            = msclr::interop::marshal_as<System::String^>(evCallInfo.password);
     err                 = gcnew EVErrorCli();
+    isBigConference     = evCallInfo.isBigConference;
+    isRemoteMuted       = evCallInfo.isRemoteMuted;
+    svcCallType         = safe_cast<EV_SVC_CALL_TYPE_CLI>(evCallInfo.svcCallType);
+    svcCallAction       = safe_cast<EV_SVC_CALL_ACTION_CLI>(evCallInfo.svcCallAction);
     err->Unmanaged2ManagedStruct(evCallInfo.err);
 }
 
@@ -80,6 +95,7 @@ void EVDeviceCli::Unmanaged2ManagedStruct(ev::engine::EVDevice& evDevice)
     {
         name[i] = evDevice.name[i];
     }
+    desc = msclr::interop::marshal_as<System::String^>(evDevice.desc);
 }
 
 void EVLayoutRequestCli::Managed2UnmanagedStruct(ev::engine::EVLayoutRequest& evLayoutRequest)

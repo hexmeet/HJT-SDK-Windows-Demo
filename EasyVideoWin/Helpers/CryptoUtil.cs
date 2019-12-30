@@ -12,11 +12,11 @@ namespace EasyVideoWin.Helpers
     {
         public static string Sha1(this string str)
         {
-            var buffer = Encoding.UTF8.GetBytes(str);
-            var data = SHA1.Create().ComputeHash(buffer);
+            byte[] buffer = Encoding.UTF8.GetBytes(str);
+            byte[] data = SHA1.Create().ComputeHash(buffer);
 
-            var sb = new StringBuilder();
-            foreach (var t in data)
+            StringBuilder sb = new StringBuilder();
+            foreach (byte t in data)
             {
                 sb.Append(t.ToString("X2"));
             }

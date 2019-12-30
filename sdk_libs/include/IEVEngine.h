@@ -347,6 +347,13 @@ public:
     bool live; 
 }; 
 
+class EV_CLASS_API EVContactInfo {
+public:
+    uint64_t id;
+    std::string displayName;
+    std::string imageUrl;
+};
+
 class EV_CLASS_API IEVEventHandler : public IEVEventCallBack {
 public:
     virtual void onRegister(bool registered) {
@@ -388,6 +395,10 @@ public:
     virtual void onParticipant(int number) {
         (void)number;
     }
+	
+	virtual void onPeerImageUrl(const char* imageUrl) {
+		(void)imageUrl;
+	}
 };
 
 //////////////////////////////
@@ -401,21 +412,31 @@ public:
     virtual int unregisterEventHandler(IEVEventHandler * handler) = 0;
 
     //Login
-    virtual int login(const char * server, unsigned int port, const char * username, const char * encrypted_password) = 0;
+    EV_DEPRECATED virtual int login(const char * server, unsigned int port, const char * username, const char * encrypted_password) = 0;
     virtual int loginWithLocation(const char * location_server, unsigned int port, const char * username, const char * encrypted_password) = 0;
     virtual int logout() = 0;
 
     //Conference & Layout
     virtual int setMaxRecvVideo(unsigned int num) = 0;
+    virtual int setLayoutCapacity(EV_LAYOUT_MODE mode, EV_LAYOUT_TYPE types[], unsigned int size) = 0;
     virtual int joinConference(const char * conference_number, const char * display_name, const char * password) = 0;
-    virtual int joinConference(const char * server, unsigned int port, const char * conference_number, const char * display_name, const char * password) = 0;
+    virtual int joinConference(const char * number, const char * display_name, const char * password, EV_SVC_CALL_TYPE type) = 0;
+    EV_DEPRECATED virtual int joinConference(const char * server, unsigned int port, const char * conference_number, const char * display_name, const char * password) = 0;
     virtual int joinConferenceWithLocation(const char * location_server, unsigned int port, const char * conference_number, const char * display_name, const char * password) = 0;
     virtual int leaveConference() = 0;
+    virtual int declineIncommingCall(const char * conference_number) = 0;
     virtual int setLayout(EVLayoutRequest & layout) = 0;
-
+    virtual int setInConfDisplayName(const char * display_name, int len) = 0;
+    virtual int setRecvVideo(unsigned int num, EVVideoSize max_resolution) = 0;
     //Set Windows
     virtual int setRemoteVideoWindow(void * id[], unsigned int size) = 0;
     virtual int getRemoteVideoWindow(void * id[], unsigned int size) = 0;
+	
+	//IM
+	virtual const char *getIMAddress() = 0;
+    virtual const char *getIMGroupID() = 0;
+    virtual void setIMUserID(const char* im_usrid) = 0;
+	virtual int getContactInfo(const char* usrid, EVContactInfo & contactInfo, int timeout_sec) = 0;
 };
 
 }

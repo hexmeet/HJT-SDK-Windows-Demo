@@ -7,7 +7,7 @@
         xmlns:ViewModel="clr-namespace:EasyVideoWin.ViewModel" x:Class="EasyVideoWin.MainWindow"
         xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
         mc:Ignorable="d"
-        Title="HexMeet" Height="520" Width="720" WindowStartupLocation="CenterScreen" FontFamily="Arial, Microsoft YaHei"
+        Title="HexMeet" Height="520" Width="750" WindowStartupLocation="CenterScreen" FontFamily="Arial, Microsoft YaHei"
         WindowStyle="None" x:Name="win" Background="Black" Loaded="Window_Loaded" ResizeMode="NoResize">
     <Window.DataContext>
         <ViewModel:MainWindowViewModel/>

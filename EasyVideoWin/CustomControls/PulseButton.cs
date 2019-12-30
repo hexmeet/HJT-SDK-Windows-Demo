@@ -371,7 +371,7 @@ namespace EasyVideoWin.CustomControls
     /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
     private static void IsPulsingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-      var pb = (PulseButton)d;
+      PulseButton pb = (PulseButton)d;
       if (pb == null || pb.partPulseContainer == null) return;
       if (!pb.IsPulsing)
         pb.partPulseContainer.Children.Clear();
@@ -386,7 +386,7 @@ namespace EasyVideoWin.CustomControls
     /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
     private static void RadiusChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-      var pb = (PulseButton)d;
+      PulseButton pb = (PulseButton)d;
       if (pb == null || pb.partPulseContainer == null) return;
       if (!pb.IsEllipsis)
         PulsesChanged(d, e);
@@ -401,16 +401,16 @@ namespace EasyVideoWin.CustomControls
     /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
     private static void PulsesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-      var pb = (PulseButton)d;
+      PulseButton pb = (PulseButton)d;
       if (pb == null || pb.partPulseContainer == null || !pb.IsPulsing) return;
       // Clear all pulses
       pb.partPulseContainer.Children.Clear();
-      var items = pb.Pulses;
+      int items = pb.Pulses;
       // Add pulses
-      for (var i = 0; i < items; i++)
+      for (int i = 0; i < items; i++)
       {
 
-        var shape = pb.IsEllipsis ?
+        Shape shape = pb.IsEllipsis ?
           (Shape)new Ellipse
                   {
                     StrokeThickness = pb.PulseWidth,
@@ -455,7 +455,7 @@ namespace EasyVideoWin.CustomControls
       {
         shape.RenderTransform = new ScaleTransform();
         // X-axis animation
-        var animation = new DoubleAnimation(1, correctedFactorX, pb.PulseSpeed)
+        DoubleAnimation animation = new DoubleAnimation(1, correctedFactorX, pb.PulseSpeed)
                         {
                           RepeatBehavior = RepeatBehavior.Forever,
                           AutoReverse = false,
@@ -463,7 +463,7 @@ namespace EasyVideoWin.CustomControls
                           EasingFunction = pb.PulseEasing
                         };
         // Y-axis animation
-        var animation2 = new DoubleAnimation(1, correctedFactorY, pb.PulseSpeed)
+        DoubleAnimation animation2 = new DoubleAnimation(1, correctedFactorY, pb.PulseSpeed)
                          {
                            RepeatBehavior = RepeatBehavior.Forever,
                            AutoReverse = false,
@@ -471,7 +471,7 @@ namespace EasyVideoWin.CustomControls
                            EasingFunction = pb.PulseEasing
                          };
         // Opacity animation
-        var animation3 = new DoubleAnimation(1, 0, pb.PulseSpeed)
+        DoubleAnimation animation3 = new DoubleAnimation(1, 0, pb.PulseSpeed)
         {
           RepeatBehavior = RepeatBehavior.Forever,
           AutoReverse = false,
@@ -480,7 +480,7 @@ namespace EasyVideoWin.CustomControls
         // Set delay between pulses
         delay += pb.PulseSpeed.TimeSpan.TotalMilliseconds / pb.Pulses;
         // Create storyboard
-        var storyboard = new Storyboard();
+        Storyboard storyboard = new Storyboard();
         storyboard.Children.Add(animation);
         storyboard.Children.Add(animation2);
         storyboard.Children.Add(animation3);

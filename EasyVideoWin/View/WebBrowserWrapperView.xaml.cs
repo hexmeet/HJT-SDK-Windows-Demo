@@ -1,11 +1,11 @@
 ﻿using CefSharp;
-using CefSharp.WinForms;
+using EasyVideoWin.CustomControls;
+using EasyVideoWin.Enums;
 using EasyVideoWin.Helpers;
 using EasyVideoWin.Model;
-using EasyVideoWin.Model.CloudModel;
-using EasyVideoWin.WinForms;
 using log4net;
 using Microsoft.Win32;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,19 +25,25 @@ using System.Windows.Shapes;
 namespace EasyVideoWin.View
 {
     /// <summary>
-    /// Interaction logic for ConferenceView.xaml
+    /// Interaction logic for WebBrowserWrapperView.xaml
     /// </summary>
-    public partial class ConferenceView : UserControl, IDisposable
+    public partial class WebBrowserWrapperView : UserControl, IDisposable
     {
         #region -- Members --
 
         private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private const string CONF_INFO_URL = "{0}/webapp/#/conferences?token={1}&userId={2}&lang={3}&orgPortAllocMode={4}&orgPortCount={5}"; // 0: server address
+        private const string CONFERENCES_URL = "{0}/webapp/#/conferences?token={1}&userId={2}&lang={3}&orgPortAllocMode={4}&orgPortCount={5}"; // 0: server address
+        private const string CONF_MANAGEMENT_URL = "{0}/webapp/#/confControl?numericId={1}&token={2}&deviceId={3}&userId={4}&lang={5}"; // 0: server address
+        private const string CONTACTS_URL = "{0}/webapp/#/contacts?token={1}"; // 0: server address
         private ConferenceJsEvent _conferenceJsEvent = null;
 
         private EasyVideoWin.CustomControls.BrowserLoadingPanel _loadingView = new EasyVideoWin.CustomControls.BrowserLoadingPanel();
         private EasyVideoWin.CustomControls.BrowserLoadFailedPanel _loadFailedView = new EasyVideoWin.CustomControls.BrowserLoadFailedPanel();
         private System.Timers.Timer _browserLoadTimer = new System.Timers.Timer();
+
+        private WebBrowserUrlType _webBrowserUrlType;
+        private IMasterDisplayWindow _masterDisplayWindow = null;
+        private bool _updateUrlOnLoaded = true;
 
         #endregion
 
@@ -49,21 +55,17 @@ namespace EasyVideoWin.View
 
         #region -- Constructor --
 
-        public ConferenceView()
+        public WebBrowserWrapperView(WebBrowserUrlType webBrowserUrlType, IMasterDisplayWindow masterWin, bool updateOnLoaded = true)
         {
+            _webBrowserUrlType = webBrowserUrlType;
+            _masterDisplayWindow = masterWin;
+            _updateUrlOnLoaded = updateOnLoaded;
+
             InitializeComponent();
 
-            //this.Browser = (this.wfh.Child as WhiteBoardForm).browser;
-            //this.Browser.RegisterJsObject("conferenceObj", new ConferenceJsEvent(), new BindingOptions() { CamelCaseJavascriptNames = false });
-            //this.Browser.MenuHandler = new CustomMenuHandler();
-            //this.Browser.RequestHandler = new ConfCefRequestHandler();
-            //this.Browser.ConsoleMessage += OnBrowserConsoleMessage;
-            //this.Browser.LoadError += Browser_LoadError;
-            //this.Browser.IsBrowserInitializedChanged += Browser_IsBrowserInitializedChanged;
-
             this.browser.Visibility = Visibility.Collapsed;
-            this.contentPresenter.Content = _loadingView;
-            this.contentPresenter.Visibility = Visibility.Visible;
+            this.loadPromptPresenter.Content = _loadingView;
+            this.loadPromptPresenter.Visibility = Visibility.Visible;
 
             _browserLoadTimer.Interval = 20 * 1000;
             _browserLoadTimer.AutoReset = false;
@@ -71,7 +73,7 @@ namespace EasyVideoWin.View
 
             _loadFailedView.ReloadEvent += LoadFailedView_ReloadEvent;
             
-            _conferenceJsEvent = new ConferenceJsEvent(this.browser, (MainWindow)Application.Current.MainWindow);
+            _conferenceJsEvent = new ConferenceJsEvent(this.browser, masterWin);
             _conferenceJsEvent.PageCreatedEvent += ConferenceJsEvent_PageCreatedEvent;
             this.browser.RegisterJsObject("conferenceObj", _conferenceJsEvent, new BindingOptions() { CamelCaseJavascriptNames = false });
             //this.browser.JavascriptObjectRepository.Register("conferenceObj", _conferenceJsEvent, true, new BindingOptions() { CamelCaseJavascriptNames = false });
@@ -82,11 +84,11 @@ namespace EasyVideoWin.View
             this.browser.IsBrowserInitializedChanged += Browser_IsBrowserInitializedChanged;
             this.browser.Loaded += Browser_Loaded;
 
-            this.Loaded += ConferenceView_Loaded;
-            this.Unloaded += ConferenceView_Unloaded;
+            this.Loaded += WebBrowserWrapperView_Loaded;
+            this.Unloaded += WebBrowserWrapperView_Unloaded;
             LoginManager.Instance.PropertyChanged += LoginManager_PropertyChanged;
         }
-        
+
         #endregion
 
         #region -- Public Method --
@@ -97,6 +99,28 @@ namespace EasyVideoWin.View
             GC.SuppressFinalize(this);
         }
 
+        public void UpdateData()
+        {
+            if (!this.browser.IsBrowserInitialized)
+            {
+                return;
+            }
+            _conferenceJsEvent.UpdateData();
+        }
+
+        public void ClearConfManagementCache()
+        {
+            if (!this.browser.IsBrowserInitialized)
+            {
+                return;
+            }
+            _conferenceJsEvent.ClearConfManagementCache();
+        }
+
+        #endregion
+
+        #region -- Protected Method --
+
         protected void Dispose(bool disposing)
         {
             if (!IsDisposed)
@@ -106,6 +130,13 @@ namespace EasyVideoWin.View
                     //Clean Up managed resources
                     LoginManager.Instance.PropertyChanged -= LoginManager_PropertyChanged;
                     Application.Current.Dispatcher.Invoke(() => {
+                        _loadFailedView.ReloadEvent -= LoadFailedView_ReloadEvent;
+                        _conferenceJsEvent.PageCreatedEvent -= ConferenceJsEvent_PageCreatedEvent;
+
+                        this.browser.ConsoleMessage -= OnBrowserConsoleMessage;
+                        this.browser.LoadError -= Browser_LoadError;
+                        this.browser.IsBrowserInitializedChanged -= Browser_IsBrowserInitializedChanged;
+
                         this.browser.Dispose();
                     });
                 }
@@ -120,13 +151,13 @@ namespace EasyVideoWin.View
         private void BrowserLoadTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             Application.Current.Dispatcher.Invoke(() => {
-                this.contentPresenter.Content = _loadFailedView;
+                this.loadPromptPresenter.Content = _loadFailedView;
             });
         }
 
         private void LoadFailedView_ReloadEvent(object sender, RoutedEventArgs e)
         {
-            this.contentPresenter.Content = _loadingView;
+            this.loadPromptPresenter.Content = _loadingView;
             this.browser.Reload(true);
             _browserLoadTimer.Enabled = true;
         }
@@ -135,7 +166,7 @@ namespace EasyVideoWin.View
         {
             _browserLoadTimer.Enabled = false;
             Application.Current.Dispatcher.Invoke(() => {
-                this.contentPresenter.Visibility = Visibility.Collapsed;
+                this.loadPromptPresenter.Visibility = Visibility.Collapsed;
                 this.browser.Visibility = Visibility.Visible;
             });
         }
@@ -156,8 +187,9 @@ namespace EasyVideoWin.View
             {
                 Application.Current.Dispatcher.InvokeAsync(() =>
                 {
+                    log.Info("Browser_IsBrowserInitializedChanged, update url");
                     // For unknow reason, the browser load a blank page in initialization, so load again after a deferred time
-                    ((CefSharp.Wpf.ChromiumWebBrowser)sender).Load(GetConferenceUrl());
+                    ((CefSharp.Wpf.ChromiumWebBrowser)sender).Load(GetUrl());
                     _browserLoadTimer.Enabled = true;
                 });
             });
@@ -171,24 +203,35 @@ namespace EasyVideoWin.View
             // ConnectionTimedOut  ConnectionRefused
             log.InfoFormat("Error occurred when loading conference view browser. Error code:{0}, failed url:{1}", e.ErrorCode, e.FailedUrl);
         }
-        
+
         private void JoinConf_Click(object sender, RoutedEventArgs e)
         {
             //JoinConfWindow joinConfWindow = new JoinConfWindow();
             //joinConfWindow.ShowDialog();
         }
 
-        private void ConferenceView_Loaded(object sender, RoutedEventArgs e)
+        private void WebBrowserWrapperView_Loaded(object sender, RoutedEventArgs e)
         {
+            if (!_updateUrlOnLoaded)
+            {
+                return;
+            }
+
             if (this.browser.IsBrowserInitialized)
             {
-                this.browser.Load(GetConferenceUrl());
+                log.Info("WebBrowserWrapperView_Loaded, update url");
+                this.browser.Load(GetUrl());
                 _browserLoadTimer.Enabled = true;
             }
         }
-        
-        private void ConferenceView_Unloaded(object sender, RoutedEventArgs e)
+
+        private void WebBrowserWrapperView_Unloaded(object sender, RoutedEventArgs e)
         {
+            if (!_updateUrlOnLoaded)
+            {
+                return;
+            }
+
             if (this.browser.IsBrowserInitialized)
             {
                 //this.browser.Load(GetConferenceUrl());
@@ -207,23 +250,54 @@ namespace EasyVideoWin.View
             log.InfoFormat("Browser console log: {0}", args.Message);
         }
 
-        private string GetConferenceUrl()
+        private string GetUrl()
         {
-            string address = Properties.Settings.Default.ConfInfoAddress;
-            if (string.IsNullOrEmpty(address))
+            string address = "";
+            switch (_webBrowserUrlType)
             {
-                address = string.Format(
-                    CONF_INFO_URL
-                    , LoginManager.Instance.LoginUserInfo.customizedH5UrlPrefix
-                    , LoginManager.Instance.LoginToken
-                    , LoginManager.Instance.UserId
-                    , LanguageUtil.Instance.GetCurrentWebLanguage()
-                    , LoginManager.Instance.LoginUserInfo.orgPortAllocMode
-                    , LoginManager.Instance.LoginUserInfo.orgPortCount
-                );
+                case WebBrowserUrlType.CONFERENCES:
+                    address = Properties.Settings.Default.ConfInfoAddress;
+                    if (string.IsNullOrEmpty(address))
+                    {
+                        address = string.Format(
+                            CONFERENCES_URL
+                            , LoginManager.Instance.LoginUserInfo.customizedH5UrlPrefix
+                            , LoginManager.Instance.LoginToken
+                            , LoginManager.Instance.UserId
+                            , LanguageUtil.Instance.GetCurrentWebLanguage()
+                            , LoginManager.Instance.LoginUserInfo.orgPortAllocMode
+                            , LoginManager.Instance.LoginUserInfo.orgPortCount
+                        );
+                    }
+                    break;
+                case WebBrowserUrlType.CONF_MANAGEMENT:
+                    address = Properties.Settings.Default.ConfManagementAddress;
+                    if (string.IsNullOrEmpty(address))
+                    {
+                        address = string.Format(
+                            CONF_MANAGEMENT_URL
+                            , LoginManager.Instance.LoginUserInfo.customizedH5UrlPrefix
+                            , CallController.Instance.ConferenceNumber
+                            , LoginManager.Instance.LoginToken
+                            , LoginManager.Instance.DeviceId
+                            , LoginManager.Instance.UserId
+                            , LanguageUtil.Instance.GetCurrentWebLanguage()
+                        );
+                    }
+                    break;
+                case WebBrowserUrlType.CONTACTS:
+                    address = string.Format(
+                            CONTACTS_URL
+                            , LoginManager.Instance.LoginUserInfo.customizedH5UrlPrefix
+                            , LoginManager.Instance.LoginToken
+                        );
+                    break;
+                default:
+                    log.InfoFormat("Unsupported WebBrowserUrlType: {0}", _webBrowserUrlType);
+                    break;
             }
-
-            log.InfoFormat("Conference info url: {0}", address);
+            
+            log.InfoFormat("GetUrl: {0}, WebBrowserUrlType: {1}", address, _webBrowserUrlType);
             return address;
         }
 
@@ -240,8 +314,15 @@ namespace EasyVideoWin.View
                     _conferenceJsEvent.UpdateToken(LoginManager.Instance.LoginToken);
                     if (this.browser.IsBrowserInitialized)
                     {
-                        this.browser.Load(GetConferenceUrl());
+                        this.browser.Load(GetUrl());
                     }
+                });
+            }
+            else if ("DisplayName" == e.PropertyName)
+            {
+                Application.Current.Dispatcher.InvokeAsync(() => {
+                    log.Info("DisplayName changed, notity it to web");
+                    _conferenceJsEvent.UpdateDisplayName(LoginManager.Instance.DisplayName);
                 });
             }
         }
@@ -360,7 +441,7 @@ namespace EasyVideoWin.View
                     string subject = "";
                     string body = "";
                     string[] toDataItems = mailToData.Split('&');
-                    for (var i = 0; i < toDataItems.Length; ++i)
+                    for (int i = 0; i < toDataItems.Length; ++i)
                     {
                         if (0 == toDataItems[i].IndexOf(subjectFlag))
                         {
@@ -391,6 +472,37 @@ namespace EasyVideoWin.View
         public void PageCreated()
         {
             PageCreatedEvent?.Invoke();
+        }
+
+        public void p2pCall(string peerInfo)
+        {
+            log.InfoFormat("p2pCall: {0}", peerInfo);
+            Rest.ServerRest.P2PUserRest peerUser = JsonConvert.DeserializeObject<Rest.ServerRest.P2PUserRest>(peerInfo);
+            
+            if (null == peerUser)
+            {
+                log.InfoFormat("Failed to parse p2pCall data: {0}", peerInfo);
+                return;
+            }
+
+            string userId = peerUser.userId.ToString();
+            if (string.IsNullOrEmpty(userId.Trim()))
+            {
+                log.Info("Failed P2P Call for empty userId");
+                return;
+            }
+
+            if (LoginManager.Instance.CurrentLoginStatus == LoginStatus.LoggedIn && !LoginManager.Instance.IsRegistered)
+            {
+                IMasterDisplayWindow ownerWindow = (MainWindow)System.Windows.Application.Current.MainWindow;
+                MessageBoxTip tip = new MessageBoxTip(ownerWindow);
+                tip.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), LanguageUtil.Instance.GetValueByKey("FAIL_TO_CALL_FOR_REGISTER_FAILURE"), LanguageUtil.Instance.GetValueByKey("CONFIRM"));
+                tip.ShowDialog();
+                return;
+            }
+
+            CallController.Instance.UpdateUserImage(Utils.GetSuspendedVideoBackground(), Utils.GetCurrentAvatarPath());
+            CallController.Instance.P2pCallPeer(userId, peerUser.imageUrl, peerUser.displayName);
         }
 
         public void showTest()
@@ -427,6 +539,22 @@ namespace EasyVideoWin.View
             }
 
             return false;
+        }
+
+        public void UpdateDisplayName(string displayName)
+        {
+            if (null == this._browser.GetBrowser() || null == this._browser.GetBrowser().GetFrame(null))
+            {
+                return;
+            }
+            log.InfoFormat("Update DisplayName to browser, displayName={0}", displayName);
+            string updateDisplayName = "window.updateLoginUser('" + displayName + "')";
+            this._browser.GetBrowser().GetFrame(null).ExecuteJavaScriptAsync(updateDisplayName);
+        }
+
+        public void clearCache()
+        {
+            log.Info("Received clearCache, but do nothing.");
         }
     }
 
@@ -522,13 +650,13 @@ namespace EasyVideoWin.View
 
         void IRequestHandler.OnResourceLoadComplete(IWebBrowser browserControl, IBrowser browser, IFrame frame, IRequest request, IResponse response, UrlRequestStatus status, long receivedContentLength)
         {
-            if (browser.IsDisposed || null == browser.MainFrame)
-            {
-                return;
-            }
-
             try
             {
+                if (browser.IsDisposed || null == browser.MainFrame)
+                {
+                    return;
+                }
+
                 browser.MainFrame.ExecuteJavaScriptAsync("document.body.style.overflow = 'hidden'");
             }
             catch(Exception e)

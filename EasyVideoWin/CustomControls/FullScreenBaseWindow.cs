@@ -105,6 +105,10 @@ namespace EasyVideoWin.CustomControls
 
                 return _handle;
             }
+            set
+            {
+                _handle = value;
+            }
         }
 
         public bool IsDisposed { get; set; } = false;
@@ -246,10 +250,15 @@ namespace EasyVideoWin.CustomControls
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!IsDisposed)
             {
-                Microsoft.Win32.SystemEvents.DisplaySettingsChanged -= new System.EventHandler(DisplaySettingsChanged);
+                if (disposing)
+                {
+                    Microsoft.Win32.SystemEvents.DisplaySettingsChanged -= new System.EventHandler(DisplaySettingsChanged);
+                }
+                //Clean up unmanaged resources
             }
+            IsDisposed = true;
         }
 
         #endregion
@@ -264,7 +273,7 @@ namespace EasyVideoWin.CustomControls
 
             _aspectRatio = _initialWidth / (_initialHeight - _titlebarHeight);
 
-            _handle = new WindowInteropHelper(this).Handle;
+            Handle = new WindowInteropHelper(this).Handle;
 
             DisplayUtil.CheckScreenOrientation(Handle);
             Microsoft.Win32.SystemEvents.DisplaySettingsChanged += new System.EventHandler(DisplaySettingsChanged);
@@ -487,10 +496,10 @@ namespace EasyVideoWin.CustomControls
 
             try
             {
-                var winInfo = GetWindowInfo();
+                WinInfo winInfo = GetWindowInfo();
                 uint dpiX = 0;
                 uint dpiY = 0;
-                var currentScreen = DpiUtil.GetScreenByHandle(Handle);
+                Screen currentScreen = DpiUtil.GetScreenByHandle(Handle);
                 DpiUtil.GetDpiByScreen(currentScreen, out dpiX, out dpiY);
                 double ratioX = ((double)dpiX / 96d);
                 double ratioY = ((double)dpiY / 96d);
@@ -529,8 +538,8 @@ namespace EasyVideoWin.CustomControls
 
         private WinInfo GetWindowInfo()
         {
-            var currentScreen = DpiUtil.GetScreenByHandle(Handle);
-            var workArea = currentScreen.WorkingArea;
+            Screen currentScreen = DpiUtil.GetScreenByHandle(Handle);
+            System.Drawing.Rectangle workArea = currentScreen.WorkingArea;
             WinInfo winInfo = new WinInfo();
             winInfo.maxCx = Math.Abs(workArea.Right - workArea.Left);
             winInfo.maxCy = Math.Abs(workArea.Bottom - workArea.Top);
@@ -600,12 +609,12 @@ namespace EasyVideoWin.CustomControls
         {
             if (this.WindowState == WindowState.Maximized && !FullScreenStatus)
             {
-                var mmi = (Utils.MINMAXINFO)Marshal.PtrToStructure(lParam, typeof(Utils.MINMAXINFO));
+                Utils.MINMAXINFO mmi = (Utils.MINMAXINFO)Marshal.PtrToStructure(lParam, typeof(Utils.MINMAXINFO));
 
                 // Adjust the maximized size and position to fit the work area of the correct monitor
-                var currentScreen = System.Windows.Forms.Screen.FromHandle(hwnd);
-                var workArea = currentScreen.WorkingArea;
-                var monitorArea = currentScreen.Bounds;
+                Screen currentScreen = System.Windows.Forms.Screen.FromHandle(hwnd);
+                System.Drawing.Rectangle workArea = currentScreen.WorkingArea;
+                System.Drawing.Rectangle monitorArea = currentScreen.Bounds;
                 mmi.ptMaxPosition.x = Math.Abs(workArea.Left - monitorArea.Left);
                 mmi.ptMaxPosition.y = Math.Abs(workArea.Top - monitorArea.Top);
                 mmi.ptMaxSize.x = Math.Abs(workArea.Right - workArea.Left);

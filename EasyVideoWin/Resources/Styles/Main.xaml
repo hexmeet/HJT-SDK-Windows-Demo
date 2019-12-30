@@ -1292,5 +1292,59 @@
         <Setter Property="Foreground" Value="#919191"/>
         <Setter Property="TextWrapping" Value="Wrap"/>
     </Style>
-    
+
+    <!-- Pulse Button -->
+    <DrawingBrush x:Key="Icon1" Stretch="Uniform">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <DrawingGroup.Children>
+                    <GeometryDrawing Brush="#FFFFFFFF" Geometry="F1 M 61.1667,0C 94.9482,0 122.333,26.639 122.333,59.5C 122.333,92.361 94.9481,119 61.1667,119C 27.3853,119 0,92.361 0,59.5C 0,26.639 27.3852,0 61.1667,0 Z M 60.8348,14.4425C 45.46,14.4425 31.8411,21.7559 23.4543,33.0016C 23.0185,33.5861 22.5967,34.1812 22.1896,34.7863C 31.4634,31.5821 56.868,23.9053 58.5007,35.3348C 60.5007,49.3348 54.5015,88.6678 70.168,78.6678C 85.0615,69.1614 94.5319,46.4005 104.594,45.0362C 98.4562,27.2534 81.1835,14.4425 60.8348,14.4425 Z M 14.6848,59.335C 14.6848,84.1284 35.3469,104.227 60.8348,104.227C 85.6694,104.227 105.922,85.1456 106.944,61.2321C 105.87,61.4615 104.523,62.1007 102.834,63.3348C 94.1675,69.6681 69.1679,110.001 52.5007,90.3348C 39.3704,74.8417 56.167,37.335 37.1669,42.6684C 27.6441,45.3414 20.3824,48.433 15.5075,50.8522C 14.9675,53.5991 14.6848,56.4349 14.6848,59.335 Z "/>
+                </DrawingGroup.Children>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+    <!-- Brushes -->
+    <LinearGradientBrush x:Key="RedButtonBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStopCollection>
+            <GradientStop Color="Red" Offset="0"/>
+            <GradientStop Color="#FFCC0000" Offset="1"/>
+        </GradientStopCollection>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ButtonHighlightBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStopCollection>
+            <GradientStop  Color="Orange" Offset="0"/>
+            <GradientStop Color="DarkOrange" Offset="1"/>
+        </GradientStopCollection>
+    </LinearGradientBrush>
+    <RadialGradientBrush x:Key="RedButtonPressedBrush">
+        <GradientStopCollection>
+            <GradientStop  Color="DarkRed" Offset="0"/>
+            <GradientStop Color="Red" Offset="1"/>
+        </GradientStopCollection>
+    </RadialGradientBrush>
+    <LinearGradientBrush x:Key="BlueButtonBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStopCollection>
+            <GradientStop  Color="Blue" Offset="0"/>
+            <GradientStop Color="DarkBlue" Offset="1"/>
+        </GradientStopCollection>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="BlueButtonPressedBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStopCollection>
+            <GradientStop  Color="SkyBlue" Offset="0"/>
+            <GradientStop Color="Blue" Offset="1"/>
+        </GradientStopCollection>
+    </LinearGradientBrush>
+    <!-- Easing functions -->
+    <QuadraticEase x:Key="EasingIn" EasingMode="EaseIn" />
+    <QuadraticEase x:Key="EasingOut" EasingMode="EaseOut" />
+
+    <Style x:Key="CloseImgButton" TargetType="{x:Type CustomControls:WpfImageButton}">
+        <Setter Property="ImageWidth" Value="28"/>
+        <Setter Property="ImageHeight" Value="28"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="TextVisibility" Value="Collapsed"/>
+        <Setter Property="NormalImage" Value="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_normal.png"/>
+        <Setter Property="PressedImage" Value="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_click.png"/>
+        <Setter Property="MouseOverImage" Value="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_hover.png"/>
+    </Style>
 </ResourceDictionary>

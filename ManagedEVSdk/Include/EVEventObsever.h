@@ -20,6 +20,7 @@ public:
     virtual void onRegister(bool registered);
     virtual void onCallIncoming(ev::engine::EVCallInfo & info);
     virtual void onCallConnected(ev::engine::EVCallInfo & info);
+    virtual void onCallPeerConnected(ev::engine::EVCallInfo & info);
     virtual void onCallEnd(ev::engine::EVCallInfo & info);
     virtual void onContent(ev::engine::EVContentInfo & info);
     virtual void onDownloadUserImageComplete(const char * path);
@@ -34,6 +35,8 @@ public:
     virtual void onMessageOverlay(ev::engine::EVMessageOverlay & msg);
     virtual void onWhiteBoardIndication(ev::engine::EVWhiteBoardInfo & info);
     virtual void onParticipant(int number);
+    virtual void onMicMutedShow(int micMuted);
+    virtual void onPeerImageUrl(const char* imageUrl);
 
 private:
     int     m_nId;

@@ -239,7 +239,7 @@ namespace EasyVideoWin
             appender.LockingModel = new log4net.Appender.FileAppender.MinimalLock();
             appender.RollingStyle = log4net.Appender.RollingFileAppender.RollingMode.Size;
             appender.MaxFileSize = 10 * 1024 * 1024;
-            appender.MaxSizeRollBackups = 5;
+            appender.MaxSizeRollBackups = 2;
             
             ///layout
             log4net.Layout.PatternLayout layout = new log4net.Layout.PatternLayout("%date [%02thread] %-5level %message%newline");

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using EasyVideoWin.ManagedEVSdk;
 using EasyVideoWin.ManagedEVSdk.Structs;
 using EasyVideoWin.Helpers;
+using EasyVideoWin.Enums;
 
 namespace EasyVideoWin.Model
 {
@@ -34,6 +35,7 @@ namespace EasyVideoWin.Model
 
         //public event Action<EVCallInfoCli> EventCallIncoming;
         public event Action<EVCallInfoCli> EventCallConnected;
+        public event Action<EVCallInfoCli> EventCallPeerConnected;
         public event Action<EVCallInfoCli> EventCallEnd;
         public event Action<EVContentInfoCli> EventContent;
 
@@ -50,6 +52,8 @@ namespace EasyVideoWin.Model
         public event Action<EVMessageOverlayCli> EventMessageOverlay;
         public event Action<EVWhiteBoardInfoCli> EventWhiteBoardIndication;
         public event Action<int> EventParticipant;
+        public event Action<bool> EventRemoteMicMuted;
+        public event Action<string> EventPeerImageUrl;
 
         public event Action<string> EventManagedLog;
         
@@ -87,6 +91,7 @@ namespace EasyVideoWin.Model
 
             //this.EVSdkWrapper.EventCallIncoming += EVSdkWrapper_EventCallIncoming;
             this.EVSdkWrapper.EventCallConnected += EVSdkWrapper_EventCallConnected;
+            this.EVSdkWrapper.EventCallPeerConnected += EVSdkWrapper_EventCallPeerConnected;
             this.EVSdkWrapper.EventCallEnd += EVSdkWrapper_EventCallEnd;
             this.EVSdkWrapper.EventContent += EVSdkWrapper_EventContent;
 
@@ -103,6 +108,8 @@ namespace EasyVideoWin.Model
             this.EVSdkWrapper.EventMessageOverlay += EVSdkWrapper_EventMessageOverlay;
             this.EVSdkWrapper.EventWhiteBoardIndication += EVSdkWrapper_EventWhiteBoardIndication;
             this.EVSdkWrapper.EventParticipant += EVSdkWrapper_EventParticipant;
+            this.EVSdkWrapper.EventMicMutedShow += EVSdkWrapper_EventMicMutedShow;
+            this.EVSdkWrapper.EventPeerImageUrl += EVSdkWrapper_EventPeerImageUrl;
         }
         
         #endregion
@@ -319,7 +326,7 @@ namespace EasyVideoWin.Model
         public ManagedEVSdk.Structs.EVDeviceCli[] GetDevices(ManagedEVSdk.Structs.EV_DEVICE_TYPE_CLI type)
         {
             _log.InfoFormat("GetDevices: {0}", type);
-            var devices = this.EVSdkWrapper.EVEngineGetDevices(type);
+            EVDeviceCli[] devices = this.EVSdkWrapper.EVEngineGetDevices(type);
             _log.InfoFormat("GetDevices done, size:{0}", devices.Length);
             return devices;
         }
@@ -327,7 +334,7 @@ namespace EasyVideoWin.Model
         public ManagedEVSdk.Structs.EVDeviceCli GetDevice(ManagedEVSdk.Structs.EV_DEVICE_TYPE_CLI type)
         {
             _log.InfoFormat("GetDevice: {0}", type);
-            var device = this.EVSdkWrapper.EVEngineGetDevice(type);
+            EVDeviceCli device = this.EVSdkWrapper.EVEngineGetDevice(type);
             _log.Info("GetDevice done");
             return device;
         }
@@ -445,7 +452,18 @@ namespace EasyVideoWin.Model
             _log.Info("SetMaxRecvVideo done");
         }
 
-        public bool JoinConference(string conferenceNumber, string displayName, string password)
+        public void SetLayoutCapacity(ManagedEVSdk.Structs.EV_LAYOUT_MODE_CLI mode, ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI[] types)
+        {
+            _log.InfoFormat("SetLayoutCapacity: {0}", mode);
+            int rst = this.EVSdkWrapper.EVEngineSetLayoutCapacity(mode, types);
+            if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
+            {
+                _log.InfoFormat("Failed to SetLayoutCapacity, result: {0}", rst);
+            }
+            _log.Info("SetLayoutCapacity done");
+        }
+
+        public bool JoinConference(string conferenceNumber, string displayName, string password, EV_SVC_CALL_TYPE_CLI type)
         {
             _log.InfoFormat("JoinConference, conf number:{0}, display name:{1}", conferenceNumber, displayName);
             if (null == displayName)
@@ -458,7 +476,7 @@ namespace EasyVideoWin.Model
                 _log.Info("password is null and set it to empty");
                 password = "";
             }
-            int rst = this.EVSdkWrapper.EVEngineJoinConference(conferenceNumber, displayName, password);
+            int rst = this.EVSdkWrapper.EVEngineJoinConference(conferenceNumber, displayName, password, type);
             _log.Info("JoinConference done");
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
@@ -533,6 +551,17 @@ namespace EasyVideoWin.Model
                 _log.InfoFormat("Failed to LeaveConference, result:{0}", rst);
             }
             _log.Info("LeaveConference done");
+        }
+
+        public void DeclineIncommingCall(string confNumber)
+        {
+            _log.InfoFormat("DeclineIncommingCall, confNumber: {0}", confNumber);
+            int rst = this.EVSdkWrapper.EVEngineDeclineIncommingCall(confNumber);
+            if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
+            {
+                _log.InfoFormat("Failed to DeclineIncommingCall, result:{0}", rst);
+            }
+            _log.Info("DeclineIncommingCall done");
         }
 
         public bool CameraEnabled()
@@ -632,7 +661,7 @@ namespace EasyVideoWin.Model
 
         public void SetLayout(ManagedEVSdk.Structs.EVLayoutRequestCli layout)
         {
-            _log.Info("SetLayout");
+            _log.InfoFormat("SetLayout, mode: {0}, max_type: {1}", layout.mode, layout.max_type);
             int rst = this.EVSdkWrapper.EVEngineSetLayout(layout);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
@@ -650,6 +679,34 @@ namespace EasyVideoWin.Model
                 _log.InfoFormat("Failed to GetStats, result:{0}", rst);
             }
             _log.Info("GetStats done");
+        }
+
+        public void SetVideoActive(MediaModeType mediaMode)
+        {
+            _log.InfoFormat("SetVideoActive: {0}", mediaMode);
+            int rst = this.EVSdkWrapper.EVEngineSetVideoActive((int)mediaMode);
+            if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
+            {
+                _log.InfoFormat("Failed to SetVideoActive, result:{0}", rst);
+            }
+            _log.Info("SetVideoActive done");
+        }
+
+        public MediaModeType VideoActive()
+        {
+            _log.Info("Get VideoActive");
+            int rst = this.EVSdkWrapper.EVEngineVideoActive();
+            _log.InfoFormat("VideoActive: {0}", rst);
+            return (MediaModeType)rst;
+        }
+
+        public bool SetInConfDisplayName(string displayName)
+        {
+            _log.InfoFormat("SetInConfDisplayName: {0}", displayName);
+            int rst = this.EVSdkWrapper.EVEngineSetInConfDisplayName(displayName);
+            _log.InfoFormat("SetInConfDisplayName done: {0}", rst);
+
+            return (int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK == rst;
         }
 
         //Send Content
@@ -765,13 +822,24 @@ namespace EasyVideoWin.Model
 
         private void EVSdkWrapper_EventCallConnected(EVCallInfoCli callInfo)
         {
+            _log.InfoFormat("EventCallConnected: {0}", GetCallInfoString(callInfo));
             WorkerThreadManager.Instance.EVSdkWorkDispatcher.InvokeAsync(() => {
                 EventCallConnected?.Invoke(callInfo);
             });
         }
 
+
+        private void EVSdkWrapper_EventCallPeerConnected(EVCallInfoCli callInfo)
+        {
+            _log.InfoFormat("EventCallPeerConnected: {0}", GetCallInfoString(callInfo));
+            WorkerThreadManager.Instance.EVSdkWorkDispatcher.InvokeAsync(() => {
+                EventCallPeerConnected?.Invoke(callInfo);
+            });
+        }
+
         private void EVSdkWrapper_EventCallEnd(EVCallInfoCli callInfo)
         {
+            _log.InfoFormat("EventCallEnd: {0}", GetCallInfoString(callInfo));
             WorkerThreadManager.Instance.EVSdkWorkDispatcher.InvokeAsync(() => {
                 EventCallEnd?.Invoke(callInfo);
             });
@@ -830,6 +898,7 @@ namespace EasyVideoWin.Model
 
         private void EVSdkWrapper_EventJoinConferenceIndication(EVCallInfoCli callInfo)
         {
+            _log.InfoFormat("EventJoinConferenceIndication: {0}", GetCallInfoString(callInfo));
             WorkerThreadManager.Instance.EVSdkWorkDispatcher.InvokeAsync(() => {
                 EventJoinConferenceIndication?.Invoke(callInfo);
             });
@@ -868,6 +937,55 @@ namespace EasyVideoWin.Model
             WorkerThreadManager.Instance.EVSdkWorkDispatcher.InvokeAsync(() => {
                 EventParticipant?.Invoke(number);
             });
+        }
+
+        private void EVSdkWrapper_EventMicMutedShow(int micMuted)
+        {
+            WorkerThreadManager.Instance.EVSdkWorkDispatcher.InvokeAsync(() => {
+                EventRemoteMicMuted?.Invoke(0 == micMuted);
+            });
+        }
+
+        private void EVSdkWrapper_EventPeerImageUrl(string imageUrl)
+        {
+            WorkerThreadManager.Instance.EVSdkWorkDispatcher.InvokeAsync(() => {
+                EventPeerImageUrl?.Invoke(imageUrl);
+            });
+        }
+
+        private string GetCallInfoString(EVCallInfoCli callInfo)
+        {
+            if (null == callInfo)
+            {
+                return "";
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("conference_number: ")
+                .Append(callInfo.conference_number)
+                .Append(", contentEnabled: ")
+                .Append(callInfo.contentEnabled)
+                .Append(", isAudioOnly: ")
+                .Append(callInfo.isAudioOnly)
+                .Append(", isBigConference: ")
+                .Append(callInfo.isBigConference)
+                .Append(", isRemoteMuted: ")
+                .Append(callInfo.isRemoteMuted)
+                .Append(", peer: ")
+                .Append(callInfo.peer)
+                .Append(", svcCallType: ")
+                .Append(callInfo.svcCallType)
+                .Append(", svcCallAction: ")
+                .Append(callInfo.svcCallAction);
+            if (null != callInfo.err)
+            {
+                sb.Append(", err.type: ")
+                    .Append(callInfo.err.type)
+                    .Append(", err.code: ")
+                    .Append(callInfo.err.code);
+            }
+
+            return sb.ToString();
         }
 
         #endregion

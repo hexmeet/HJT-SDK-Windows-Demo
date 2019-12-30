@@ -168,18 +168,18 @@ namespace EasyVideoWin.View
 
             if (szNameDisplayedInConf.Length > Utils.DISPLAY_NAME_MAX_LENGTH)
             {
-                log.Info("The lenght of name exceeds 16.");
+                log.InfoFormat("The lenght of name exceeds {0}.", Utils.DISPLAY_NAME_MAX_LENGTH);
                 MessageBoxTip tip = new MessageBoxTip(ownerWindow);
                 tip.SetTitleAndMsg(
                     LanguageUtil.Instance.GetValueByKey("PROMPT")
-                    , LanguageUtil.Instance.GetValueByKey("NAME_DISPLAYED_IN_CONF_MAX_LENGTH")
+                    , string.Format(LanguageUtil.Instance.GetValueByKey("NAME_DISPLAYED_IN_CONF_MAX_LENGTH"), Utils.DISPLAY_NAME_MAX_LENGTH)
                     , LanguageUtil.Instance.GetValueByKey("CONFIRM")
                 );
                 tip.ShowDialog();
                 return;
             }
             
-            if (Regex.IsMatch(szNameDisplayedInConf, Utils.INVALID_DISPLAY_NAME_CHAR))
+            if (Regex.IsMatch(szNameDisplayedInConf, Utils.INVALID_DISPLAY_NAME_REGEX))
             {
                 log.Info("Invalid char in name.");
                 MessageBoxTip tip = new MessageBoxTip(ownerWindow);

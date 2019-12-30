@@ -62,7 +62,7 @@
 
             <Grid Grid.Column="1">
                 <ScrollViewer Style="{StaticResource GrayScrollViewer}" HorizontalAlignment="Left" Height="{Binding Path=ControlHeight, ElementName=settingViewCtrl}" BorderThickness="0"
-                              VerticalScrollBarVisibility="Auto" Width="480">
+                              VerticalScrollBarVisibility="Auto" Width="510">
                     <ContentPresenter Grid.Row="1" Grid.Column="1" x:Name="ContentArea" Content="{Binding CurrentView}"/>
                 </ScrollViewer >
             </Grid>

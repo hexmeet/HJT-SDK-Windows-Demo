@@ -283,6 +283,9 @@ namespace EasyVideoWin.View
                 switch (status)
                 {
                     case CallStatus.Dialing:
+                    case CallStatus.ConfIncoming:
+                    case CallStatus.P2pIncoming:
+                    case CallStatus.P2pOutgoing:
                     case CallStatus.Connected:
                         if (Visibility.Visible == MyInfoWindow.Instance.Visibility)
                         {

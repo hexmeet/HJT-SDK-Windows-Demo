@@ -484,6 +484,9 @@
     <Compile Include="CustomControls\GeneralOperationButton.xaml.cs">
       <DependentUpon>GeneralOperationButton.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CustomControls\LayoutOperationbarTextButton.xaml.cs">
+      <DependentUpon>LayoutOperationbarTextButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CustomControls\ResumePipButton.xaml.cs">
       <DependentUpon>ResumePipButton.xaml</DependentUpon>
     </Compile>
@@ -527,9 +530,15 @@
     <Compile Include="CustomControls\SimpleImageButton.xaml.cs">
       <DependentUpon>SimpleImageButton.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CustomControls\TextWithBgButton.xaml.cs">
+      <DependentUpon>TextWithBgButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CustomControls\WpfImageButton.xaml.cs">
       <DependentUpon>WpfImageButton.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Enums\LayoutModeType.cs" />
+    <Compile Include="Enums\MediaModeType.cs" />
+    <Compile Include="Enums\WebBrowserUrlType.cs" />
     <Compile Include="Helpers\CefSharpUtil.cs" />
     <Compile Include="Helpers\DbtUtil.cs" />
     <Compile Include="Helpers\DpiUtil.cs" />
@@ -557,6 +566,7 @@
     <Compile Include="Model\EVSdkManager.cs" />
     <Compile Include="Model\LoginManager.cs" />
     <Compile Include="Model\SettingManager.cs" />
+    <Compile Include="Rest\ServerRest\P2PUserRest.cs" />
     <Compile Include="Rest\SoftwareUpdateRest\AppInfoRest.cs" />
     <Compile Include="ViewModel\AnonymousJoinConfViewModel.cs" />
     <Compile Include="ViewModel\AudioDeviceModel.cs" />
@@ -595,6 +605,12 @@
     <Compile Include="View\AudioDeviceSelectorWindow.xaml.cs">
       <DependentUpon>AudioDeviceSelectorWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\ChangeDisplayNameWindow.xaml.cs">
+      <DependentUpon>ChangeDisplayNameWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LayoutExitAudioModeWindow.xaml.cs">
+      <DependentUpon>LayoutExitAudioModeWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\BackScreenColorSelectWindow.xaml.cs">
       <DependentUpon>BackScreenColorSelectWindow.xaml</DependentUpon>
     </Compile>
@@ -613,6 +629,15 @@
     <Compile Include="View\GeneralView.xaml.cs">
       <DependentUpon>GeneralView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\DialoutPeerInfoWindow.xaml.cs">
+      <DependentUpon>DialoutPeerInfoWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LayoutSpeakerPromptWindow.xaml.cs">
+      <DependentUpon>LayoutSpeakerPromptWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SelectMoreContentModeWindow.xaml.cs">
+      <DependentUpon>SelectMoreContentModeWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\SettingView.xaml.cs">
       <DependentUpon>SettingView.xaml</DependentUpon>
     </Compile>
@@ -624,9 +649,6 @@
     </Compile>
     <Compile Include="View\SoftwareUpdateWindow.xaml.cs">
       <DependentUpon>SoftwareUpdateWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\ConferenceView.xaml.cs">
-      <DependentUpon>ConferenceView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\ConfirmWin.xaml.cs">
       <DependentUpon>ConfirmWin.xaml</DependentUpon>
@@ -745,9 +767,6 @@
     <Compile Include="View\SpeakingPrompt.xaml.cs">
       <DependentUpon>SpeakingPrompt.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\IncomingCallPromptDialog.xaml.cs">
-      <DependentUpon>IncomingCallPromptDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="View\LoginInfoView.xaml.cs">
       <DependentUpon>LoginInfoView.xaml</DependentUpon>
     </Compile>
@@ -771,6 +790,9 @@
     </Compile>
     <Compile Include="View\WaitingCollectLogView.xaml.cs">
       <DependentUpon>WaitingCollectLogView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\WebBrowserWrapperView.xaml.cs">
+      <DependentUpon>WebBrowserWrapperView.xaml</DependentUpon>
     </Compile>
     <Compile Include="WinForms\WhiteBoardControl.cs">
       <SubType>UserControl</SubType>
@@ -823,6 +845,10 @@
     <Page Include="CustomControls\GeneralOperationButton.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CustomControls\LayoutOperationbarTextButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CustomControls\ResumePipButton.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -880,6 +906,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="CustomControls\TextWithBgButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CustomControls\WpfImageButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -925,6 +955,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\ChangeDisplayNameWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\LayoutExitAudioModeWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\BackScreenColorSelectWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -949,6 +987,18 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\DialoutPeerInfoWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\LayoutSpeakerPromptWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="View\SelectMoreContentModeWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\SettingView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -964,10 +1014,6 @@
     <Page Include="View\SoftwareUpdateWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="View\ConferenceView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ConfirmWin.xaml">
       <SubType>Designer</SubType>
@@ -1117,10 +1163,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\IncomingCallPromptDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="View\LoginInfoView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -1158,6 +1200,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\WaitingCollectLogView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\WebBrowserWrapperView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -1363,14 +1409,10 @@
     <Resource Include="Resources\Icons\WindowTitlebar\btn_back.png" />
     <Resource Include="Resources\Icons\login\img_login_b.png" />
     <Resource Include="Resources\Icons\login\img_login_c.png" />
-    <Resource Include="Resources\Icons\MainView\icon_appointment.png" />
     <Resource Include="Resources\Icons\MainView\icon_contact_click.png" />
     <Resource Include="Resources\Icons\MainView\icon_contact_normal.png" />
-    <Resource Include="Resources\Icons\MainView\icon_join.png" />
     <Resource Include="Resources\Icons\MainView\icon_meeting_click.png" />
     <Resource Include="Resources\Icons\MainView\icon_meeting_normal.png" />
-    <Resource Include="Resources\Icons\MainView\icon_mymeeting.png" />
-    <Resource Include="Resources\Icons\MainView\icon_notice.png" />
     <Resource Include="Resources\Icons\MainView\icon_setting_click.png" />
     <Resource Include="Resources\Icons\MainView\icon_setting_normal.png" />
     <Resource Include="Resources\Icons\MainView\default_user_photo.png" />
@@ -1399,6 +1441,18 @@
     <Resource Include="Resources\Icons\WindowTitlebar\more_normal.png" />
     <Resource Include="Resources\Icons\Content\icon_sharemusic-off.png" />
     <Resource Include="Resources\Icons\Content\icon_sharemusic.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_traditional_speaker.png" />
+    <Resource Include="Resources\Icons\MainView\icon_chat_click.png" />
+    <Resource Include="Resources\Icons\MainView\icon_chat_normal.png" />
+    <Resource Include="Resources\Icons\btn_video_hover.png" />
+    <Resource Include="Resources\Icons\btn_video_normal.png" />
+    <Resource Include="Resources\Icons\btn_exit.png" />
+    <Resource Include="Resources\Icons\img_audio.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_more.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_toolbar_more.png" />
+    <Resource Include="Resources\Icons\bg_audio-mode.jpg" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_show_share_click.png" />
+    <Resource Include="Resources\Icons\LayoutOperationbar\icon_show_share_normal.png" />
     <Content Include="Resources\sounds\camera.wav" />
     <Content Include="Resources\sounds\speaker.wav" />
     <Resource Include="Resources\Icons\icon_me_click.png" />
@@ -1543,6 +1597,8 @@ xcopy $(ProjectDir)\Resources\sounds\ringtone.wav $(TargetDir)\\Resources\sounds
 xcopy $(ProjectDir)\Resources\sounds\camera.wav $(TargetDir)\\Resources\sounds\ /Y
 
 xcopy $(ProjectDir)\Resources\Icons\background.jpg $(TargetDir)\\Resources\Icons\ /Y
+
+xcopy $(ProjectDir)\Resources\Icons\bg_audio-mode.jpg $(TargetDir)\\Resources\Icons\ /Y
 
 xcopy $(ProjectDir)\Resources\Icons\default_user_header.jpg $(TargetDir)\\Resources\Icons\ /Y
 if "$(ConfigurationName)"=="Release" (

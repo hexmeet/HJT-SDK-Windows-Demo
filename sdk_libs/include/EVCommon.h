@@ -19,6 +19,14 @@
 #define EV_CLASS_API 
 #endif
 
+#ifndef EV_DEPRECATED
+#if defined(_MSC_VER)
+#define EV_DEPRECATED __declspec(deprecated)
+#else
+#define EV_DEPRECATED __attribute__ ((deprecated))
+#endif
+#endif
+
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -52,7 +60,9 @@ typedef enum _EV_ERROR {
     EV_SERVER_INVALID = 9,
     EV_CALL_DECLINED = 10,
     EV_CALL_BUSY = 11,
-    EV_CALL_IO_ERROR = 12
+    EV_CALL_IO_ERROR = 12,
+    EV_NOT_LOGIN = 13,
+    EV_CALL_TIMEOUT = 14
 } EV_ERROR;
 
 }
@@ -73,6 +83,17 @@ typedef enum _EV_CALL_TYPE {
 	EV_CALL_H323 = 2,
 	EV_CALL_SVC = 3
 } EV_CALL_TYPE;
+
+typedef enum _EV_SVC_CALL_TYPE {
+    EV_SVC_CALL_CONF = 0,
+    EV_SVC_CALL_P2P = 1
+} EV_SVC_CALL_TYPE;
+
+typedef enum _EV_SVC_CALL_ACTION {
+    EV_SVC_NO_ACTION = 0,
+    EV_SVC_INCOMING_CALL_RING,
+    EV_SVC_INCOMING_CALL_CANCEL
+}EV_SVC_CALL_ACTION;
 
 typedef enum _EV_CALL_DIR {
 	EV_CALL_OUTGOING = 0,
@@ -142,7 +163,9 @@ typedef enum _EV_WARN {
     EV_WARN_NETWORK_VERY_POOR = 1,
     EV_WARN_BANDWIDTH_INSUFFICIENT = 2,
     EV_WARN_BANDWIDTH_VERY_INSUFFICIENT = 3,
-    EV_WARN_NO_AUDIO_CAPTURE_CARD = 4
+    EV_WARN_NO_AUDIO_CAPTURE_CARD = 4,
+    EV_WARN_UNMUTE_AUDIO_NOT_ALLOWED = 5,
+    EV_WARN_UNMUTE_AUDIO_INDICATION = 6
 } EV_WARN;
 
 class EV_CLASS_API EVWarn {
@@ -181,14 +204,26 @@ typedef enum _EV_LOG_LEVEL {
 typedef enum _EV_DEVICE_TYPE {
     EV_DEVICE_AUDIO_CAPTURE = 0,
     EV_DEVICE_AUDIO_PLAYBACK = 1,
-    EV_DEVICE_VIDEO_CAPTURE = 2
+    EV_DEVICE_VIDEO_CAPTURE = 2,
+    EV_DEVICE_CONTENT_CAPTURE = 3
 } EV_DEVICE_TYPE;
 
 class EV_CLASS_API EVDevice {
 public:
+    EVDevice() {
+        clear();
+    }
+
+    void clear() {
+        id = -1;
+        type = EV_DEVICE_AUDIO_CAPTURE;
+        name.clear();
+        desc.clear();
+    }
     unsigned int id;
     EV_DEVICE_TYPE type;
     std::string name;
+    std::string desc;
 };
 
 //////////////////////////////
@@ -267,6 +302,22 @@ public:
 //////////////////////////////
 //  Event
 //////////////////////////////
+class EV_CLASS_API EVFeatureSupport {
+public:
+	void clear() {
+        contactWebPage = false;
+		p2pCall = false;
+ 		chatInConference = false;
+		switchingToAudioConference = false;
+		sitenameIsChangeable = false;
+    }
+	bool contactWebPage;
+    bool p2pCall;
+    bool chatInConference;
+    bool switchingToAudioConference;
+	bool sitenameIsChangeable;
+
+};
 
 class EV_CLASS_API EVUserInfo {
 public:
@@ -291,6 +342,7 @@ public:
     std::string appServerType;
     std::string urlSuffixForMobile;
     std::string urlSuffixForPC;
+	EVFeatureSupport featureSupport;
 };
 
 class EV_CLASS_API EVCallInfo {
@@ -308,16 +360,19 @@ public:
         err.clear();
         isBigConference = FALSE;
         isRemoteMuted = FALSE;
+        svcCallType = EV_SVC_CALL_CONF;
     }
 
     bool isAudioOnly;
     bool contentEnabled;
+    bool isBigConference;
+    bool isRemoteMuted;
     std::string peer;
     std::string conference_number;
     std::string password;
     EVError err;
-    bool isBigConference;
-    bool isRemoteMuted;
+    EV_SVC_CALL_TYPE svcCallType;
+	EV_SVC_CALL_ACTION svcCallAction;
 };
 
 class EV_CLASS_API EVContentInfo {
@@ -388,6 +443,10 @@ public:
         (void)info;
     }
 
+    virtual void onCallPeerConnected(EVCallInfo & info) {
+        (void)info;
+    }
+
     virtual void onCallEnd(EVCallInfo & info) {
         (void)info;
     }
@@ -412,12 +471,32 @@ public:
         (void)frame;
         (void)size;
     }
+    
+    virtual void onMicMutedShow(int mic_muted) {
+        (void)mic_muted;
+    } 
 };
+
+enum {
+    MAX_CELL_COUNT = 16
+};
+typedef struct VEncMixerCfg_t
+{
+    int cell_count;
+    struct {
+        unsigned int id;
+        unsigned short x_start;
+        unsigned short y_start;
+        unsigned short width;
+        unsigned short height;  // base 1920x1080
+    } cells[MAX_CELL_COUNT];
+} VEncMixerCfg;
 
 class EV_CLASS_API IEVCommon {
 public:
     //Log
     virtual void setLog(EV_LOG_LEVEL level, const char * log_path, const char * log_file_name, unsigned int max_file_size) = 0;
+    virtual void setConsoleLog(EV_LOG_LEVEL level) = 0;
     virtual void enableLog(bool enable) = 0;
     virtual std::string compressLog() = 0;
 
@@ -442,12 +521,14 @@ public:
     virtual float getMicVolume() = 0;
     virtual int setDeviceRotation(int rotation) = 0;
     virtual int audioInterruption(int type) = 0;
+    virtual void setVideoEncoderMixerCfg(VEncMixerCfg const & cfg, int is_content) = 0;
 
     //Set Windows
     virtual int setLocalVideoWindow(void * id) = 0;
     virtual int setRemoteVideoWindow(void * id) = 0;
     virtual int setRemoteContentWindow(void * id) = 0;
     virtual int setLocalContentWindow(void * id, EV_CONTENT_MODE mode) = 0;
+    virtual int setLocalContentArea(int x, int y, int width, int height) = 0;
     virtual int setPreviewVideoWindow(void * id) = 0;
     virtual int zoomRemoteWindow(EV_STREAM_TYPE stream_type, float zoom_factor, 
     float x, float y) = 0;

@@ -30,6 +30,7 @@ namespace EasyVideoWin.View
 
         private Timer _autoCloseTimer = null;
         private IMasterDisplayWindow _masterWindow = null;
+        private bool _destroyWin = false;
 
         public static PromptWindow Instance
         {
@@ -39,7 +40,7 @@ namespace EasyVideoWin.View
             }
         }
 
-        private PromptWindow(Window owner)
+        public PromptWindow(Window owner)
         {
             InitializeComponent();
             InitParams(owner);
@@ -91,7 +92,29 @@ namespace EasyVideoWin.View
                 _autoCloseTimer.Enabled = false;
             }
             log.Info("Close window");
+
+            if (_destroyWin)
+            {
+                this.Close();
+                return;
+            }
+
             this.Visibility = Visibility.Collapsed;
+        }
+
+        public void ShowPromptByTime(string content, int duration)
+        {
+            if (string.IsNullOrEmpty(content))
+            {
+                return;
+            }
+
+            this.label.Content = content;
+            this.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            this.Show();
+            //this.Top += (WindowDownRatio * ratio);
+            _destroyWin = true;
+            StartAutoCloseTimer(duration);
         }
 
         public void ShowPromptByTime(string content, int duration, IMasterDisplayWindow masterWin, Window activeWindow)
@@ -152,7 +175,7 @@ namespace EasyVideoWin.View
             double left = mainWindowRect.Left + Math.Round((mainWindowRect.Width - width) / 2);
 
             this.Left = left;
-            this.Top = mainWindowRect.Top + (mainWindowRect.Height - this.ActualHeight) / 2;
+            this.Top = mainWindowRect.Top + (mainWindowRect.Height - this.ActualHeight) / 4 * 3;
         }
 
         protected override void OnClosed(EventArgs e)

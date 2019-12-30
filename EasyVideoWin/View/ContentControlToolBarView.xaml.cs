@@ -259,8 +259,8 @@ namespace EasyVideoWin.View
         private void Window_SourceInitialized(object sender, EventArgs e)
         {
             log.DebugFormat("ContentControlToolBarView Window_SourceInitialized {0}", this.GetHashCode());
-            var hwnd = new System.Windows.Interop.WindowInteropHelper((Window)sender).Handle;
-            var value = GetWindowLong(hwnd, GWL_STYLE);
+            IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper((Window)sender).Handle;
+            int value = GetWindowLong(hwnd, GWL_STYLE);
             SetWindowLong(hwnd, GWL_STYLE, (int)(value & ~WS_MAXIMIZEBOX));
 
             System.Windows.Interop.HwndSource hwndSource = (System.Windows.Interop.HwndSource)System.Windows.Interop.HwndSource.FromVisual((Window)sender);
