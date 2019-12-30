@@ -28,7 +28,12 @@ public enum class EV_ERROR_CLI
     EV_REGISTER_FAILED = 6,
     EV_INTERNAL_ERROR = 7,
     EV_SERVER_UNREACHABLE = 8,
-    EV_SERVER_INVALID = 9
+    EV_SERVER_INVALID = 9,
+    EV_CALL_DECLINED = 10,
+    EV_CALL_BUSY = 11,
+    EV_CALL_IO_ERROR = 12,
+    EV_NOT_LOGIN = 13,
+    EV_CALL_TIMEOUT = 14
 };
 
 [System::Serializable]

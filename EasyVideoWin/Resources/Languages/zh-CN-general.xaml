@@ -166,7 +166,7 @@
     <sys:String x:Key="BANDWIDTH_VERY_INSUFFICIENT">当前网络带宽严重不足，建议检查网络带宽或者切换网络</sys:String>
     <sys:String x:Key="KNOW">知道了</sys:String>
     <sys:String x:Key="GENERATING_PIC">正在生成图片，请稍候...</sys:String>
-    <sys:String x:Key="HANGUP">挂断</sys:String>
+    <sys:String x:Key="HANGUP">挂 断</sys:String>
     <sys:String x:Key="INPUT_MEETING_NUMBER">请输入会议号码</sys:String>
     <sys:String x:Key="NO_CALL_HISTORY">无呼叫历史</sys:String>
     <sys:String x:Key="CALL_OUT_ID">呼叫ID</sys:String>
@@ -223,6 +223,7 @@
     <!-- call-->
     <sys:String x:Key="FAIL_TO_CALL_FOR_BAD_NETWORK">网络不可用，呼叫失败</sys:String>
     <sys:String x:Key="FAIL_TO_CALL_FOR_REGISTER_FAILURE">注册失败，无法呼叫</sys:String>
+    <sys:String x:Key="SWITCH_VIDEO">退出语音模式</sys:String>
     <!-- request speak-->
     <sys:String x:Key="REQUEST_SPEAK">您已被静音，请申请发言</sys:String>
     <sys:String x:Key="SENDING_REQUEST_SPEAK">发言申请已发送</sys:String>
@@ -235,15 +236,16 @@
     <sys:String x:Key="BOTTOM_BAR_SHARE">分享</sys:String>
     <sys:String x:Key="BOTTOM_BAR_SETTING">设备</sys:String>
     <sys:String x:Key="BOTTOM_BAR_REQUEST">申请发言</sys:String>
-    <sys:String x:Key="BOTTOM_BAR_HANGUP">挂断</sys:String>
+    <sys:String x:Key="BOTTOM_BAR_HANGUP">挂 断</sys:String>
     <sys:String x:Key="BOTTOM_BAR_SHOW_WINDOW">显示分享</sys:String>
-
+    <sys:String x:Key="BOTTOM_BAR_SWITCH_AUDIO">切到语音模式</sys:String>
+    
     <sys:String x:Key="SPEAKER_VIEW">主讲视图</sys:String>
     <sys:String x:Key="GALLERY_VIEW">画廊视图</sys:String>
     <sys:String x:Key="ACCEPT">接受</sys:String>
     <sys:String x:Key="DECLINE">婉拒</sys:String>
     <sys:String x:Key="INVITED_JOIN_CONF_PROMPT">您被邀请加入会议：{0}</sys:String>
-    <sys:String x:Key="ADMIN_INVITE_YOU_JOIN_CONF_PROMPT">{0} 正在邀请您加入会议：{1}</sys:String>
+    <sys:String x:Key="ADMIN_INVITE_YOU_JOIN_CONF_PROMPT">正在邀请您加入会议：{0}</sys:String>
     <sys:String x:Key="CALL">呼叫</sys:String>
     <sys:String x:Key="CANCEL_FOCUS_VIDEO">取消选定视频</sys:String>
     <sys:String x:Key="ENTERPRISE_USER">私有部署用户</sys:String>
@@ -266,10 +268,10 @@
     <sys:String x:Key="RESERVATION">预约会议</sys:String>
     <sys:String x:Key="MY_CONFERENCE">我的会议</sys:String>
     <sys:String x:Key="CONFERENCE_MANAGEMENT">会议管理</sys:String>
-    <sys:String x:Key="CHAIRMAN_MUTE_ENDPOINT_INFO">您已被静音，请申请发言</sys:String>
-    <sys:String x:Key="CHAIRMAN_UNMUTE_ENDPOINT_INFO">您已被主持人解除静音</sys:String>
+    <sys:String x:Key="CHAIRMAN_MUTE_ENDPOINT_INFO">已被静音，您的声音不会被听到</sys:String>
+    <sys:String x:Key="CHAIRMAN_UNMUTE_ENDPOINT_INFO">已解除静音，与会者将听到您的声音</sys:String>
     <sys:String x:Key="CONFERENCE_NEED_PASSWORD">请在下面输入会议密码</sys:String>
-    <sys:String x:Key="NAME_DISPLAYED_IN_CONF_MAX_LENGTH">会议中显示的用户名的长度不能超过16</sys:String>
+    <sys:String x:Key="NAME_DISPLAYED_IN_CONF_MAX_LENGTH">会议中显示的用户名的长度不能超过{0}</sys:String>
     <sys:String x:Key="NAME_DISPLAYED_IN_CONF_INCORRECT_PROMPT">会议中显示的用户名不能包含 &quot;, &lt;, &gt;</sys:String>
     <sys:String x:Key="PORT_OPTIONAL">端口（选填）</sys:String>
     <sys:String x:Key="ADVANCED_SETTING">高级设置</sys:String>
@@ -389,7 +391,7 @@
     <sys:String x:Key="ONLY_ROOM_OWNER_CAN_ACTIVATE_ROOM">只允许会议室拥有者激活会议室</sys:String>
     <sys:String x:Key="NOT_ALLOW_ANONYMOUS_PARTY">该会议不允许匿名呼叫</sys:String>
 
-    <sys:String x:Key="RESUME_PIP">恢复画中画</sys:String>
+    <sys:String x:Key="RESUME_PIP">显示画中画</sys:String>
 
     <!-- Call error message -->
     <sys:String x:Key="SERVICE_EXCEPTION">系统内部异常，请调整后再试或者联系管理员</sys:String>
@@ -414,13 +416,16 @@
     <sys:String x:Key="HAISHEN_PORT_COUNT_USED_UP">当前与会人数已达平台会议端口上限</sys:String>
     <sys:String x:Key="EXCEEDED_GATEWAY_AUDIO_PORT_COUNT_IN_LICENSE">网关语音通话数量已达到云平台的许可上限</sys:String>
     <sys:String x:Key="EXCEEDED_GATEWAY_VIDEO_PORT_COUNT_IN_LICENSE">网关视频通话数量已达到云平台的许可上限</sys:String>
-
+    <sys:String x:Key="PARTY_OFFLINE">对方不在线</sys:String>
+    <sys:String x:Key="FAILED_JOIN_CONF_FOR_LOCKED">加入失败，会议已锁定</sys:String>
+    <sys:String x:Key="CALL_FAILED_FOR_PARTY_IN_CALL">呼叫失败，对方正在通话中</sys:String>
+    
     <sys:String x:Key="INVALID_CONFERENCE_ID">会议号码只能输入数字</sys:String>
     <sys:String x:Key="PIC_1280_720_LARGE">当图片被转化成分辨为1280x720时，图片的大小超过了5M。请处理后重新上传！</sys:String>
     <sys:String x:Key="TRYING_TO_LOAD">正在努力加载中...</sys:String>
     <sys:String x:Key="FAILED_LOAD">加载失败，请检查您的网络</sys:String>
     <sys:String x:Key="RELOAD">重新加载</sys:String>
-    <sys:String x:Key="LAYOUT_CHANGE_DISABLED">当前会议暂不支持指定分屏模式</sys:String>
+    <sys:String x:Key="LAYOUT_CHANGE_DISABLED">当前会议禁止切换分屏</sys:String>
     <sys:String x:Key="REGISTRATION_FAILED_CALL_AGAIN">注册失败，请重新呼入</sys:String>
     <sys:String x:Key="ORGANIZATION">单位</sys:String>
     <sys:String x:Key="DEPARTMENT">部门</sys:String>
@@ -486,4 +491,15 @@
     <sys:String x:Key="SHARE_COMPUTER_SOUND">共享电脑声音</sys:String>
     <sys:String x:Key="SHARE_SOUND">共享声音</sys:String>
     <sys:String x:Key="STOP_SHARING_SOUND">停止共享声音</sys:String>
+    <sys:String x:Key="LAYOUT_SWITCH">分屏切换</sys:String>
+    <sys:String x:Key="CALLING">正在呼叫...</sys:String>
+    <sys:String x:Key="INVITING_YOU">正在邀请您</sys:String>
+    <sys:String x:Key="CAN_NOT_UNMUTE_REMOTE">当前会议禁止解除静音</sys:String>
+    <sys:String x:Key="REMOTE_UNMUTED_INDICATION">主持人正在解除静音，是否同意解除静音？</sys:String>
+    <sys:String x:Key="SPEAKER_SPEAKING">{0} 正在讲话</sys:String>
+    <sys:String x:Key="CALL_ENDED_BY_OTHER_USER">对方已挂断</sys:String>
+    <sys:String x:Key="CALL_TIMEOUT">呼叫超时，结束呼叫</sys:String>
+    <sys:String x:Key="CALL_DECLINED">呼叫失败，对方忙</sys:String>
+    <sys:String x:Key="CHANGE_NAME">改名</sys:String>
+    <sys:String x:Key="INPUT_NEW_DISPLAY_NAME">输入新的显示名称：</sys:String>
 </ResourceDictionary>

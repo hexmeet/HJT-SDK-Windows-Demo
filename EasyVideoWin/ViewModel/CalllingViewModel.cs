@@ -70,14 +70,12 @@ namespace EasyVideoWin.ViewModel
             switch (status)
             {
                 case CallStatus.Dialing:
+                case CallStatus.ConfIncoming:
+                case CallStatus.P2pIncoming:
                     CurrentView = _dialingView;
                     CallController.Instance.PlayRingtone();
                     break;
-                case CallStatus.Connected:
-                    CallController.Instance.StopRingtone();
-                    //CurrentView = _playerView;
-                    break;
-                case CallStatus.Ended:
+                default:
                     CallController.Instance.StopRingtone();
                     break;
 

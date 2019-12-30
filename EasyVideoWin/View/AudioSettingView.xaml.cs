@@ -63,7 +63,7 @@ namespace EasyVideoWin.View
                 int waveOutDevices = WaveOut.DeviceCount;
                 for (int i = 0; i < WaveOut.DeviceCount; i++)
                 {
-                    var cap = WaveOut.GetCapabilities(i);
+                    WaveOutCapabilities cap = WaveOut.GetCapabilities(i);
                     if (selectedSpeaker.Contains(cap.ProductName))
                     {
                         _waveOut.DeviceNumber = i;

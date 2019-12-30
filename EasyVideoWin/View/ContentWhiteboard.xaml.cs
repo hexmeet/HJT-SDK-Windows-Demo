@@ -124,7 +124,7 @@ namespace EasyVideoWin.View
 
             InitToolbar();
 
-            TitleConfNumberLabel.Text = CallController.Instance.ConferenceNumber;
+            TitleConfNumberLabel.Text = CallController.Instance.IsP2pCall ? "" : CallController.Instance.ConferenceNumber;
 
             CallController.Instance.PropertyChanged += OnWhiteBoardPresenterChanged;
 
@@ -159,6 +159,10 @@ namespace EasyVideoWin.View
         {
             if ("WhiteBoardPresenter" == e.PropertyName)
             {
+                if (CallController.Instance.IsP2pCall)
+                {
+                    return;
+                }
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     TitleConfNumberLabel.Text = string.Format(LanguageUtil.Instance.GetValueByKey("S_WHITEBOARD"), CallController.Instance.WhiteBoardPresenter);
@@ -1045,7 +1049,7 @@ namespace EasyVideoWin.View
                 {
                     using (Bitmap resized = new Bitmap(memoryImage, new System.Drawing.Size(1280, 720)))
                     {
-                        using (var ms = new MemoryStream())
+                        using (MemoryStream ms = new MemoryStream())
                         {
                             resized.Save(ms, memoryImage.RawFormat);
                             ms.Seek(0, SeekOrigin.Begin);
@@ -1087,16 +1091,16 @@ namespace EasyVideoWin.View
         {
             using (HttpContent fileStreamContent = new StreamContent(imageStream))
             {
-                var baseAddress = new Uri(WhiteBoardServerAddr);
-                var cookieContainer = new CookieContainer();
-                using (var handler = new HttpClientHandler() { CookieContainer = cookieContainer })
-                using (var client = new HttpClient(handler))
-                using (var formData = new MultipartFormDataContent())
+                Uri baseAddress = new Uri(WhiteBoardServerAddr);
+                CookieContainer cookieContainer = new CookieContainer();
+                using (HttpClientHandler handler = new HttpClientHandler() { CookieContainer = cookieContainer })
+                using (HttpClient client = new HttpClient(handler))
+                using (MultipartFormDataContent formData = new MultipartFormDataContent())
                 {
                     cookieContainer.Add(baseAddress, new System.Net.Cookie("jwt", jwtParam));
 
                     formData.Add(fileStreamContent, "file", "background.jpg");
-                    var response = client.PostAsync(url, formData).Result;
+                    HttpResponseMessage response = client.PostAsync(url, formData).Result;
                     if (!response.IsSuccessStatusCode)
                     {
                         return false;
@@ -1639,12 +1643,12 @@ namespace EasyVideoWin.View
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    var task = this.Browser.GetMainFrame().EvaluateScriptAsync("(function() {return window.jwtParam; })();", null);
+                    Task<JavascriptResponse> task = this.Browser.GetMainFrame().EvaluateScriptAsync("(function() {return window.jwtParam; })();", null);
                     task.ContinueWith(t =>
                     {
                         if (!t.IsFaulted)
                         {
-                            var response = t.Result;
+                            JavascriptResponse response = t.Result;
                             this.JwtParam = (string)response.Result;
                         }
                     }, TaskScheduler.FromCurrentSynchronizationContext());

@@ -1,5 +1,6 @@
 ﻿using CefSharp;
 using EasyVideoWin.CustomControls;
+using EasyVideoWin.Enums;
 using EasyVideoWin.Helpers;
 using EasyVideoWin.Model;
 using EasyVideoWin.Model.CloudModel;
@@ -33,15 +34,17 @@ namespace EasyVideoWin.View
         #region -- Members --
         private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public delegate void SvcLyoutModeChangedHandler(bool isSpeakerMode, bool isDpiChanged = false);
+        public delegate void SvcLyoutModeChangedHandler(LayoutModeType layoutMode, bool isDpiChanged = false);
         public event SvcLyoutModeChangedHandler SvcLyoutModeChanged;
         public event PropertyChangedEventHandler PropertyChanged;
         public event EventHandler ShowNormalCellsChanged;
         public event EventHandler ConfManagementChanged;
         public event Action EventInitScreen;
         public event Action EventRequestSpeaker;
+        public event Action EventSwitch2AudioMode;
+        public event Action<string> EventDisplayNameChanged;
 
-        private bool _isSpeakerMode = false;
+        private LayoutModeType _layoutMode = LayoutModeType.NEW_SPEAKER_MODE;
         private bool _isAudioMuted;
         private bool _isLocalVideoSuspended;
 
@@ -49,37 +52,52 @@ namespace EasyVideoWin.View
         private string _whiteboardServerAddr = "";
         private ContentWhiteboard _contentWhiteboard = null;
         private SelectShareContentModeWindow _selectShareContentModeWindow = null;
+        private SelectMoreContentModeWindow _selectMoreContentModeWindow = null;
         private System.Windows.Forms.Screen _selectedScreen = null;
         private CallStatus _callStatus = CallStatus.Idle;
         private bool _isShowSelectedContentMode = false;
+        private bool _isShowSelectedMoreContentMode = false;
         private BackgroundWorker _loadWhiteBoardWindowWorker;
         private string _boardRoom = "";
         private const string ACS_URL = "{0}/acs/index.html?jwt={1}";
         private const string ACS_TEST_URL = "{0}/acs/pseudoAuth?uname={1}&room={2}&role=chair+person";
         private VideoContentWindow _receiveContentWin = null;
         private ContentControlView _sendContentWin = null;
-        private Visibility _showNormalCellsBtnVisibility;
-        private Visibility _requestSpeakVisibility;
+        private bool _isNormalCellShown;
         private CancellationTokenSource _ctsSetPresenter;
         private System.Timers.Timer _checkWhiteBoardConnectionTimer;
+        private bool _isRemoteMuted = false;
+        private MediaModeType _mediaMode = MediaModeType.VIDEO_NORMAL;
+        private bool _isChangeDisplayNameWinShown = false;
 
         private const int INITIAL_WIDTH = 1280;
         private ulong _presenterDeviceId;
-
+        private BitmapImage _galleryImage = new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_gallery.png"));
+        private BitmapImage _newSpeakerImage = new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_speaker.png"));
+        private BitmapImage _traditionalSpeakerImage = new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/Resources/Icons/LayoutOperationbar/icon_traditional_speaker.png"));
+        
         #endregion
 
         #region -- Properties --
+
+        public bool IsNormalCellShown
+        {
+            get
+            {
+                return _isNormalCellShown;
+            }
+            set
+            {
+                _isNormalCellShown = value;
+                OnPropertyChanged("ShowNormalCellsBtnVisibility");
+            }
+        }
 
         public Visibility ShowNormalCellsBtnVisibility
         {
             get
             {
-                return _showNormalCellsBtnVisibility;
-            }
-            set
-            {
-                _showNormalCellsBtnVisibility = value;
-                OnPropertyChanged("ShowNormalCellsBtnVisibility");
+                return !_isNormalCellShown && MediaModeType.VIDEO_NORMAL == MediaMode ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 
@@ -118,15 +136,15 @@ namespace EasyVideoWin.View
 
         public bool IsLocalVideoSuspended
         {
+            get
+            {
+                return _isLocalVideoSuspended;
+            }
             set
             {
                 _isLocalVideoSuspended = value;
                 OnPropertyChanged("SuspendVideoVisibility");
                 OnPropertyChanged("ResumeVideoVisibility");
-            }
-            get
-            {
-                return _isLocalVideoSuspended;
             }
         }
 
@@ -134,7 +152,7 @@ namespace EasyVideoWin.View
         {
             get
             {
-                return IsLocalVideoSuspended ? Visibility.Visible : Visibility.Collapsed;
+                return IsLocalVideoSuspended && MediaModeType.VIDEO_NORMAL == MediaMode ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 
@@ -142,37 +160,31 @@ namespace EasyVideoWin.View
         {
             get
             {
-                return IsLocalVideoSuspended ? Visibility.Collapsed : Visibility.Visible;
+                return !IsLocalVideoSuspended && MediaModeType.VIDEO_NORMAL == MediaMode ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 
-        public bool IsSpeakerMode
+        public LayoutModeType LayoutMode
         {
             get
             {
-                return _isSpeakerMode;
+                return _layoutMode;
             }
             set
             {
-                _isSpeakerMode = value;
-                OnPropertyChanged("GalleryViewButtonVisibility");
-                OnPropertyChanged("SpeakerViewButtonVisibility");
-            }
-        }
-
-        public Visibility GalleryViewButtonVisibility
-        {
-            get
-            {
-                return IsSpeakerMode ? Visibility.Visible : Visibility.Collapsed;
-            }
-        }
-
-        public Visibility SpeakerViewButtonVisibility
-        {
-            get
-            {
-                return IsSpeakerMode ? Visibility.Collapsed : Visibility.Visible;
+                switch (value)
+                {
+                    case LayoutModeType.GALLERY_MODE:
+                        this.switchLayoutBtn.NormalImage = _galleryImage;
+                        break;
+                    case LayoutModeType.NEW_SPEAKER_MODE:
+                        this.switchLayoutBtn.NormalImage = _newSpeakerImage;
+                        break;
+                    case LayoutModeType.TRADITIONAL_SPEAKER_MODE:
+                        this.switchLayoutBtn.NormalImage = _traditionalSpeakerImage;
+                        break;
+                }
+                _layoutMode = value;
             }
         }
 
@@ -180,6 +192,11 @@ namespace EasyVideoWin.View
         {
             get
             {
+                if (MediaModeType.VIDEO_NORMAL != MediaMode)
+                {
+                    return Visibility.Collapsed;
+                }
+
                 bool isStartWhiteBoard = ContentStreamStatus.ReceivingWhiteBoardStarted == CallController.Instance.CurrentContentStreamStatus
                                          || ContentStreamStatus.SendingWhiteBoardStarted == CallController.Instance.CurrentContentStreamStatus;
                 if (
@@ -196,16 +213,32 @@ namespace EasyVideoWin.View
             }
         }
 
-        public Visibility RequestSpeakVisibility
+        public Visibility ShareModeVisibility
         {
             get
             {
-                return _requestSpeakVisibility;
+                return MediaModeType.VIDEO_NORMAL == MediaMode ? Visibility.Visible : Visibility.Collapsed;
             }
-            set
+        }
+
+        public Visibility SwitchLayoutVisibility
+        {
+            get
             {
-                _requestSpeakVisibility = value;
-                OnPropertyChanged("RequestSpeakVisibility");
+                return MediaModeType.VIDEO_NORMAL == MediaMode ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        public Visibility MoreModeVisibility
+        {
+            get
+            {
+                bool showAudioMode =       null != LoginManager.Instance.LoginUserInfo
+                                        && LoginManager.Instance.LoginUserInfo.featureSupport.switchingToAudioConference
+                                        && MediaModeType.VIDEO_NORMAL == MediaMode;
+                bool showChangeDisplayName = null != LoginManager.Instance.LoginUserInfo && LoginManager.Instance.LoginUserInfo.featureSupport.sitenameIsChangeable;
+                log.InfoFormat("MoreModeVisibility, IsRemoteMuted: {0}, showAudioMode: {1}, showChangeDisplayName: {2}, MediaMode: {3}", IsRemoteMuted, showAudioMode, showChangeDisplayName, MediaMode);
+                return IsRemoteMuted || showAudioMode || showChangeDisplayName ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 
@@ -227,6 +260,46 @@ namespace EasyVideoWin.View
 
         public string AcsServerAddress { get; set; }
         
+        public bool IsRemoteMuted
+        {
+            get
+            {
+                return _isRemoteMuted;
+            }
+            set
+            {
+                _isRemoteMuted = value;
+                OnPropertyChanged("MoreModeVisibility");
+            }
+        }
+        public MediaModeType MediaMode
+        {
+            get
+            {
+                return _mediaMode;
+            }
+            set
+            {
+                _mediaMode = value;
+
+                OnPropertyChanged("ShowNormalCellsBtnVisibility");
+                OnPropertyChanged("ShareModeVisibility");
+                OnPropertyChanged("SwitchLayoutVisibility");
+                OnPropertyChanged("ShowShareVisibility");
+                OnPropertyChanged("MoreModeVisibility");
+                CheckLocalVideoStatus();
+
+            }
+        }
+
+        public bool HasActiveSubDialog
+        {
+            get
+            {
+                return _isChangeDisplayNameWinShown;
+            }
+        }
+
         #endregion
 
         #region -- Constructor --
@@ -240,22 +313,21 @@ namespace EasyVideoWin.View
             this.muteAudioBtn.SetBinding(Button.VisibilityProperty, new Binding("MuteAudioVisibility") { Source = this });
             this.resumeVideoBtn.SetBinding(Button.VisibilityProperty, new Binding("ResumeVideoVisibility") { Source = this });
             this.suspendVideoBtn.SetBinding(Button.VisibilityProperty, new Binding("SuspendVideoVisibility") { Source = this });
-            this.galleryViewBtn.SetBinding(Button.VisibilityProperty, new Binding("GalleryViewButtonVisibility") { Source = this });
-            this.speakerViewBtn.SetBinding(Button.VisibilityProperty, new Binding("SpeakerViewButtonVisibility") { Source = this });
-            this.requestSpeakBtn.SetBinding(Button.VisibilityProperty, new Binding("RequestSpeakVisibility") { Source = this });
+            this.shareModeBtn.SetBinding(Button.VisibilityProperty, new Binding("ShareModeVisibility") { Source = this });
+            this.switchLayoutBtn.SetBinding(Button.VisibilityProperty, new Binding("SwitchLayoutVisibility") { Source = this });
+            this.moreModeBtn.SetBinding(Button.VisibilityProperty, new Binding("MoreModeVisibility") { Source = this });
             this.showShareBtn.SetBinding(Button.VisibilityProperty, new Binding("ShowShareVisibility") { Source = this });
             
             CallController.Instance.CallStatusChanged += OnCallStatusChanged;
             CallController.Instance.ContentStreamStatusChanged += OnContentStreamStatusChanged;
             
-            RequestSpeakVisibility = Visibility.Collapsed;
-
             this.Loaded += LayoutOperationbarWindow_Loaded;
             EVSdkManager.Instance.EventWhiteBoardIndication += EVSdkWrapper_EventWhiteBoardIndication;
             EVSdkManager.Instance.EventParticipant += EVSdkWrapper_EventParticipant;
+            EVSdkManager.Instance.EventRemoteMicMuted += EVSdkWrapper_EventRemoteMicMuted;
             LoginManager.Instance.PropertyChanged += LoginManager_PropertyChanged;
         }
-
+        
         #endregion
 
         #region -- Public Methods --
@@ -353,6 +425,11 @@ namespace EasyVideoWin.View
             ////}
         }
 
+        public void UnmuteAudio()
+        {
+            MuteAudioBtn_Click(this, null);
+        }
+
         #endregion
 
         #region -- Private Methods --
@@ -446,12 +523,12 @@ namespace EasyVideoWin.View
                     Application.Current.Dispatcher.InvokeAsync(() => {
                         CloseSendContentWin();
                         ReleaseWhiteBoard();
-                        RequestSpeakVisibility = Visibility.Collapsed;
                     });
                     
                     RestoreIconState();
                     HideSelectShareContentModeWindow();
-                    
+                    HideSelectMoreContentModeWindow();
+
                     break;
             }
 
@@ -571,7 +648,8 @@ namespace EasyVideoWin.View
             DisplayUtil.SetWndOnSuitableScreen(_receiveContentWin, VideoPeopleWindow.Instance);
             _receiveContentWin.AdjustWindowSize();
             //change the content window to max size to get clearer content.
-            _receiveContentWin.TitleConfNumberLabel.Content = CallController.Instance.ConferenceNumber;
+            //_receiveContentWin.TitleConfNumberLabel.Content = CallController.Instance.IsP2pCall ? CallController.Instance.PeerDisplayName : CallController.Instance.ConferenceNumber;
+            _receiveContentWin.TitleConfNumberLabel.Content = CallController.Instance.IsP2pCall ? "" : CallController.Instance.ConferenceNumber;
 
             // do not max the content window to max to avoid max handy once time.
             //if (VideoPeopleWindow.Instance.WindowState == WindowState.Maximized && VideoPeopleWindow.Instance.FullScreenStatus)
@@ -725,22 +803,50 @@ namespace EasyVideoWin.View
         {
             ConfManagementChanged?.Invoke(sender, new EventArgs());
         }
-
-        private void GalleryViewBtn_Click(object sender, RoutedEventArgs e)
+        
+        private void SwitchLayoutBtn_Click(object sender, RoutedEventArgs e)
         {
-            SvcLyoutModeChanged?.Invoke(false);
+            switch (LayoutMode)
+            {
+                case LayoutModeType.GALLERY_MODE:
+                    SvcLyoutModeChanged?.Invoke(LayoutModeType.NEW_SPEAKER_MODE);
+                    break;
+                case LayoutModeType.NEW_SPEAKER_MODE:
+                    SvcLyoutModeChanged?.Invoke(LayoutModeType.TRADITIONAL_SPEAKER_MODE);
+                    break;
+                case LayoutModeType.TRADITIONAL_SPEAKER_MODE:
+                    SvcLyoutModeChanged?.Invoke(LayoutModeType.GALLERY_MODE);
+                    break;
+            }
+            
         }
 
-        private void SpeakerViewBtn_Click(object sender, RoutedEventArgs e)
+        private void MoreMode_Click(object sender, RoutedEventArgs e)
         {
-            SvcLyoutModeChanged?.Invoke(true);
-        }
+            if (_isShowSelectedMoreContentMode)
+            {
+                log.Info("close SelectMoreContentMode Window");
+                HideSelectMoreContentModeWindow();
+            }
+            else
+            {
+                log.Info("init and show SelectMoreContentMode Window");
+                if (_selectMoreContentModeWindow == null)
+                {
+                    bool showSwitch2AudioMode = LoginManager.Instance.LoginUserInfo.featureSupport.switchingToAudioConference && MediaModeType.VIDEO_NORMAL == MediaMode;
+                    _selectMoreContentModeWindow = new SelectMoreContentModeWindow(showSwitch2AudioMode, IsRemoteMuted, LoginManager.Instance.LoginUserInfo.featureSupport.sitenameIsChangeable);
+                }
 
-        private void RequestSpeak_Click(object sender, RoutedEventArgs e)
-        {
-            log.Info("Request speak.");
-            EventRequestSpeaker?.Invoke();
-            EVSdkManager.Instance.RequestRemoteUnmute(true);
+                _selectMoreContentModeWindow.Owner = this;
+                _selectMoreContentModeWindow.Top = this.Top - _selectMoreContentModeWindow.Height - 5;
+                Vector vectorNormal = VisualTreeHelper.GetOffset(this.normalButtonsDockPanel);
+                Vector vectorMore = VisualTreeHelper.GetOffset(this.moreModeBtn);
+                _selectMoreContentModeWindow.Left = this.Left + vectorNormal.X + vectorMore.X + this.moreModeBtn.ActualWidth / 2 - _selectMoreContentModeWindow.Width / 2;
+
+                _selectMoreContentModeWindow.Show();
+                _selectMoreContentModeWindow.ListenerSelectedMoreContent += new SelectMoreContentModeWindow.ListenerSelectedMoreContentHandler(SelectedMoreContentMode);
+                _isShowSelectedMoreContentMode = true;
+            }
         }
 
         private void ShowShare_Click(object sender, RoutedEventArgs e)
@@ -788,11 +894,11 @@ namespace EasyVideoWin.View
                 }
 
                 _selectShareContentModeWindow.Owner = this;
-                _selectShareContentModeWindow.Top = this.Top - _selectShareContentModeWindow.Height;
+                _selectShareContentModeWindow.Top = this.Top - _selectShareContentModeWindow.Height - 5;
                 Vector vectorNormal = VisualTreeHelper.GetOffset(this.normalButtonsDockPanel);
                 Vector vectorSendShare = VisualTreeHelper.GetOffset(this.shareModeBtn);
 
-                _selectShareContentModeWindow.Left = this.Left + vectorNormal.X + vectorSendShare.X;
+                _selectShareContentModeWindow.Left = this.Left + vectorNormal.X + vectorSendShare.X + this.shareModeBtn.ActualWidth / 2 - _selectShareContentModeWindow.Width / 2;
 
                 _selectShareContentModeWindow.Show();
                 _selectShareContentModeWindow.ListenerSelectedShareContent += new SelectShareContentModeWindow.ListenerSelectedShareContentHandler(SelectedShareContentMode);
@@ -814,6 +920,7 @@ namespace EasyVideoWin.View
 
         private void HangupBtn_Click(object sender, RoutedEventArgs e)
         {
+            log.Info("HangupBtn_Click");
             CallController.Instance.TerminateCall();
         }
 
@@ -967,7 +1074,7 @@ namespace EasyVideoWin.View
         {
             log.Info("CloseWhiteboard");
 
-            var contentStatus = CallController.Instance.CurrentContentStreamStatus;
+            ContentStreamStatus contentStatus = CallController.Instance.CurrentContentStreamStatus;
             if (ContentStreamStatus.SendingWhiteBoardStarted == contentStatus)
             {
                 CallController.Instance.StopContent();
@@ -990,7 +1097,65 @@ namespace EasyVideoWin.View
         {
             OnPropertyChanged("ShowShareVisibility");
         }
-                
+
+        private void SelectedMoreContentMode(MoreContentMode mode)
+        {
+            if (MoreContentMode.Switch2AudioMode == mode)
+            {
+                Switch2AudioMode();
+            }
+            else if (MoreContentMode.RequestSpeak == mode)
+            {
+                RequestSpeak();
+            }
+            else if (MoreContentMode.ChangeDisplayName == mode)
+            {
+                ChangeDisplayName();
+            }
+            HideSelectMoreContentModeWindow();
+        }
+
+        private void Switch2AudioMode()
+        {
+            log.Info("SwitchAudioMode");
+            CallController.Instance.Switch2AudioMode();
+            EventSwitch2AudioMode?.Invoke();
+        }
+        
+        private void RequestSpeak()
+        {
+            log.Info("RequestSpeak");
+            EventRequestSpeaker?.Invoke();
+            EVSdkManager.Instance.RequestRemoteUnmute(true);
+        }
+
+        private void ChangeDisplayName()
+        {
+            ChangeDisplayNameWindow dlg = new ChangeDisplayNameWindow();
+            dlg.Owner = this;
+            dlg.ConfirmEvent += (displayName) =>
+            {
+                this.Activate();
+                if (EVSdkManager.Instance.SetInConfDisplayName(displayName))
+                {
+                    EventDisplayNameChanged?.Invoke(displayName);
+                }
+                else
+                {
+                    log.Info("Failed to ChangeDisplayName");
+                }
+                _isChangeDisplayNameWinShown = false;
+                dlg.Close();
+            };
+            dlg.CloseEvent += (sender, e) =>
+            {
+                this.Activate();
+                _isChangeDisplayNameWinShown = false;
+            };
+            _isChangeDisplayNameWinShown = true;
+            dlg.ShowDialog();
+        }
+
         private void SelectedShareContentMode(ShareContentMode mode)
         {
             if (ShareContentMode.ScreenShare == mode)
@@ -1285,8 +1450,27 @@ namespace EasyVideoWin.View
                 _selectShareContentModeWindow = null;
             });
         }
-       
-        
+
+        private void HideSelectMoreContentModeWindow()
+        {
+            Application.Current.Dispatcher.InvokeAsync(() => {
+                if (!_isShowSelectedMoreContentMode)
+                {
+                    return;
+                }
+                log.Info("Hide SelectMoreContentModeWindow");
+                _isShowSelectedMoreContentMode = false;
+                if (null == _selectMoreContentModeWindow)
+                {
+                    return;
+                }
+                _selectMoreContentModeWindow.ListenerSelectedMoreContent -= new SelectMoreContentModeWindow.ListenerSelectedMoreContentHandler(SelectedMoreContentMode);
+                //_selectMoreContentModeWindow.Hide();
+                _selectMoreContentModeWindow.Close();
+                _selectMoreContentModeWindow = null;
+            });
+        }
+
         private void ShowNormalCellsBtn_Click(object sender, RoutedEventArgs e)
         {
             ShowNormalCellsChanged?.Invoke(sender, new EventArgs());
@@ -1296,6 +1480,14 @@ namespace EasyVideoWin.View
         {
             Application.Current.Dispatcher.InvokeAsync(() => {
                 this.confManagementBtn.ExtraInfoText = number.ToString();
+            });
+        }
+
+        private void EVSdkWrapper_EventRemoteMicMuted(bool micMuted)
+        {
+            log.InfoFormat("EVSdkWrapper_EventRemoteMicMuted: {0}", micMuted);
+            Application.Current.Dispatcher.InvokeAsync(() => {
+                IsAudioMuted = !CallController.Instance.IsMicEnabled();
             });
         }
 
@@ -1311,6 +1503,10 @@ namespace EasyVideoWin.View
                 log.Info("LoginToken updated and GetWhiteBoardPresenterName");
                 GetWhiteBoardPresenterName(_presenterDeviceId);
             }
+            else if ("LoginUserInfo" == e.PropertyName)
+            {
+                OnPropertyChanged("MoreModeVisibility");
+            }
         }
 
         #endregion
@@ -1320,6 +1516,7 @@ namespace EasyVideoWin.View
         override protected void OnWindowHidden()
         {
             HideSelectShareContentModeWindow();
+            HideSelectMoreContentModeWindow();
         }
 
         protected override void OnClosed(EventArgs e)

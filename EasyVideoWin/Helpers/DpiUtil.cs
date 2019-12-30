@@ -101,8 +101,8 @@ namespace EasyVideoWin.Helpers
             {
                 throw new DllNotFoundException("Dll file not find.");
             }
-            var pnt = new System.Drawing.Point(screen.Bounds.Left + 1, screen.Bounds.Top + 1);
-            var mon = MonitorFromPoint(pnt, 2/*MONITOR_DEFAULTTONEAREST*/);
+            System.Drawing.Point pnt = new System.Drawing.Point(screen.Bounds.Left + 1, screen.Bounds.Top + 1);
+            IntPtr mon = MonitorFromPoint(pnt, 2/*MONITOR_DEFAULTTONEAREST*/);
             GetDpiForMonitor(mon, DpiType.Effective, out dpiX, out dpiY);
         }
 
@@ -144,7 +144,7 @@ namespace EasyVideoWin.Helpers
         {
             dpiX = 96;
             dpiY = 96;
-            var currentScreen = GetScreenByHandle(handle);
+            System.Windows.Forms.Screen currentScreen = GetScreenByHandle(handle);
             try
             {
                 GetDpiByScreen(currentScreen, out dpiX, out dpiY);
@@ -159,7 +159,7 @@ namespace EasyVideoWin.Helpers
         {
             uint dpiX = 96;
             uint dpiY = 96;
-            var currentScreen = GetScreenByHandle(handle);
+            System.Windows.Forms.Screen currentScreen = GetScreenByHandle(handle);
             try
             {
                 GetDpiByScreen(currentScreen, out dpiX, out dpiY);

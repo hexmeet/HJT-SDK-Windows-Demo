@@ -32,6 +32,6 @@ namespace EasyVideoWin.ViewModel
 
             CallController.Instance.UpdateUserImage(Utils.GetSuspendedVideoBackground(), Utils.GetCurrentAvatarPath());
             CallController.Instance.JoinConference(conferenceNumber, displayName, password);
-        }        
+        }
     }
 }

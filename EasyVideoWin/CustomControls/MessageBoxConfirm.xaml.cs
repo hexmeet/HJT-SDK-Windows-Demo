@@ -13,7 +13,8 @@ namespace EasyVideoWin.CustomControls
         private bool _resize = true;
         private IMasterDisplayWindow _ownerWindow;
         public event EventHandler ConfirmEvent;
-        
+        public event EventHandler CloseEvent;
+
         private MessageBoxConfirm()
         {
             InitializeComponent();
@@ -41,6 +42,7 @@ namespace EasyVideoWin.CustomControls
 
         private void CloseBtn_Click(object sender, RoutedEventArgs e)
         {
+            CloseEvent?.Invoke(this, new EventArgs());
             this.Close();
         }
 
@@ -51,17 +53,17 @@ namespace EasyVideoWin.CustomControls
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (_resize)
-            {
-                Rect rect = MessageBoxUtil.GetOwnerWindowRect(this, _ownerWindow);
-                if (0 != rect.Width)
-                {
-                    this.Width = rect.Width;
-                    this.Height = rect.Height;
-                    this.Left = rect.Left;
-                    this.Top = rect.Top;
-                }
-            }
+            //if (_resize)
+            //{
+            //    Rect rect = MessageBoxUtil.GetOwnerWindowRect(this, _ownerWindow);
+            //    if (0 != rect.Width)
+            //    {
+            //        this.Width = rect.Width;
+            //        this.Height = rect.Height;
+            //        this.Left = rect.Left;
+            //        this.Top = rect.Top;
+            //    }
+            //}
         }
     }
 }

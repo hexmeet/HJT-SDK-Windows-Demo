@@ -24,13 +24,18 @@ namespace EasyVideoWin.ViewModel
         private float _backgroundOpacity;
         private Visibility _headerImageVisibility;
         private string _foreground;
-        
+        private Visibility _videoAnswerVisibility;
+        private Visibility _confNumberVisibility;
+        private string _peerDisplayName;
+        private string _peerImageUrl;
+        private string _invitingInfo;
         #endregion
 
         #region -- Properties --
 
         public RelayCommand HangupCommand { get; private set; }
-        
+        public RelayCommand VideoAnswerCommand { get; private set; }
+
         public string ConferenceNumber
         {
             get
@@ -96,6 +101,74 @@ namespace EasyVideoWin.ViewModel
             }
         }
 
+        public Visibility VideoAnswerVisibility
+        {
+            get
+            {
+                return _videoAnswerVisibility;
+            }
+            private set
+            {
+                _videoAnswerVisibility = value;
+                OnPropertyChanged("VideoAnswerVisibility");
+            }
+        }
+
+        public Visibility ConfNumberVisibility
+        {
+            get
+            {
+                return _confNumberVisibility;
+            }
+            private set
+            {
+                _confNumberVisibility = value;
+                OnPropertyChanged("ConfNumberVisibility");
+            }
+        }
+
+        public string PeerDisplayName
+        {
+            get
+            {
+                return _peerDisplayName;
+            }
+            private set
+            {
+                _peerDisplayName = value;
+                OnPropertyChanged("PeerDisplayName");
+            }
+        }
+
+        public string PeerImageUrl
+        {
+            get
+            {
+                return _peerImageUrl;
+            }
+            private set
+            {
+                if (_peerImageUrl != value)
+                {
+                    _peerImageUrl = value;
+                    OnPropertyChanged("PeerImageUrl");
+                }
+            }
+        }
+
+        public string InvitingInfo
+        {
+            get
+            {
+                return _invitingInfo;
+            }
+            private set
+            {
+                _invitingInfo = value;
+                OnPropertyChanged("InvitingInfo");
+            }
+        }
+
         #endregion
         //private Dispatcher _workerDispatcher;
 
@@ -104,11 +177,12 @@ namespace EasyVideoWin.ViewModel
         public DialingViewModel()
         {
             HangupCommand = new RelayCommand(Hangup);
+            VideoAnswerCommand = new RelayCommand(VideoAnswer);
 
             SetDefaultSetting();
             
-            CallController.Instance.PropertyChanged += OnCallControllerPropertyChanged;
             CallController.Instance.CallStatusChanged += OnCallStatusChanged;
+            EVSdkManager.Instance.EventPeerImageUrl += EVSdkManager_EventPeerImageUrl;
             //ManualResetEvent dispatcherReadyEvent = new ManualResetEvent(false);
 
             //Thread t = new Thread(new ThreadStart(() =>
@@ -123,7 +197,7 @@ namespace EasyVideoWin.ViewModel
 
             //dispatcherReadyEvent.WaitOne();
         }
-
+        
         #endregion
 
         #region -- Private Methods --
@@ -131,28 +205,54 @@ namespace EasyVideoWin.ViewModel
         private void OnCallStatusChanged(object sender, CallStatus status)
         {
             log.Info("OnCallStatusChanged start.");
-            switch (status)
+            if (CallStatus.Ended == status || CallStatus.Idle == status)
             {
-                case CallStatus.Ended:
+                log.Info("Call Ended or status, empty ConferenceNumber");
+                ConferenceNumber = "";
+                if (CallStatus.Ended == status)
+                {
                     SetDefaultSetting();
-                    break;
-                default:
-                    break;
+                }
+                PeerImageUrl = "";
             }
-            log.Info("OnCallStatusChanged end.");
-        }
-
-        private void OnCallControllerPropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
-            if ("ConferenceNumber" == args.PropertyName)
+            else if (CallStatus.ConfIncoming == status || CallStatus.P2pIncoming == status)
             {
-                OnConferenceNumberChanged(CallController.Instance.ConferenceNumber);
+                VideoAnswerVisibility = Visibility.Visible;
+                ConfNumberVisibility = Visibility.Collapsed;
+                PeerDisplayName = CallController.Instance.CallInfo.peer;
+                if (CallStatus.P2pIncoming == status)
+                {
+                    InvitingInfo = LanguageUtil.Instance.GetValueByKey("INVITING_YOU");
+                }
+                else if (CallStatus.ConfIncoming == status)
+                {
+                    if (string.IsNullOrEmpty(PeerDisplayName))
+                    {
+                        InvitingInfo = string.Format(LanguageUtil.Instance.GetValueByKey("INVITED_JOIN_CONF_PROMPT"), CallController.Instance.CallInfo.conference_number);
+                    }
+                    else
+                    {
+                        InvitingInfo = string.Format(LanguageUtil.Instance.GetValueByKey("ADMIN_INVITE_YOU_JOIN_CONF_PROMPT"), CallController.Instance.CallInfo.conference_number);
+                    }
+                }
             }
-        }
-
-        private void OnConferenceNumberChanged(string conferenceNumber)
-        {
-            ConferenceNumber = conferenceNumber;
+            else if (CallStatus.Dialing == status)
+            {
+                if (CallController.Instance.IsP2pCall)
+                {
+                    ConferenceNumber = CallController.Instance.PeerDisplayName;
+                }
+                else
+                {
+                    ConferenceNumber = CallController.Instance.ConferenceNumber;
+                }
+                log.InfoFormat("Dialing, set ConferenceNumber: {0}", ConferenceNumber);
+                VideoAnswerVisibility = Visibility.Collapsed;
+                ConfNumberVisibility = Visibility.Visible;
+                PeerDisplayName = "";
+            }
+            
+            log.Info("OnCallStatusChanged end.");
         }
         
         private void SetDefaultSetting()
@@ -165,7 +265,30 @@ namespace EasyVideoWin.ViewModel
         
         private void Hangup(object parameter)
         {
-            CallController.Instance.TerminateCall();
+            log.Info("Hangup");
+            
+            if (CallStatus.ConfIncoming == CallController.Instance.CurrentCallStatus || CallStatus.P2pIncoming == CallController.Instance.CurrentCallStatus)
+            {
+                CallController.Instance.CurrentCallStatus = CallStatus.Idle;
+                CallController.Instance.DeclineIncommingCall(CallController.Instance.CallInfo.conference_number);
+            }
+            else
+            {
+                CallController.Instance.TerminateCall();
+            }
+        }
+
+        private void VideoAnswer(object parameter)
+        {
+            log.Info("VideoAnswer");
+            CallController.Instance.UpdateUserImage(Utils.GetSuspendedVideoBackground(), Utils.GetCurrentAvatarPath());
+            CallController.Instance.JoinConference(CallController.Instance.CallInfo.conference_number, LoginManager.Instance.DisplayName, CallController.Instance.CallInfo.password, ManagedEVSdk.Structs.EV_SVC_CALL_TYPE_CLI.EV_SVC_CALL_CONF);
+        }
+
+        private void EVSdkManager_EventPeerImageUrl(string imageUrl)
+        {
+            log.InfoFormat("EVSdkManager_EventPeerImageUrl: {0}", imageUrl);
+            PeerImageUrl = imageUrl;
         }
 
         #endregion

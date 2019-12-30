@@ -123,14 +123,14 @@ namespace EasyVideoWin.Helpers
                 //    bmp.Save(path, ImageFormat.Png);
                 //}
 
-                var nImage = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
+                BitmapSource nImage = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
                                 hbitmap, IntPtr.Zero, System.Windows.Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
                 log.InfoFormat("Snapped image, PixelWidth:{0}, PixelHeight:{1}, Width:{2}, Height:{3}", nImage.PixelWidth, nImage.PixelHeight, nImage.Width, nImage.Height);
-                var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
+                System.Windows.Media.Imaging.PngBitmapEncoder encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
                 encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(nImage));
                 try
                 {
-                    using (var stream = new FileStream(path, FileMode.Create))
+                    using (FileStream stream = new FileStream(path, FileMode.Create))
                     {
                         encoder.Save(stream);
                     }

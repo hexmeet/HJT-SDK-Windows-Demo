@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,6 +18,12 @@ namespace EasyVideoWin.Helpers
 
         private PerformanceCounter _performanceCounter;
         private bool _initialized = false;
+
+        [DllImport("KERNEL32.DLL", EntryPoint = "SetProcessWorkingSetSize", SetLastError = true, CallingConvention = CallingConvention.StdCall)]
+        internal static extern bool SetProcessWorkingSetSize(IntPtr pProcess, int dwMinimumWorkingSetSize, int dwMaximumWorkingSetSize);
+
+        [DllImport("KERNEL32.DLL", EntryPoint = "GetCurrentProcess", SetLastError = true, CallingConvention = CallingConvention.StdCall)]
+        internal static extern IntPtr GetCurrentProcess();
 
         #endregion
 
@@ -68,11 +75,13 @@ namespace EasyVideoWin.Helpers
             {
                 return;
             }
-            log.InfoFormat("Before collect garbage. Process memory: {0}, GC memory: {1}", _performanceCounter.NextValue(), GC.GetTotalMemory(true));
+            log.InfoFormat("GC. Process memory: {0}, GC memory: {1}", _performanceCounter.NextValue(), GC.GetTotalMemory(true));
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
-            log.InfoFormat("After garbage collected. Process memory: {0}, GC memory: {1}", _performanceCounter.NextValue(), GC.GetTotalMemory(true));
+            IntPtr pHandle = GetCurrentProcess();
+            SetProcessWorkingSetSize(pHandle, -1, -1);
+            log.InfoFormat("GC done. Process memory: {0}, GC memory: {1}", _performanceCounter.NextValue(), GC.GetTotalMemory(true));
         }
 
         #endregion

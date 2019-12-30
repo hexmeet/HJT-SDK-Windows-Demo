@@ -128,7 +128,7 @@ namespace EasyVideoWin.Helpers
         {
             if (Win2000OrLater)
             {
-                var fi = Create_FLASHWINFO(handle, FLASHW_ALL, uint.MaxValue, 0);
+                FLASHWINFO fi = Create_FLASHWINFO(handle, FLASHW_ALL, uint.MaxValue, 0);
                 return FlashWindowEx(ref fi);
             }
             return false;
@@ -143,7 +143,7 @@ namespace EasyVideoWin.Helpers
         {
             if (Win2000OrLater)
             {
-                var fi = Create_FLASHWINFO(handle, FLASHW_STOP, uint.MaxValue, 0);
+                FLASHWINFO fi = Create_FLASHWINFO(handle, FLASHW_STOP, uint.MaxValue, 0);
                 return FlashWindowEx(ref fi);
             }
             return false;

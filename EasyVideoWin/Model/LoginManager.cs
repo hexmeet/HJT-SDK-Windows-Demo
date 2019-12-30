@@ -10,6 +10,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -216,8 +217,40 @@ namespace EasyVideoWin.Model
                 }
             }
         }
-
-        public EVUserInfoCli LoginUserInfo { get; set; }
+        
+        public EVUserInfoCli _loginUserInfo;
+        public EVUserInfoCli LoginUserInfo
+        {
+            get
+            {
+                return _loginUserInfo;
+            }
+            set
+            {
+                _loginUserInfo = value;
+                if (null == _loginUserInfo)
+                {
+                    log.Info("_loginUserInfo is null");
+                }
+                else
+                {
+                    if (null == _loginUserInfo.featureSupport)
+                    {
+                        log.Info("_loginUserInfo.featureSupport is null");
+                    }
+                    else
+                    {
+                        log.InfoFormat("_loginUserInfo.featureSupport, chatInConference: {0}, contactWebPage: {1}, p2pCall: {2}, sitenameIsChangeable: {3}, switchingToAudioConference: {4}"
+                            , _loginUserInfo.featureSupport.chatInConference
+                            , _loginUserInfo.featureSupport.contactWebPage
+                            , _loginUserInfo.featureSupport.p2pCall
+                            , _loginUserInfo.featureSupport.sitenameIsChangeable
+                            , _loginUserInfo.featureSupport.switchingToAudioConference);
+                    }
+                }
+                OnPropertyChanged("LoginUserInfo");
+            }
+        }
         
         private string _loginToken;
         public string LoginToken
@@ -520,10 +553,16 @@ namespace EasyVideoWin.Model
             _serverDomainAddress = domainAddress;
             LoginPassword = pwd;
             CurrentLoginStatus = LoginStatus.LoggingIn;
-            EVSdkManager.Instance.LoginWithLocation(domainAddress, ServerPort, userName, pwd);
+
+            Task.Run(() => {
+                // When click button login in login dialog, the LoginWithLocation may block the UI thread and ProgressDialogLogin can not be displayed.
+                // So exec LoginWithLocation in another thread.
+                EVSdkManager.Instance.LoginWithLocation(domainAddress, ServerPort, userName, pwd);
+            });
 
             Application.Current.Dispatcher.InvokeAsync(() =>
             {
+                log.Info("Show ProgressDialogLogin");
                 DisplayUtil.SetWindowCenterAndOwner(ProgressDialogLogin.Instance, (IMasterDisplayWindow)LoginWindow);
                 ProgressDialogLogin.Instance.ShowDialog();
             });
@@ -669,7 +708,13 @@ namespace EasyVideoWin.Model
             if (null == userInfo)
             {
                 log.Info("Failed to update login token");
-                if (logoutWhenFailed)
+                if (
+                       logoutWhenFailed
+                    && CallStatus.ConfIncoming != CallController.Instance.CurrentCallStatus
+                    && CallStatus.P2pIncoming != CallController.Instance.CurrentCallStatus
+                    && CallStatus.P2pOutgoing != CallController.Instance.CurrentCallStatus
+                    && CallStatus.Connected != CallController.Instance.CurrentCallStatus
+                )
                 {
                     CurrentLoginStatus = LoginStatus.NotLogin;
                     log.Info("Failed to update token and logout.");

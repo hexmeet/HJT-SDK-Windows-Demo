@@ -272,12 +272,34 @@ int EVSdkWrapper::EVEngineSetMaxRecvVideo(unsigned int num)
     return m_pEVEngine->setMaxRecvVideo(num);
 }
 
+int EVSdkWrapper::EVEngineSetLayoutCapacity(Structs::EV_LAYOUT_MODE_CLI mode, array<Structs::EV_LAYOUT_TYPE_CLI>^ types)
+{
+    ev::engine::EV_LAYOUT_TYPE* evLayoutTypes = new ev::engine::EV_LAYOUT_TYPE[types->Length];
+    for (auto i = 0; i < types->Length; ++i)
+    {
+        evLayoutTypes[i] = safe_cast<ev::engine::EV_LAYOUT_TYPE>(types[i]);
+    }
+    int rst = m_pEVEngine->setLayoutCapacity(safe_cast<ev::engine::EV_LAYOUT_MODE>(mode), evLayoutTypes, types->Length);
+    delete[] evLayoutTypes;
+    return rst;
+}
+
 int EVSdkWrapper::EVEngineJoinConference(System::String^ conferenceNumber, System::String^ displayName, System::String^ password)
 {
     std::string szConferenceNumber = msclr::interop::marshal_as<std::string>(conferenceNumber);
     char * pszName = Utils::ManagedStr2Utf8Char(displayName);
     std::string szPassword = msclr::interop::marshal_as<std::string>(password);
     int rst = m_pEVEngine->joinConference(szConferenceNumber.c_str(), pszName, szPassword.c_str());
+    delete[] pszName;
+    return rst;
+}
+
+int EVSdkWrapper::EVEngineJoinConference(System::String^ number, System::String^ displayName, System::String^ password, Structs::EV_SVC_CALL_TYPE_CLI type)
+{
+    std::string szConferenceNumber = msclr::interop::marshal_as<std::string>(number);
+    char * pszName = Utils::ManagedStr2Utf8Char(displayName);
+    std::string szPassword = msclr::interop::marshal_as<std::string>(password);
+    int rst = m_pEVEngine->joinConference(szConferenceNumber.c_str(), pszName, szPassword.c_str(), safe_cast<ev::engine::EV_SVC_CALL_TYPE>(type));
     delete[] pszName;
     return rst;
 }
@@ -307,6 +329,12 @@ int EVSdkWrapper::EVEngineJoinConferenceWithLocation(System::String^ locationSer
 int EVSdkWrapper::EVEngineLeaveConference()
 {
     return m_pEVEngine->leaveConference();
+}
+
+int EVSdkWrapper::EVEngineDeclineIncommingCall(System::String^ conferenceNumber)
+{
+    std::string szConferenceNumber = msclr::interop::marshal_as<std::string>(conferenceNumber);
+    return m_pEVEngine->declineIncommingCall(szConferenceNumber.c_str());
 }
 
 bool EVSdkWrapper::EVEngineCameraEnabled()
@@ -387,6 +415,22 @@ int EVSdkWrapper::EVEngineGetStats(Structs::EVStatsCli^ %statsCli)
     return rst;
 }
 
+int EVSdkWrapper::EVEngineSetVideoActive(int active)
+{
+    return m_pEVEngine->setVideoActive(active);
+}
+
+int EVSdkWrapper::EVEngineVideoActive()
+{
+    return m_pEVEngine->videoActive();
+}
+
+int EVSdkWrapper::EVEngineSetInConfDisplayName(System::String^ displayName)
+{
+    std::string szName = Utils::ManagedStr2Utf8Str(displayName);
+    return m_pEVEngine->setInConfDisplayName(szName.c_str(), szName.size());
+}
+
 
 //Send Content
 int EVSdkWrapper::EVEngineSendContent()
@@ -462,6 +506,13 @@ void EVSdkWrapper::OnCallConnected(ev::engine::EVCallInfo& info)
     Structs::EVCallInfoCli^ callInfoCli = gcnew Structs::EVCallInfoCli();
     callInfoCli->Unmanaged2ManagedStruct(info);
     EventCallConnected(callInfoCli);
+}
+
+void EVSdkWrapper::OnCallPeerConnected(ev::engine::EVCallInfo& info)
+{
+    Structs::EVCallInfoCli^ callInfoCli = gcnew Structs::EVCallInfoCli();
+    callInfoCli->Unmanaged2ManagedStruct(info);
+    EventCallPeerConnected(callInfoCli);
 }
 
 void EVSdkWrapper::OnCallEnd(ev::engine::EVCallInfo& info)
@@ -550,6 +601,16 @@ void EVSdkWrapper::OnWhiteBoardIndication(ev::engine::EVWhiteBoardInfo & info)
 void EVSdkWrapper::OnParticipant(int number)
 {
     EventParticipant(number);
+}
+
+void EVSdkWrapper::OnMicMutedShow(int micMuted)
+{
+    EventMicMutedShow(micMuted);
+}
+
+void EVSdkWrapper::OnPeerImageUrl(const char* imageUrl)
+{
+    EventPeerImageUrl(msclr::interop::marshal_as<System::String^>(imageUrl));
 }
 
 void EVSdkWrapper::OutputLog(System::String^ %str)

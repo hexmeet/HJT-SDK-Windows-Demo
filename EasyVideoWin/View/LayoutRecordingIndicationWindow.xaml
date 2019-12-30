@@ -10,11 +10,11 @@
     <Grid>
         <Grid Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
             <Border x:Name="btnBorder" Background="#66000000" CornerRadius="2" Padding="2">
-                <StackPanel Orientation="Horizontal" Cursor="Hand" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Ellipse Width="10" Height="10" Fill="#ff2a3c" Margin="10, 2, 0, 2">
                         
                     </Ellipse>
-                    <TextBlock x:Name="typeTitle" Cursor="Hand" FontSize="14" Foreground="#FFFFFF" Margin="5, 2, 10, 2" Text="REC"></TextBlock>
+                    <TextBlock x:Name="typeTitle" FontSize="14" Foreground="#FFFFFF" Margin="5, 2, 10, 2" Text="REC"></TextBlock>
                 </StackPanel>
             </Border>
         </Grid>

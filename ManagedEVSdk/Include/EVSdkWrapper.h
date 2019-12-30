@@ -45,6 +45,7 @@ public:
     event System::Action<bool>^ EventRegister;
     //event System::Action<Structs::EVCallInfoCli^>^ EventCallIncoming;
     event System::Action<Structs::EVCallInfoCli^>^ EventCallConnected;
+    event System::Action<Structs::EVCallInfoCli^>^ EventCallPeerConnected;
     event System::Action<Structs::EVCallInfoCli^>^ EventCallEnd;
     event System::Action<Structs::EVContentInfoCli^>^ EventContent;
     event System::Action<System::String^>^ EventDownloadUserImageComplete;
@@ -59,6 +60,8 @@ public:
     event System::Action<Structs::EVMessageOverlayCli^>^ EventMessageOverlay;
     event System::Action<Structs::EVWhiteBoardInfoCli^>^ EventWhiteBoardIndication;
     event System::Action<int>^ EventParticipant;
+    event System::Action<int>^ EventMicMutedShow;
+    event System::Action<System::String^>^ EventPeerImageUrl;
 
 	event System::Action<System::String^>^ EventManagedLog;
 
@@ -105,10 +108,13 @@ public:
     int EVEngineSetBandwidth(unsigned int kbps);
     unsigned int EVEngineGetBandwidth();
     int EVEngineSetMaxRecvVideo(unsigned int num);
+    int EVEngineSetLayoutCapacity(Structs::EV_LAYOUT_MODE_CLI mode, array<Structs::EV_LAYOUT_TYPE_CLI>^ types);
     int EVEngineJoinConference(System::String^ conferenceNumber, System::String^ displayName, System::String^ password);
+    int EVEngineJoinConference(System::String^ number, System::String^ displayName, System::String^ password, Structs::EV_SVC_CALL_TYPE_CLI type);
     int EVEngineJoinConference(System::String^ server, unsigned int port, System::String^ conferenceNumber, System::String^ displayName, System::String^ password);
     int EVEngineJoinConferenceWithLocation(System::String^ locationServer, unsigned int port, System::String^ conferenceNumber, System::String^ displayName, System::String^ password);
     int EVEngineLeaveConference();
+    int EVEngineDeclineIncommingCall(System::String^ conferenceNumber);
     bool EVEngineCameraEnabled();
     int EVEngineEnableCamera(bool enable);
     bool EVEngineMicEnabled();
@@ -122,6 +128,9 @@ public:
     int EVEngineSetLayout(Structs::EVLayoutRequestCli^ layout);
     float EVEngineGetNetworkQuality();
     int EVEngineGetStats(Structs::EVStatsCli^ %stats);
+    int EVEngineSetVideoActive(int active);
+    int EVEngineVideoActive();
+    int EVEngineSetInConfDisplayName(System::String^ displayName);
 
     //Send Content
     int EVEngineSendContent();
@@ -139,6 +148,7 @@ public:
     void OnRegister(bool registered);
     void OnCallIncoming(ev::engine::EVCallInfo& info);
     void OnCallConnected(ev::engine::EVCallInfo& info);
+    void OnCallPeerConnected(ev::engine::EVCallInfo& info);
     void OnCallEnd(ev::engine::EVCallInfo& info);
     void OnContent(ev::engine::EVContentInfo& info);
     void OnDownloadUserImageComplete(const char * path);
@@ -153,7 +163,8 @@ public:
     void OnMessageOverlay(ev::engine::EVMessageOverlay& msg);
     void OnWhiteBoardIndication(ev::engine::EVWhiteBoardInfo & info);
     void OnParticipant(int number);
-    
+    void OnMicMutedShow(int micMuted);
+    void OnPeerImageUrl(const char* imageUrl);
 
 
 private:

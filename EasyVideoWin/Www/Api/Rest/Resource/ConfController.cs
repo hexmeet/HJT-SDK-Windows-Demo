@@ -1,5 +1,6 @@
 ﻿#if AUTOTEST
 
+using EasyVideoWin.Enums;
 using EasyVideoWin.Helpers;
 using EasyVideoWin.ManagedEVSdk.Structs;
 using EasyVideoWin.Model;
@@ -211,7 +212,7 @@ namespace EasyVideoWin.www.api.rest
             {
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
-                    LayoutBackgroundWindow.Instance.LayoutOperationbar_SvcLayoutModeChanged(2 == svcLayoutMode.mode);
+                    LayoutBackgroundWindow.Instance.LayoutOperationbar_SvcLayoutModeChanged(2 == svcLayoutMode.mode ? LayoutModeType.NEW_SPEAKER_MODE : LayoutModeType.GALLERY_MODE );
                 });
             }
             return Content("");
@@ -246,7 +247,7 @@ namespace EasyVideoWin.www.api.rest
                 }
             }
             
-            layoutInfo.layoutMode = LayoutBackgroundWindow.Instance.IsSpeakerMode ? "Speaker" : "Gallery";
+            layoutInfo.layoutMode = LayoutModeType.GALLERY_MODE == LayoutBackgroundWindow.Instance.LayoutMode ? "Gallery" : "Speaker";
             layoutInfo.speakerName = LayoutBackgroundWindow.Instance.LayoutIndication.speaker_name;
 
             SvcMeetingInfo svcMeetingInfo = new SvcMeetingInfo()

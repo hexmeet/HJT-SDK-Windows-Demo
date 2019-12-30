@@ -7,12 +7,12 @@
         xmlns:ViewModel="clr-namespace:EasyVideoWin.ViewModel"
         xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
         mc:Ignorable="d"
-        Title="LayoutTitlebarWindow" Height="40" Width="1280" Background="#313131" WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False">
+        Title="LayoutTitlebarWindow" Height="40" Width="1280" Background="#000" WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False">
     <Window.DataContext>
         <ViewModel:LayoutTitlebarWindowViewModel/>
     </Window.DataContext>
     <StackPanel Orientation="Vertical" x:Name="contentPanel">
-        <Grid x:Name="titleBar" Background="#313131" Height="40">
+        <Grid x:Name="titleBar" Background="#000" Height="40">
             <!--<Grid.Visibility>
                 <Binding Path="ShowTitleBar" Converter="{StaticResource BoolToVis}"/>
             </Grid.Visibility>-->

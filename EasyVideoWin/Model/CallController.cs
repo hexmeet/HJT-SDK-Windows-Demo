@@ -6,13 +6,23 @@ using log4net;
 using Microsoft.WindowsAPICodePack.ApplicationServices;
 using EasyVideoWin.View;
 using EasyVideoWin.CustomControls;
+using EasyVideoWin.Enums;
 
 namespace EasyVideoWin.Model
 {
+    // 1. Idle -- Dialing -- [Connected | Ended] -- Ended
+    // 2. Dialing -- P2pOutgoing -- [Connected | PeerDeclined | TimeoutSelfCancelled] -- [Ended | Idle]
+    // 3. [P2pIncoming | ConfIncoming] -- [(Dialing -- Connected) | Idle | PeerCancelled | TimeoutSelfCancelled] -- [Ended | Idle]
     public enum CallStatus
     {
         Idle,
         Dialing,
+        P2pOutgoing,
+        PeerDeclined,
+        P2pIncoming,
+        PeerCancelled,
+        TimeoutSelfCancelled,
+        ConfIncoming,
         Connected,
         Ended
     }
@@ -72,7 +82,8 @@ namespace EasyVideoWin.Model
         }
 
         //private Dispatcher _workerDispatcher;
-        
+        public CallStatus PreviousCallStatus { get; set; }
+
         private CallStatus _callStatus = CallStatus.Idle;
         public CallStatus CurrentCallStatus
         {
@@ -85,6 +96,15 @@ namespace EasyVideoWin.Model
                 if (value != _callStatus)
                 {
                     log.InfoFormat("Call status changed from {0} to {1}", _callStatus, value);
+                    if (CallStatus.Idle == value || CallStatus.Ended == value)
+                    {
+                        log.Info("Set IsP2pCall to false");
+                        IsP2pCall = false;
+                        PeerAvatarUrl = "";
+                        PeerDisplayName = "";
+                    }
+
+                    PreviousCallStatus = _callStatus;
                     _callStatus = value;
                     CallStatusChanged?.Invoke(this, _callStatus);
                 }
@@ -119,18 +139,25 @@ namespace EasyVideoWin.Model
                 log.InfoFormat("change content stream status from {0} to {1}", _currentContentStreamStatus, value);
                 if (_currentContentStreamStatus != value)
                 {
-                    var lastStatus = _currentContentStreamStatus;
+                    ContentStreamStatus lastStatus = _currentContentStreamStatus;
                     _currentContentStreamStatus = value;
                     ContentStreamStatusChanged?.Invoke(this, new ContentStreamInfo() { LastStatus = lastStatus, CurrentStatus = value });
                 }
             }
         }
 
+        public ManagedEVSdk.Structs.EVCallInfoCli CallInfo { get; set; }
+        public string PeerAvatarUrl { get; set; }
+        public string PeerDisplayName { get; set; }
+        public bool IsP2pCall { get; set; }
+        
         public event PropertyChangedEventHandler PropertyChanged;
 
         private CallController()
         {
             EVSdkManager.Instance.EventCallConnected += EVSdkWrapper_EventCallConnected;
+            EVSdkManager.Instance.EventCallPeerConnected += EVSdkWrapper_EventCallPeerConnected;
+            EVSdkManager.Instance.EventJoinConferenceIndication += EVSdkWrapper_EventJoinConferenceIndication;
             EVSdkManager.Instance.EventCallEnd += EVSdkWrapper_EventCallEnd;
             EVSdkManager.Instance.EventContent += EVSdkWrapper_EventContent;
             
@@ -151,7 +178,7 @@ namespace EasyVideoWin.Model
 
             //dispatcherReadyEvent.WaitOne();
         }
-        
+
         //private void SystemEvents_PowerModeChanged(object sender, Microsoft.Win32.PowerModeChangedEventArgs e)
         private void MonitorOnChanged(object sender, EventArgs e)
         {
@@ -160,7 +187,12 @@ namespace EasyVideoWin.Model
                 return;
             }
             // stop sending content.
-            if (CurrentCallStatus == CallStatus.Connected)
+            if (
+                   CurrentCallStatus == CallStatus.Connected
+                || CallStatus.ConfIncoming == CurrentCallStatus
+                || CallStatus.P2pIncoming == CurrentCallStatus
+                || CallStatus.P2pOutgoing == CurrentCallStatus
+            )
             {
                 if (ContentStreamStatus.SendingContentStarted == CurrentContentStreamStatus || ContentStreamStatus.SendingWhiteBoardStarted == CurrentContentStreamStatus)
                 {
@@ -168,7 +200,16 @@ namespace EasyVideoWin.Model
                 }
                 log.Info("Terminate call for system power turned off monitor");
                 // terminate call, white board will be cleared automatically.
-                TerminateCall();
+                if (CallStatus.ConfIncoming == CurrentCallStatus || CallStatus.P2pIncoming == CurrentCallStatus)
+                {
+                    CurrentCallStatus = CallStatus.Idle;
+                    DeclineIncommingCall(CallInfo.conference_number);
+                }
+                else
+                {
+                    TerminateCall();
+                }
+                
                 App.Current.Dispatcher.InvokeAsync(() => {
                     MessageBoxTip tip;
                     if (
@@ -199,14 +240,102 @@ namespace EasyVideoWin.Model
         
         public EventHandler<CallStatus> CallStatusChanged;
         public EventHandler<ContentStreamInfo> ContentStreamStatusChanged;
-
+        
         private void EVSdkWrapper_EventCallConnected(ManagedEVSdk.Structs.EVCallInfoCli callInfo)
         {
-            log.InfoFormat("EventCallConnected. Peer:{0}", callInfo.peer);
-            ConferenceNumber = callInfo.peer;
+            log.Info("EventCallConnected");
+            CallInfo = callInfo;
+            ConferenceNumber = callInfo.conference_number;
+            CurrentContentStreamStatus = ContentStreamStatus.Idle;
+            if (ManagedEVSdk.Structs.EV_SVC_CALL_TYPE_CLI.EV_SVC_CALL_P2P == callInfo.svcCallType)
+            {
+                CurrentCallStatus = CallStatus.P2pOutgoing;
+            }
+            else
+            {
+                CurrentCallStatus = CallStatus.Connected;
+            }
+            log.Info("EventCallConnected end");
+        }
+
+
+        private void EVSdkWrapper_EventCallPeerConnected(ManagedEVSdk.Structs.EVCallInfoCli callInfo)
+        {
+            log.Info("EventCallPeerConnected");
+            CallInfo = callInfo;
+            ConferenceNumber = callInfo.conference_number;
             CurrentContentStreamStatus = ContentStreamStatus.Idle;
             CurrentCallStatus = CallStatus.Connected;
-            log.Info("EventCallConnected end");
+            log.Info("EventCallPeerConnected end");
+        }
+
+        // incoming call: EventJoinConferenceIndication[P2pIncoming | ConfIncoming] -- {(JoinConference[Dialing] -- EventCallConnected[Connected]) or (DeclineIncommingCall[Idle]) or (EventJoinConferenceIndication[PeerCancelled]) or (EventJoinConferenceIndication[TimeoutSelfCancelled])}
+        private void EVSdkWrapper_EventJoinConferenceIndication(ManagedEVSdk.Structs.EVCallInfoCli callInfo)
+        {
+            log.InfoFormat("EventJoinConferenceIndication, svcCallAction: {0}", callInfo.svcCallAction);
+
+            if (
+                   CallStatus.Idle != CurrentCallStatus
+                && CallStatus.Ended != CurrentCallStatus
+                && CallStatus.P2pIncoming != CurrentCallStatus
+                && CallStatus.ConfIncoming != CurrentCallStatus
+            )
+            {
+                log.InfoFormat("Received EventJoinConferenceIndication, but CurrentCallStatus is invalid: {0}", CurrentCallStatus);
+                return;
+            }
+
+            CallInfo = callInfo;
+
+            if (ManagedEVSdk.Structs.EV_SVC_CALL_ACTION_CLI.EV_SVC_INCOMING_CALL_RING == callInfo.svcCallAction)
+            {
+                if (ManagedEVSdk.Structs.EV_SVC_CALL_TYPE_CLI.EV_SVC_CALL_P2P == callInfo.svcCallType)
+                {
+                    log.Info("P2pIncoming, set IsP2pCall to true");
+                    IsP2pCall = true;
+                }
+
+                if (Utils.GetAutoAnswer())
+                {
+                    log.Info("Auto answer the dial in conf, EventJoinConferenceIndication end");
+                    JoinConference(CallInfo.conference_number, LoginManager.Instance.DisplayName, CallInfo.password, ManagedEVSdk.Structs.EV_SVC_CALL_TYPE_CLI.EV_SVC_CALL_CONF);
+                    return;
+                }
+
+                if (ManagedEVSdk.Structs.EV_SVC_CALL_TYPE_CLI.EV_SVC_CALL_P2P == callInfo.svcCallType)
+                {
+                    CurrentCallStatus = CallStatus.P2pIncoming;
+                }
+                else
+                {
+                    CurrentCallStatus = CallStatus.ConfIncoming;
+                }
+            }
+            else if (ManagedEVSdk.Structs.EV_SVC_CALL_ACTION_CLI.EV_SVC_INCOMING_CALL_CANCEL == callInfo.svcCallAction)
+            {
+                if (CallStatus.P2pIncoming == CurrentCallStatus || CallStatus.ConfIncoming == CurrentCallStatus)
+                {
+                    if (ManagedEVSdk.ErrorInfo.EV_ERROR_TYPE_CLI.EV_ERROR_TYPE_SDK == callInfo.err.type && (int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_CALL_TIMEOUT == callInfo.err.code)
+                    {
+                        log.Info("Call timeout, terminate the call");
+                        CurrentCallStatus = CallStatus.TimeoutSelfCancelled;
+                    }
+                    else
+                    {
+                        CurrentCallStatus = CallStatus.PeerCancelled;
+                    }
+                }
+                else
+                {
+                    log.InfoFormat("Recevied EV_SVC_INCOMING_CALL_CANCEL, but CurrentCallStatus is: {0}", CurrentCallStatus);
+                }
+            }
+            else
+            {
+                log.Info("Received unhandling action");
+            }
+            
+            log.Info("EventJoinConferenceIndication end");
         }
         
         private void EVSdkWrapper_EventContent(ManagedEVSdk.Structs.EVContentInfoCli contentInfo)
@@ -287,25 +416,64 @@ namespace EasyVideoWin.Model
             }
             else
             {
-                CurrentCallStatus = CallStatus.Ended;
-                if (LoginStatus.AnonymousLoggedIn == LoginManager.Instance.CurrentLoginStatus)
+                if (
+                       LoginStatus.LoggedIn == LoginManager.Instance.CurrentLoginStatus
+                    && ManagedEVSdk.ErrorInfo.EV_ERROR_TYPE_CLI.EV_ERROR_TYPE_SDK == callInfo.err.type
+                    && ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_CALL_TIMEOUT == callInfo.err.code || (int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_CALL_DECLINED == callInfo.err.code)
+                )
                 {
-                    LoginManager.Instance.CurrentLoginStatus = LoginStatus.NotLogin;
+                    if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_CALL_TIMEOUT == callInfo.err.code)
+                    {
+                        log.Info("EventCallEnd, error code is EV_CALL_TIMEOUT, set TimeoutSelfCancelled");
+                        CurrentCallStatus = CallStatus.TimeoutSelfCancelled;
+                    }
+                    else if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_CALL_DECLINED == callInfo.err.code)
+                    {
+                        log.Info("EventCallEnd, error code is EV_CALL_DECLINED, set PeerDeclined");
+                        CurrentCallStatus = CallStatus.PeerDeclined;
+                    }
+                }
+                else
+                {
+                    CurrentCallStatus = CallStatus.Ended;
+                    if (LoginStatus.AnonymousLoggedIn == LoginManager.Instance.CurrentLoginStatus)
+                    {
+                        LoginManager.Instance.CurrentLoginStatus = LoginStatus.NotLogin;
+                    }
                 }
             }
 
             log.InfoFormat("EventCallEnd end.");
         }
-        
-        public void JoinConference(string confNumber, string displayName, string password)
-        {
-            log.InfoFormat("Join conference. conf number:{0}, display name:{1}", confNumber, displayName);
 
+        // P2p outgoing: P2pCallPeer(JoinConference)[Dialing] -- EventCallConnected[P2pOutgoing] -- {(EventCallPeerConnected[Connected]) or (EventCallEnd[PeerDeclined]) or (EventCallEnd[TimeoutSelfCancelled])}
+        public void P2pCallPeer(string peerUserId, string peerAvatarUrl, string peerDisplayName)
+        {
+            log.Info("P2pCallPeer, set IsP2pCall to true");
+            IsP2pCall = true;
+            PeerAvatarUrl = peerAvatarUrl;
+            PeerDisplayName = peerDisplayName;
+            JoinConference(peerUserId, LoginManager.Instance.DisplayName, "", ManagedEVSdk.Structs.EV_SVC_CALL_TYPE_CLI.EV_SVC_CALL_P2P);
+        }
+
+        public void JoinConference(
+                                      string confNumber
+                                    , string displayName
+                                    , string password
+                                    , ManagedEVSdk.Structs.EV_SVC_CALL_TYPE_CLI type = ManagedEVSdk.Structs.EV_SVC_CALL_TYPE_CLI.EV_SVC_CALL_CONF
+                                  )
+        {
+            log.InfoFormat("Join conference. conf number:{0}, display name:{1}, type: {2}", confNumber, displayName, type);
+            
             _conferenceDisplayName = displayName;
             ConferenceNumber = confNumber;
-            CurrentCallStatus = CallStatus.Dialing;
-
-            bool rst = EVSdkManager.Instance.JoinConference(confNumber, displayName, password);
+            
+            if (CallStatus.P2pIncoming != CurrentCallStatus)
+            {
+                CurrentCallStatus = CallStatus.Dialing;
+            }
+            
+            bool rst = EVSdkManager.Instance.JoinConference(confNumber, displayName, password, type);
             if (!rst)
             {
                 log.Info("Failed to join conference and change call status to ended.");
@@ -493,6 +661,26 @@ namespace EasyVideoWin.Model
         public bool ContentAudioEnabled()
         {
             return EVSdkManager.Instance.ContentAudioEnabled();
+        }
+
+        public void DeclineIncommingCall(string confNumber)
+        {
+            EVSdkManager.Instance.DeclineIncommingCall(confNumber);
+        }
+
+        public void Switch2AudioMode()
+        {
+            UpdateUserImage(Utils.GetAudioModeBackground(), Utils.GetAudioModeBackground());
+            EVSdkManager.Instance.SetVideoActive(MediaModeType.AUDIO_ONLY);
+        }
+
+        public void Switch2VideoMode()
+        {
+            EVSdkManager.Instance.SetVideoActive(MediaModeType.VIDEO_NORMAL);
+            UpdateUserImage(
+                Utils.GetSuspendedVideoBackground()
+                , LoginStatus.AnonymousLoggedIn == LoginManager.Instance.CurrentLoginStatus ? Utils.GetDefaultUserAvatar() : Utils.GetCurrentAvatarPath()
+            );
         }
     }
 }

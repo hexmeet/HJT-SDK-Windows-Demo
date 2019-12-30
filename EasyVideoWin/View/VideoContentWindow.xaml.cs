@@ -120,7 +120,6 @@ namespace EasyVideoWin.View
         private void OnCallStatusChanged(object sender, CallStatus status)
         {
             log.Info("OnCallStatusChanged start.");
-            var _callStatus = status;
             switch (status)
             {
                 case CallStatus.Ended:

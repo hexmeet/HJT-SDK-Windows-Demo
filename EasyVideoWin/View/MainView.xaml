@@ -104,6 +104,16 @@
                                                            NormalImage="pack://application:,,,/Resources/Icons/MainView/icon_meeting_normal.png"
                                                            MouseOverImage="pack://application:,,,/Resources/Icons/MainView/icon_meeting_click.png"
                                                            PressedImage="pack://application:,,,/Resources/Icons/MainView/icon_meeting_click.png"/>
+
+                        <CustomControls:MainViewMenuButton TitleText="{DynamicResource CONTACT}"
+                                                           Visibility="{Binding ContactsVisibility}"
+                                                           Cursor="Hand"
+                                                           Command="{Binding ShowContactCommand}"
+                                                           Margin="0, 20, 0, 0"
+                                                           IsChecked="{Binding ContactViewEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                           NormalImage="pack://application:,,,/Resources/Icons/MainView/icon_contact_normal.png"
+                                                           MouseOverImage="pack://application:,,,/Resources/Icons/MainView/icon_contact_click.png"
+                                                           PressedImage="pack://application:,,,/Resources/Icons/MainView/icon_contact_click.png"/>
                         
                         <CustomControls:MainViewMenuButton TitleText="{DynamicResource SETTING}"
                                                            Cursor="Hand"
@@ -117,23 +127,12 @@
                 </Grid>
                 <Grid Grid.Row="4" VerticalAlignment="Bottom">
                     <StackPanel HorizontalAlignment="Center">
-                        <CustomControls:WpfImageButton Visibility="{Binding RegisterSuccessVisibility}" Height="70" ImageWidth="16" ImageHeight="16"
-                                                       TitleText="{DynamicResource REGISTER_SUCCESS}" FontSize="14" TextForeground="#FFFFFF"
+                        <CustomControls:SimpleImageButton Height="70" ImageWidth="16" ImageHeight="16"
+                                                       TitleText="{Binding RegisterStatusText}" FontSize="14" TextForeground="#FFFFFF"
                                                        TextOrientation="Horizontal"
                                                        Margin="0, 0, 0, 0"
                                                        TextMargin="0, 2, 0, 0"
-                                                       NormalImage="pack://application:,,,/Resources/Icons/icon_register_success.png"
-                                                       MouseOverImage="pack://application:,,,/Resources/Icons/icon_register_success.png"
-                                                       PressedImage="pack://application:,,,/Resources/Icons/icon_register_success.png"
-                                                    />
-                        <CustomControls:WpfImageButton Visibility="{Binding RegisterFailureVisibility}" Height="70" ImageWidth="16" ImageHeight="16"
-                                                       TitleText="{DynamicResource REGISTER_FAILURE}" FontSize="14" TextForeground="#FFFFFF"
-                                                       TextOrientation="Horizontal"
-                                                       Margin="0, 0, 0, 0"
-                                                       TextMargin="0, 2, 0, 0"
-                                                       NormalImage="pack://application:,,,/Resources/Icons/icon_register_failure.png"
-                                                       MouseOverImage="pack://application:,,,/Resources/Icons/icon_register_failure.png"
-                                                       PressedImage="pack://application:,,,/Resources/Icons/icon_register_failure.png"
+                                                       ImageSource="{Binding RegisterStatusImg}"
                                                     />
                     </StackPanel>
                 </Grid>

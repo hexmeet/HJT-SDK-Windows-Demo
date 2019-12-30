@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:EasyVideoWin.CustomControls"
              mc:Ignorable="d">
-    <Button Name="button" Click="button_Click" Background="#313131" Height="68" Width="100" Cursor="Hand"
+    <Button Name="button" Click="button_Click" Background="#313131" Height="60" Width="88" Cursor="Hand"
             Command="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:LayoutOperationbarVerticalButton}}, Path=Command}"
             CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:LayoutOperationbarVerticalButton}}, Path=CommandParameter}">
         <Button.Style>
@@ -23,18 +23,18 @@
                                     <Grid Grid.Row="1" Grid.Column="0">
                                         <Image Name="btnbg" Width="28" Height="28" VerticalAlignment="Center" HorizontalAlignment="Center"
                                           Source="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:LayoutOperationbarVerticalButton}}, Path=NormalImage}"/>
-                                        <DockPanel HorizontalAlignment="Right" VerticalAlignment="Top" Width="40">
+                                        <DockPanel HorizontalAlignment="Right" VerticalAlignment="Top" Width="32">
                                             <Label Padding="0"
                                            Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:LayoutOperationbarVerticalButton}}, Path=ExtraInfoText}"
                                            Foreground="White"
-                                           FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                           FontSize="12" HorizontalAlignment="Left" VerticalAlignment="Top"/>
                                         </DockPanel>
                                     </Grid>
                                     <Grid Grid.Row="2" Grid.Column="0">
                                         <Label Name="btnText" 
                                            Content="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:LayoutOperationbarVerticalButton}}, Path=ButtonText}"
-                                           Foreground="White"
-                                           FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                           Foreground="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type local:LayoutOperationbarVerticalButton}}, Path=Foreground}"
+                                           FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Grid>
                                 </Grid>
                             </Border>

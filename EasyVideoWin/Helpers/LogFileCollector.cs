@@ -12,6 +12,7 @@ using log4net;
 using Aliyun.OSS;
 using EasyVideoWin.Model;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace EasyVideoWin.Helpers
 {
@@ -301,33 +302,49 @@ namespace EasyVideoWin.Helpers
 		{
 			try
 			{
-                log.DebugFormat(DateTime.Now.ToString());
+                log.Info("Collect");
 				ClearTheFolder();
-                log.DebugFormat ("**************finished log clean: {0}", DateTime.Now);
+                log.Info("Finished log clean");
 				CollectSystemInfoEx();
-                log.DebugFormat("**************finished get System info: {0}", DateTime.Now); 
+                log.Info("Finished get System info");
                 PackageCachedFolderIntoZip();
-                log.DebugFormat("**************finished package log: {0}", DateTime.Now);
+                log.Info("Finished package log");
 			}
 			catch (Exception ex)
 			{
                 //MessageBox.Show(string.Format("Error:\n {0}", ex.Message), "Error");
-                MessageBoxTip tip = new MessageBoxTip((MainWindow)Application.Current.MainWindow);
-                tip.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), string.Format("Error:\n {0}", ex.Message), LanguageUtil.Instance.GetValueByKey("CONFIRM"));
-                tip.ShowDialog();
-                //if (!EventLog.SourceExists("HexMeetLogCollect"))
-                //    EventLog.CreateEventSource("HexMeetLogCollect", "Application");
+                Application.Current.Dispatcher.InvokeAsync(() => {
+                    IMasterDisplayWindow masterWin;
+                    if (LoginStatus.LoginFailed == LoginManager.Instance.CurrentLoginStatus || LoginStatus.NotLogin == LoginManager.Instance.CurrentLoginStatus)
+                    {
+                        masterWin = (IMasterDisplayWindow)LoginManager.Instance.LoginWindow;
+                    }
+                    else
+                    {
+                        masterWin = (MainWindow)Application.Current.MainWindow;
+                    }
+                    MessageBoxTip tip = new MessageBoxTip(masterWin);
+                    tip.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), string.Format("Error:\n {0}", ex.Message), LanguageUtil.Instance.GetValueByKey("CONFIRM"));
+                    tip.ShowDialog();
+                    //if (!EventLog.SourceExists("HexMeetLogCollect"))
+                    //    EventLog.CreateEventSource("HexMeetLogCollect", "Application");
 
-                //EventLog.WriteEntry("HexMeetLogCollect -- Collect", ex.ToString(), EventLogEntryType.Error); 
-
+                    //EventLog.WriteEntry("HexMeetLogCollect -- Collect", ex.ToString(), EventLogEntryType.Error); 
+                });
+                
                 return false;
 			}
 			return true;
 		}
 
-		private void ClearTheFolder()
+        private const string USELESS_LOG_FILE_REGEX = @"^*.log.([2-9]|\d{2,})$";
+        private const string LOG_FILE_SEARCH_PATTERN = "*.log.*";
+        private const string DUMP_FILE_SEARCH_PATTERN = "*exe.*.dmp";
+
+        // delete the useless file in the folder
+        private void ClearTheFolder()
 		{
-			string[] files = Directory.GetFiles(this._appdatafolder, "HexMeetLogs_*.zip", SearchOption.TopDirectoryOnly);
+			string[] files = Directory.GetFiles(this._appdatafolder, "HexMeetHJTLogs_*.zip", SearchOption.TopDirectoryOnly);
 			if (files != null)
 			{
 				foreach (string f in files)
@@ -350,7 +367,54 @@ namespace EasyVideoWin.Helpers
                     }
 				}
 			}
-		}
+
+            // remove the redundant log files for there is only 2 usefull files for the log
+            files = Directory.GetFiles(this._appdatafolder, LOG_FILE_SEARCH_PATTERN, SearchOption.TopDirectoryOnly);
+            if (null != files)
+            {
+                foreach (string file in files)
+                {
+                    Match mat = Regex.Match(file, USELESS_LOG_FILE_REGEX);
+                    if (!mat.Success)
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch (Exception e)
+                    {
+                        log.InfoFormat("Failed to delete log file: {0}, exception: {1}", file, e);
+                    }
+                }
+            }
+
+            // remove the redundant dump files that only the newest dump file for 73 hours is usefull
+            files = Directory.GetFiles(this._appdatafolder, DUMP_FILE_SEARCH_PATTERN, SearchOption.TopDirectoryOnly);
+            if (null != files)
+            {
+                foreach (string file in files)
+                {
+                    FileInfo fi = new FileInfo(file);
+                    long nowTicks = DateTime.Now.Ticks;
+                    double timePast = new TimeSpan(nowTicks - fi.CreationTime.Ticks).TotalMilliseconds;
+                    if (timePast < 72 * 60 * 60 * 1000)
+                    {
+                        continue;
+                    }
+                    try
+                    {
+                        File.Delete(file);
+                    }
+                    catch (Exception e)
+                    {
+                        log.InfoFormat("Failed to delete dump file: {0}, exception: {1}", file, e);
+                    }
+                }
+            }
+        }
 
         public Dictionary<string, string> GetOSInfo()
         {

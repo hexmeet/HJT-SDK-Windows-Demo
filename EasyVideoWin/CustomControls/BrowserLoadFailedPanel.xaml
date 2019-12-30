@@ -7,15 +7,15 @@
              xmlns:gif="https://github.com/XamlAnimatedGif/XamlAnimatedGif"
              xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="508" d:DesignWidth="452">
 
     <Grid>
         <Grid.Background>
             <SolidColorBrush Color="White" />
         </Grid.Background>
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Image Source="pack://application:,,,/Resources/Icons/default_page_nonetwork.png" Width="142" Height="132" />
-            <TextBlock Text="{DynamicResource FAILED_LOAD}" Margin="0, 16, 0, 0" Foreground="#919191" FontSize="14"/>
+            <Image Source="pack://application:,,,/Resources/Icons/default_page_nonetwork.png" Width="452" Height="308" />
+            <TextBlock Text="{DynamicResource FAILED_LOAD}" Margin="0, 16, 0, 0" Foreground="#919191" FontSize="14" TextAlignment="Center"/>
             <CustomControls:TextButton
                     ButtonWidth="100"
                     ButtonHeight="28"

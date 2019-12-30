@@ -32,7 +32,23 @@ namespace EasyVideoWin.View
         private const double WINDOW_DESIGN_WIDTH = 530;
         private LoginManager _loginMgr = LoginManager.Instance;
         private IntPtr _handle;
-        
+
+        private static ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI[] galleryLayoutCapaticy = {
+            ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI.EV_LAYOUT_TYPE_1
+            , ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI.EV_LAYOUT_TYPE_2H
+            , ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI.EV_LAYOUT_TYPE_4
+       //     , ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI.EV_LAYOUT_TYPE_6W
+            , ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI.EV_LAYOUT_TYPE_9
+        //    , ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI.EV_LAYOUT_TYPE_12W
+            , ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI.EV_LAYOUT_TYPE_16
+        };
+
+        private static ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI[] speakerLayoutCapaticy = {
+            ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI.EV_LAYOUT_TYPE_1
+            , ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI.EV_LAYOUT_TYPE_5_1L_4R
+            , ManagedEVSdk.Structs.EV_LAYOUT_TYPE_CLI.EV_LAYOUT_TYPE_8
+        };
+
         #endregion
 
         #region -- Properties --
@@ -205,6 +221,7 @@ namespace EasyVideoWin.View
                 EVSdkManager.Instance.SetLog(ManagedEVSdk.Structs.EV_LOG_LEVEL_CLI.EV_LOG_LEVEL_MESSAGE, appDataFolder, "evsdk", 20 * 1024 * 1024);
                 EVSdkManager.Instance.EnableLog(true);
                 EVSdkManager.Instance.Initialize(appDataFolder, "hexmeetrc");
+                EVSdkManager.Instance.EnablePreview(false);
                 string rootCAPath = Utils.GetRootCAPath();
                 EVSdkManager.Instance.SetRootCA(rootCAPath);
                 EVSdkManager.Instance.EnableWhiteBoard(true);
@@ -222,6 +239,10 @@ namespace EasyVideoWin.View
                 // get correct product version for user agent.
                 string version = System.Windows.Forms.Application.ProductVersion;
                 EVSdkManager.Instance.SetUserAgent(userAgentName, version);
+
+                EVSdkManager.Instance.SetLayoutCapacity(ManagedEVSdk.Structs.EV_LAYOUT_MODE_CLI.EV_LAYOUT_GALLERY_MODE, galleryLayoutCapaticy);
+                EVSdkManager.Instance.SetLayoutCapacity(ManagedEVSdk.Structs.EV_LAYOUT_MODE_CLI.EV_LAYOUT_SPEAKER_MODE, speakerLayoutCapaticy);
+
                 log.Info("Init sdk end.");
             }
             catch(Exception e)

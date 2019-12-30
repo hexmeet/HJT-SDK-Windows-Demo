@@ -58,6 +58,9 @@ namespace EasyVideoWin.ViewModel
             {
                 bool flag = (
                                    CallStatus.Dialing == CallController.Instance.CurrentCallStatus
+                                || CallStatus.ConfIncoming == CallController.Instance.CurrentCallStatus
+                                || CallStatus.P2pIncoming == CallController.Instance.CurrentCallStatus
+                                || CallStatus.P2pOutgoing == CallController.Instance.CurrentCallStatus
                                 || CallStatus.Connected == CallController.Instance.CurrentCallStatus
                             );
                 log.InfoFormat("Video people window visible changed, visible:{0}", flag);
@@ -115,6 +118,8 @@ namespace EasyVideoWin.ViewModel
             switch (status)
             {
                 case CallStatus.Dialing:
+                case CallStatus.ConfIncoming:
+                case CallStatus.P2pIncoming:
                     CurrentView = _callingView;
                     Application.Current.Dispatcher.InvokeAsync(() =>
                     {
@@ -122,13 +127,19 @@ namespace EasyVideoWin.ViewModel
                     });
                     break;
                 case CallStatus.Connected:
+                case CallStatus.P2pOutgoing:
                     Application.Current.Dispatcher.InvokeAsync(() =>
                     {
                         CurrentView = _logoView;
                         LayoutBackgroundWindow.Instance.InitSetting();
                         LayoutBackgroundWindow.Instance.ShowWindow(true);
                     });
-                    SaveCurrentConfId();
+
+                    if (CallStatus.Connected == status)
+                    {
+                        SaveCurrentConfId();
+                    }
+
                     break;
             }
             log.Info("OnCallStatusChanged end.");
@@ -136,6 +147,12 @@ namespace EasyVideoWin.ViewModel
 
         private void SaveCurrentConfId()
         {
+            if (CallController.Instance.IsP2pCall)
+            {
+                log.InfoFormat("P2p call, do not save conf number to history list: {0}", CallController.Instance.ConferenceNumber);
+                return;
+            }
+            log.InfoFormat("Save conf number to history list: {0}", CallController.Instance.ConferenceNumber);
             List<string> confIds = Utils.GetConfIdsSetting();
             confIds.RemoveAll(u => u == CallController.Instance.ConferenceNumber);
             confIds.Insert(0, CallController.Instance.ConferenceNumber);

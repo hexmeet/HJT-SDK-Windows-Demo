@@ -153,7 +153,7 @@ namespace EasyVideoWin.HttpUtils
                 ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
             }
 
-            var response = _httpClient.GetAsync(url).Result;
+            HttpResponseMessage response = _httpClient.GetAsync(url).Result;
             string resContent = response.Content.ReadAsStringAsync().Result;
 
             RestResponse restResponse = new RestResponse { StatusCode = response.StatusCode, Content = resContent };
@@ -173,7 +173,7 @@ namespace EasyVideoWin.HttpUtils
                     ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
                 }
 
-                var result = _httpClient.PostAsync(url, content).Result;
+                HttpResponseMessage result = _httpClient.PostAsync(url, content).Result;
                 string res = result.Content.ReadAsStringAsync().Result;
 
                 RestResponse restResponse = new RestResponse { StatusCode = result.StatusCode, Content = res };
@@ -194,7 +194,7 @@ namespace EasyVideoWin.HttpUtils
                     ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
                 }
 
-                var result = _httpClient.PutAsync(url, content).Result;
+                HttpResponseMessage result = _httpClient.PutAsync(url, content).Result;
                 string res = result.Content.ReadAsStringAsync().Result;
 
                 RestResponse restResponse = new RestResponse { StatusCode = result.StatusCode, Content = res };
@@ -210,7 +210,7 @@ namespace EasyVideoWin.HttpUtils
                 ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
             }
 
-            var response = _httpClient.DeleteAsync(url).Result;
+            HttpResponseMessage response = _httpClient.DeleteAsync(url).Result;
             string resContent = response.Content.ReadAsStringAsync().Result;
 
             RestResponse restResponse = new RestResponse { StatusCode = response.StatusCode, Content = resContent };

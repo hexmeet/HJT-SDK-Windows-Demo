@@ -83,6 +83,9 @@ namespace EasyVideoWin.ViewModel
             , {2033,    "NOT_ALLOW_ANONYMOUS_PARTY"}
             //, {2043,    "LOCAL_ZONE_NOT_STARTED"} do not prompt the error
             //, {2045,    "LOCAL_ZONE_STOPPED"} do not prompt the error
+            , {4049,    "CALL_FAILED_FOR_PARTY_IN_CALL"}
+            , {4051,    "PARTY_OFFLINE"}
+            , {4055,    "FAILED_JOIN_CONF_FOR_LOCKED"}
         };
 
         public static readonly int SERVER_ERROR_LOGIN_FAILED_MORE_THAN_5_TIMES = 1101;
@@ -323,7 +326,7 @@ namespace EasyVideoWin.ViewModel
                 }
             }
 
-            var loginStatus = LoginManager.Instance.CurrentLoginStatus;
+            LoginStatus loginStatus = LoginManager.Instance.CurrentLoginStatus;
             if (LoginStatus.LoggingIn == LoginManager.Instance.CurrentLoginStatus || LoginStatus.AnonymousLoggingIn == LoginManager.Instance.CurrentLoginStatus)
             {
                 log.InfoFormat("Current login status:{0}. Login failed.", LoginManager.Instance.CurrentLoginStatus);
@@ -425,7 +428,19 @@ namespace EasyVideoWin.ViewModel
             UpdateWindowVisibility();
             switch (status)
             {
-                case CallStatus.Ended:
+                case CallStatus.Idle:
+                    // do noting. Note: do not remove the branch, or go to default
+                    break;
+                case CallStatus.Dialing:
+                case CallStatus.ConfIncoming:
+                case CallStatus.P2pIncoming:
+                case CallStatus.P2pOutgoing:
+                case CallStatus.Connected:
+                    Application.Current.Dispatcher.InvokeAsync(() => {
+                        JoinConfDisplayNameWindow.Instance.CloseWindow();
+                    });
+                    break;
+                default: // Ended, PeerDeclined, PeerCancelled, TimeoutSelfCancelled
                     log.Info("Call ended and change current view to main view.");
                     if (LoginStatus.LoggedIn == LoginManager.Instance.CurrentLoginStatus)
                     {
@@ -450,11 +465,6 @@ namespace EasyVideoWin.ViewModel
 
                     log.Info("Call ended and collect garbage");
                     SystemMonitorUtil.Instance.CollectGarbage();
-                    
-                    break;
-                case CallStatus.Dialing:
-                case CallStatus.Connected:
-                    JoinConfDisplayNameWindow.Instance.CloseWindow();
                     break;
             }
 
@@ -527,7 +537,11 @@ namespace EasyVideoWin.ViewModel
             LoginStatus loginStatus = LoginManager.Instance.CurrentLoginStatus;
             CallStatus callStatus = CallController.Instance.CurrentCallStatus;
             log.InfoFormat("Update window visibility, login status: {0}, call status: {1}", loginStatus, callStatus);
-            bool isInCall = CallStatus.Dialing == callStatus || CallStatus.Connected == callStatus;
+            bool isInCall =    CallStatus.Dialing == callStatus
+                            || CallStatus.ConfIncoming == callStatus
+                            || CallStatus.P2pIncoming == callStatus
+                            || CallStatus.P2pOutgoing == callStatus
+                            || CallStatus.Connected == callStatus;
             bool isLoginWindowVisible = 
                    LoginStatus.NotLogin == loginStatus
                 || LoginStatus.LoggingIn == loginStatus
@@ -707,7 +721,7 @@ namespace EasyVideoWin.ViewModel
                     string[] arrCurrentVersion = currentVersion.Split('.');
                     int len = arrAppInfo.Length > arrCurrentVersion.Length ? arrAppInfo.Length : arrCurrentVersion.Length;
                     bool newVersionFound = false;
-                    for (var i=0; i<len; ++i)
+                    for (int i=0; i<len; ++i)
                     {
                         int newItem = int.Parse(arrAppInfo[i]);
                         int currentItem = int.Parse(arrCurrentVersion[i]);

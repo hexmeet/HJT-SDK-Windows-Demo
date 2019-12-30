@@ -72,7 +72,7 @@ namespace EasyVideoWin.Helpers
             if (!CefSharp.Cef.IsInitialized)
             {
                 _log.Info("Init cef sharp setting.");
-                var settings = new CefSharp.Wpf.CefSettings
+                CefSharp.Wpf.CefSettings settings = new CefSharp.Wpf.CefSettings
                 {
                     RemoteDebuggingPort = 8888
                     , CachePath         = Path.Combine(Utils.GetConfigDataPath(), CEF_CACHE_PATH)
@@ -119,7 +119,7 @@ namespace EasyVideoWin.Helpers
         {
             // For the cache stored the directory of app data in previous version, so delete them firstly
             string configPath = Utils.GetConfigDataPath();
-            for (var i = 0; i < _cacheFiles.Length; ++i)
+            for (int i = 0; i < _cacheFiles.Length; ++i)
             {
                 string fileName = Path.Combine(configPath, _cacheFiles[i]);
                 try
@@ -166,7 +166,7 @@ namespace EasyVideoWin.Helpers
                     }
                     using (StreamWriter sw = new StreamWriter(cefLog))
                     {
-                        foreach (var ln in lns)
+                        foreach (string ln in lns)
                         {
                             sw.WriteLine(ln);
                         }

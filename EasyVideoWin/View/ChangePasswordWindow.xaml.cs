@@ -33,7 +33,6 @@ namespace EasyVideoWin.View
 
         private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static ChangePasswordWindow _instance = new ChangePasswordWindow();
-        private const string INVALID_NAME_REGEX = "[\"<>]+";
         private IntPtr _handle = IntPtr.Zero;
 
         #endregion
