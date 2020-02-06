@@ -446,25 +446,28 @@ namespace EasyVideoWin.Helpers
 
             double tempWidth = window.Width;
             double tempHeight = window.Height;
-
+            double left = 0;
+            double top = 0;
             if (screen.DeviceName.Equals(System.Windows.Forms.Screen.PrimaryScreen.DeviceName))
             {
                 log.InfoFormat("Set window on primary screen, screen: left={0}, top: {1}, width: {2}, height: {3}, ratio: {4}"
                     , screen.Bounds.Left, screen.Bounds.Top, screen.Bounds.Width, screen.Bounds.Height, currentRatio
                 );
-                window.Left = (screen.Bounds.Left / currentRatio + (screen.Bounds.Width / currentRatio - tempWidth) / 2);
-                window.Top = (screen.Bounds.Top / currentRatio + (screen.Bounds.Height / currentRatio - tempHeight) / 2);
+                left = (screen.Bounds.Left / currentRatio + (screen.Bounds.Width / currentRatio - tempWidth) / 2);
+                top = (screen.Bounds.Top / currentRatio + (screen.Bounds.Height / currentRatio - tempHeight) / 2);
             }
             else
             {
                 log.InfoFormat("Set window on extend screen, screen: left={0}, top: {1}, width: {2}, height: {3}, ratio: {4}"
                     , screen.Bounds.Left, screen.Bounds.Top, screen.Bounds.Width, screen.Bounds.Height, currentRatio
                 );
-                window.Left = (screen.Bounds.Left * currentRatio + (screen.Bounds.Width * currentRatio - tempWidth) / 2);
-                window.Top = (screen.Bounds.Top * currentRatio + (screen.Bounds.Height * currentRatio - tempHeight) / 2);
+                left = (screen.Bounds.Left * currentRatio + (screen.Bounds.Width * currentRatio - tempWidth) / 2);
+                top = (screen.Bounds.Top * currentRatio + (screen.Bounds.Height * currentRatio - tempHeight) / 2);
             }
 
-            log.InfoFormat("window is centered, left: {0}, top: {1}", window.Left, window.Top);
+            window.Left = left;
+            window.Top = top;
+            log.InfoFormat("window is centered, left: {0}, top: {1}, set value: {2} - {3}", window.Left, window.Top, left, top);
         }
     }
 }

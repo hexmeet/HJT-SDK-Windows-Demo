@@ -51,7 +51,14 @@ namespace EasyVideoWin.Model
             _loginStatus = LoginStatus.NotLogin;
 
             Utils.ParseCloudServerAddress();
-            ServiceType = Utils.GetServiceType();
+            if (EasyVideoWin.Properties.Settings.Default.CloudOnly)
+            {
+                ServiceType = Utils.ServiceTypeEnum.Cloud;
+            }
+            else
+            {
+                ServiceType = Utils.GetServiceType();
+            }
             string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
             if (!string.IsNullOrEmpty(joinConfAddress))
             {

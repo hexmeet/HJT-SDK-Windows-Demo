@@ -3,7 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib"
                     xmlns:local="clr-namespace:EasyVideoWin.Resources">
     <sys:String x:Key="ARE_YOU_SURE_TO_CLOSE_APP">Are you sure to close HJT?</sys:String>
-    <sys:String x:Key="COPY_RIGHT" xml:space="preserve">Copyright ⓒ  2019 Beijing Zhong Chuang Shi Xun Technology Co., Ltd.&#13;All Rights Reserved.</sys:String>
+    <sys:String x:Key="COPY_RIGHT" xml:space="preserve">Copyright ⓒ  2020 Beijing Zhong Chuang Shi Xun Technology Co., Ltd.&#13;All Rights Reserved.</sys:String>
     <sys:String x:Key="COMPANY_NAME">Beijing ZhongChuang</sys:String>
     <sys:String x:Key="AUTO_LOGIN">Login automatically when HJT starts up</sys:String>
     <sys:String x:Key="FULL_SCREEN_MODE">Full Screen when HJT starts up</sys:String>

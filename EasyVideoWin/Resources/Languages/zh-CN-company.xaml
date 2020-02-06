@@ -3,7 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib"
                     xmlns:local="clr-namespace:EasyVideoWin.Resources">
     <sys:String x:Key="ARE_YOU_SURE_TO_CLOSE_APP">您确定关闭应用吗?</sys:String>
-    <sys:String x:Key="COPY_RIGHT">版权所有 ⓒ  2019 北京中创视讯科技有限公司, 保留所有权利</sys:String>
+    <sys:String x:Key="COPY_RIGHT">版权所有 ⓒ  2020 北京中创视讯科技有限公司, 保留所有权利</sys:String>
     <sys:String x:Key="COMPANY_NAME">中创视讯</sys:String>
     <sys:String x:Key="AUTO_LOGIN">自动登录</sys:String>
     <sys:String x:Key="FULL_SCREEN_MODE">全屏模式 (下次启动时生效)</sys:String>

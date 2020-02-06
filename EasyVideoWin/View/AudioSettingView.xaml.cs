@@ -76,7 +76,13 @@ namespace EasyVideoWin.View
 
         private void OpenLoudspeaker_Click(object sender, RoutedEventArgs e)
         {
+            bool shouldStopWave = null != _waveOut && _waveOut.PlaybackState == NAudio.Wave.PlaybackState.Playing;
             DisposeWave();
+            if (shouldStopWave)
+            {
+                // only stop play sound
+                return;
+            }
             //init
             _waveOut = new WaveOutEvent();
             //set output device

@@ -73,7 +73,7 @@
     <sys:String x:Key="SAVE_SUCCESSFULLY">Save Succeeded.</sys:String>
     <sys:String x:Key="BRUSH">Pen</sys:String>
     <sys:String x:Key="HIGHLIGHTER">Mark</sys:String>
-    <sys:String x:Key="STOP_SHARE">Exit</sys:String>
+    <sys:String x:Key="STOP_SHARE">Stop Share</sys:String>
     <sys:String x:Key="CLEAR">Clear</sys:String>
     <sys:String x:Key="BACKGROUND">Color</sys:String>
     <sys:String x:Key="REVERT">Undo</sys:String>

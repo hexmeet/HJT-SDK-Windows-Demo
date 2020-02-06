@@ -9,6 +9,7 @@ using EasyVideoWin.View;
 using EasyVideoWin.ViewModel;
 using EasyVideoWin.Www.Api.Rest.DataStruct;
 using EasyVideoWin.Www.Api.Rest.Resource;
+using log4net;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,7 @@ namespace EasyVideoWin.www.api.rest
     public class ConfController : BaseApiController
     {
         private CallDialOut callDialOut = new CallDialOut();
+        private static readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         [HttpPut(Constants.MAKE_CALL_PATH)]
         public ActionResult MakeCall([FromBody] CallRequest callRequest)
@@ -322,6 +324,38 @@ namespace EasyVideoWin.www.api.rest
             {
                 LayoutBackgroundWindow.Instance.ExitContent();
             });
+            return Content("");
+        }
+
+        [HttpPut(Constants.P2P_CALL_PATH)]
+        public ActionResult P2pCall([FromBody] Rest.ServerRest.P2PUserRest peerUser)
+        {
+            if (LoginStatus.LoggedIn != LoginManager.Instance.CurrentLoginStatus)
+            {
+                return GetErrInfo(Constants.ErrorCode.NOT_LOGGED_IN);
+            }
+
+            if (null == peerUser)
+            {
+                log.Info("Failed to p2pCall for null data");
+                return GetErrInfo(Constants.ErrorCode.EMPTY_PEER_USER_INFO);
+            }
+
+            string userId = peerUser.userId.ToString();
+            if (string.IsNullOrEmpty(userId.Trim()))
+            {
+                log.Info("Failed P2P Call for empty userId");
+                return GetErrInfo(Constants.ErrorCode.EMPTY_PEER_USER_ID);
+            }
+
+            if (LoginManager.Instance.CurrentLoginStatus == LoginStatus.LoggedIn && !LoginManager.Instance.IsRegistered)
+            {
+                return GetErrInfo(Constants.ErrorCode.NOT_REGISTRATION);
+            }
+
+            CallController.Instance.UpdateUserImage(Utils.GetSuspendedVideoBackground(), Utils.GetCurrentAvatarPath());
+            CallController.Instance.P2pCallPeer(userId, peerUser.imageUrl, peerUser.displayName);
+
             return Content("");
         }
     }

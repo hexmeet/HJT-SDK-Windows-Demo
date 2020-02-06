@@ -110,6 +110,7 @@ namespace EasyVideoWin.View
 
         public void ResetInitialSize()
         {
+            log.InfoFormat("ResetInitialSize, current size: {0} x {1}", this.Width, this.Height);
             this.Width = INITIAL_WIDTH;
             this.Height = INITIAL_HEIGHT;
         }

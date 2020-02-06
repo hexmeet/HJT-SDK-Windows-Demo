@@ -421,8 +421,9 @@ namespace EasyVideoWin.View
             this._browser.GetBrowser().GetFrame(null).ExecuteJavaScriptAsync(cmd);
         }
 
-        public void SendEmail(string email)
+        public void sendEmail(string email)
         {
+            log.Info("sendEmail");
             if (IsFoxmailAsDefaultMail())
             {
                 System.Diagnostics.Process.Start("mailto:?");
