@@ -6,9 +6,9 @@
         xmlns:local="clr-namespace:EasyVideoWin.View"
         xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
         mc:Ignorable="d"
-        Title="LayoutRecordingIndicationWindow" Height="26" Width="104" WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False" AllowsTransparency="True" Background="Transparent">
+        Title="LayoutRecordingIndicationWindow" Height="30" Width="104" WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False" AllowsTransparency="True" Background="Transparent">
     <Grid>
-        <Grid Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
+        <Grid Height="30" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center">
             <Border x:Name="btnBorder" Background="#66000000" CornerRadius="2" Padding="2">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Ellipse Width="10" Height="10" Fill="#ff2a3c" Margin="10, 2, 0, 2">

@@ -552,7 +552,7 @@ namespace EasyVideoWin.Model
             }
             _log.Info("LeaveConference done");
         }
-
+        
         public void DeclineIncommingCall(string confNumber)
         {
             _log.InfoFormat("DeclineIncommingCall, confNumber: {0}", confNumber);

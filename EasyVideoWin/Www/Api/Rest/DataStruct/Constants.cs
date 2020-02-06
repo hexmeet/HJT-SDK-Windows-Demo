@@ -28,6 +28,7 @@ namespace EasyVideoWin.Www.Api.Rest.DataStruct
         public const string STOP_WHITEBOARD             = "/api/rest/system/whiteboard/stop";
         public const string START_CONTENT               = "/api/rest/system/content/start";
         public const string STOP_CONTENT                = "/api/rest/system/content/stop";
+        public const string P2P_CALL_PATH               = "/api/rest/system/p2p_call";
 
         public enum ErrorCode
         {
@@ -40,7 +41,13 @@ namespace EasyVideoWin.Www.Api.Rest.DataStruct
             [Description("The device is not logged in.")]
             NOT_LOGGED_IN = 4002,
             [Description("There is no conference.")]
-            NO_CONFERENCE = 4003
+            NO_CONFERENCE = 4003,
+            [Description("Empty peer user info.")]
+            EMPTY_PEER_USER_INFO = 4004,
+            [Description("Empty peer user id.")]
+            EMPTY_PEER_USER_ID = 4005,
+            [Description("Not registration")]
+            NOT_REGISTRATION = 4006
         }
 
         

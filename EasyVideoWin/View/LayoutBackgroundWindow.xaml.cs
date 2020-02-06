@@ -608,7 +608,7 @@ namespace EasyVideoWin.View
             // update the string according the language setting
             _localVideoCell.CellName = EVSdkManager.Instance.GetDisplayName();
             _disablePrompt = Utils.GetDisablePrompt();
-            log.InfoFormat("InitSetting, _disablePrompt: {0}", _disablePrompt);
+            log.InfoFormat("InitSetting, _disablePrompt: {0}, _localVideoCell.CellName: {1}", _disablePrompt, _localVideoCell.CellName);
         }
 
         public void StartWhiteboard()
@@ -922,7 +922,15 @@ namespace EasyVideoWin.View
         {
             double left = cell.Left;
             double top = 0;
-            double width = cell.Width - 3;
+            double width = cell.Width;
+            if (width > 3)
+            {
+                width -= 3;
+            }
+            else
+            {
+                log.WarnFormat("The cell width value is less than 3, the width value is: {0}", cell.Width);
+            }
             double height = cell.Operationbar.InitialHeight;
             int cellBottom = (int)(cell.Top + cell.Height);
             // maybe cellBottom is only larger than (_layoutOperationbar.Top + _layoutOperationbar.Height) 0.xx, so convert to int 
@@ -2334,7 +2342,17 @@ namespace EasyVideoWin.View
             log.Info("EventMessageOverlay");
             if (null == messageOverlay)
             {
-                log.Info("Received message overlay, but the object is null. EventMessageOverlay end");
+                log.Info("Received EventMessageOverlay, but the object is null. EventMessageOverlay end");
+                return;
+            }
+
+            if (   CallStatus.Connected != CallController.Instance.CurrentCallStatus
+                && CallStatus.P2pOutgoing != CallController.Instance.CurrentCallStatus
+                && CallStatus.P2pIncoming != CallController.Instance.CurrentCallStatus
+                && CallStatus.ConfIncoming != CallController.Instance.CurrentCallStatus
+            )
+            {
+                log.InfoFormat("Received EventMessageOverlay, but CallStatus is not proper: {0}", CallController.Instance.CurrentCallStatus);
                 return;
             }
             
@@ -2357,6 +2375,7 @@ namespace EasyVideoWin.View
                         IsRemoteMuted = site.remote_muted;
                     }
                     _localVideoCell.CellName = site.name;
+                    log.InfoFormat("EventDisplayNameChanged, change _localVideoCell.CellName to: {0}", _localVideoCell.CellName);
                 }
 
                 OnLayoutSiteChanged(site);
@@ -3151,6 +3170,19 @@ namespace EasyVideoWin.View
         private void LayoutOperationbar_EventSwitch2AudioMode()
         {
             MediaMode = EVSdkManager.Instance.VideoActive();
+            if (MediaModeType.AUDIO_ONLY == MediaMode)
+            {
+                if (ContentStreamStatus.SendingWhiteBoardStarted == CallController.Instance.CurrentContentStreamStatus)
+                {
+                    log.Info("Switch2AudioMode and ExitWhiteboard");
+                    ExitWhiteboard();
+                }
+                else if (ContentStreamStatus.SendingContentStarted == CallController.Instance.CurrentContentStreamStatus)
+                {
+                    log.Info("Switch2AudioMode and ExitContent");
+                    ExitContent();
+                }
+            }
         }
 
         private void ExitAudioModeWindow_EventSwitch2VideoMode()
@@ -3215,6 +3247,7 @@ namespace EasyVideoWin.View
 
         private void LayoutOperationbar_EventDisplayNameChanged(string displayName)
         {
+            log.InfoFormat("EventDisplayNameChanged, change _localVideoCell.CellName to: {0}", displayName);
             _localVideoCell.CellName = displayName;
         }
 

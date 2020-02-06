@@ -67,7 +67,7 @@ namespace EasyVideoWin.View
             string szPort = this.textBoxPort.Text.Trim();
             if (string.IsNullOrEmpty(szPort))
             {
-                szPort = "0";
+                szPort =  this.checkBoxUseHttps.IsChecked.HasValue && this.checkBoxUseHttps.IsChecked.Value ? "443" : "80";
             }
             int nPort;
             if (!int.TryParse(szPort, out nPort))

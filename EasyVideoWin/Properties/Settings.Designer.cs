@@ -154,5 +154,17 @@ namespace EasyVideoWin.Properties {
                 this["SoftwareUpdateAppInfoPrefix"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CloudOnly {
+            get {
+                return ((bool)(this["CloudOnly"]));
+            }
+            set {
+                this["CloudOnly"] = value;
+            }
+        }
     }
 }
