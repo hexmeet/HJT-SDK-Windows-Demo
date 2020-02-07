@@ -474,23 +474,62 @@ public:
     
     virtual void onMicMutedShow(int mic_muted) {
         (void)mic_muted;
-    } 
+    }
+
+    virtual void onVidInputStateChanged(int id, int active, int width, int height, int fps) {
+        (void)id; (void)active; (void)width; (void)height; (void)fps;
+    }
 };
 
 enum {
     MAX_CELL_COUNT = 16
+    , MAX_VOUT_MAIN_MIXER_CELL_COUNT = 4
+    , MAX_VOUT_SUB_MIXER_CELL_COUNT = 4
+    , MAX_VOUT_COUNT = 2
 };
+
+typedef struct VCellStruct_t {
+    unsigned int id;        // can be cell type (first grade layout) or a vinput device id (second grade layout)
+    
+    unsigned short x_start;
+    unsigned short y_start;
+    unsigned short width;
+    unsigned short height;  // base 1920x1080
+} VCellStruct;
+
 typedef struct VEncMixerCfg_t
 {
     int cell_count;
-    struct {
-        unsigned int id;
-        unsigned short x_start;
-        unsigned short y_start;
-        unsigned short width;
-        unsigned short height;  // base 1920x1080
-    } cells[MAX_CELL_COUNT];
+    VCellStruct cells[MAX_CELL_COUNT];
 } VEncMixerCfg;
+
+typedef enum _tagAudSrcType{
+    AUDIO_ANALOG_MIC1  = 0,
+    AUDIO_ANALOG_MIC2,
+    AUDIO_ANALOG_LINE1,    
+    AUDIO_ANALOG_MAIN,	
+    AUDIO_HDMI_IN,                  // only supported  by  hdmi1 input , but not hdmi2.
+    AUDIO_USB_IN,
+    AUDIO_BT_IN,
+    AUDIO_MAX
+}MW_AUD_SRC_CHN_TYPE_E;
+
+typedef enum HWVOLayoutCellType_t {
+      HWVO_LAYOUT_CELL_LOCAL = 0
+    , HWVO_LAYOUT_CELL_REMOTE_PEOPLE = 2
+    , HWVO_LAYOUT_CELL_REMOTE_CONTENT = 3
+} HWVOLayoutCellType;
+
+typedef struct VSubMixerCfg_t {
+    int cell_count;
+    VCellStruct cells[MAX_VOUT_SUB_MIXER_CELL_COUNT];
+} VSubMixerCfg;
+
+typedef struct VMainMixerCfg_t {
+    int cell_count;
+    VCellStruct cells[MAX_VOUT_MAIN_MIXER_CELL_COUNT];
+    VSubMixerCfg sub_cfgs[MAX_VOUT_MAIN_MIXER_CELL_COUNT];
+} VMainMixerCfg;
 
 class EV_CLASS_API IEVCommon {
 public:
@@ -593,6 +632,13 @@ public:
     //Codec
     virtual int enableHardDecoding(bool enable) = 0;
     virtual bool hardDecodingEnabled() = 0;
+
+    virtual int setVideoOutParameters(int devid, int width, int height, int herz, int interlaced) = 0;
+    virtual int setAudioInputVolume(MW_AUD_SRC_CHN_TYPE_E audio_in_channel, int vol) = 0;  // for hisi based linux sdk
+    virtual int setAudioOutputVolume(int vol) = 0;
+    virtual int setHWVOMixerCfgNoCall(std::vector<VMainMixerCfg> const & cfg) = 0;
+    virtual int setHWVOMixerCfgWithRemoteContent(std::vector<VMainMixerCfg> const & cfg) = 0;
+    virtual int setHWVOMixerCfgWithoutRemoteContent(std::vector<VMainMixerCfg> const & cfg) = 0;
 };
 
 }

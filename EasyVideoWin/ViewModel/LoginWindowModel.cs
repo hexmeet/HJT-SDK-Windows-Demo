@@ -97,7 +97,15 @@ namespace EasyVideoWin.ViewModel
         {
             get
             {
-                return LoginProgressEnum.Idle == LoginManager.Instance.LoginProgress ? Visibility.Collapsed : Visibility.Visible;
+                if (EasyVideoWin.Properties.Settings.Default.CloudOnly)
+                {
+                    return (LoginProgressEnum.Idle == LoginManager.Instance.LoginProgress || LoginProgressEnum.CloudOptions == LoginManager.Instance.LoginProgress)
+                            ? Visibility.Collapsed : Visibility.Visible;
+                }
+                else
+                {
+                    return LoginProgressEnum.Idle == LoginManager.Instance.LoginProgress ? Visibility.Collapsed : Visibility.Visible;
+                }
             }
         }
         
