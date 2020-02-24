@@ -45,7 +45,7 @@
     <sys:String x:Key="CALL_RATE">Call Rate</sys:String>
     <sys:String x:Key="DEVICE_SELECTION">Device Selection</sys:String>
     <sys:String x:Key="DIAGNOSTICS">Diagnostics</sys:String>
-    <sys:String x:Key="START_DIAGNOSTICS">Start Diagnostics</sys:String>
+    <sys:String x:Key="START_DIAGNOSTICS">Upload Logs</sys:String>
     <sys:String x:Key="AUTO_ANSWER">Answer incoming calls automatically</sys:String>
     <sys:String x:Key="AUTO_CAPTURE">Automatic save a snapshot when close whiteboard</sys:String>
     <sys:String x:Key="OPEN_NEW_WIN_IN_CONTENTSTREAM">Use a separate window when viewing the video content shared by others</sys:String>
@@ -470,7 +470,7 @@
 
     <sys:String x:Key="SEND_CONTENT_DENIED">The request for sending conent is denied due to lack of permission.</sys:String>
     <sys:String x:Key="NO_MICROPHONE">There is no microphone found and other can not listen to you. Please check microphone device.</sys:String>
-    <sys:String x:Key="INVALID_USER">Invalid user.</sys:String>
+    <sys:String x:Key="INVALID_USER">Incorrect account or password.</sys:String>
     <sys:String x:Key="INVALID_MEETING_ID">Invalid meeting ID.</sys:String>
     <sys:String x:Key="GOT_IT">Got it</sys:String>
     <sys:String x:Key="FAILED_PLAY_TEST_MUSIC_FOR_SPEAKER_OCCUPIED">No loudspeaker detected, unable to play test music.</sys:String>

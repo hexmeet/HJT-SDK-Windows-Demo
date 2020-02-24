@@ -19,7 +19,7 @@ namespace EasyVideoWin
     public partial class MainWindow : FullScreenBaseWindow
     {
         private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private const double INITIAL_WIDTH = 720d;
+        private const double INITIAL_WIDTH = 750d;
         private const double INITIAL_HEIGHT = 520d;
 
         [DllImport("kernel32.dll")]

@@ -462,6 +462,12 @@ public:
         (void)call_log;
     }
 
+    virtual void onAudioData(int sample_rate, void * data, int len) {
+        (void)sample_rate;
+        (void)data;
+        (void)len;
+    }
+
     virtual void onVideoPreviewFrame(void * frame, int size) {
         (void)frame;
         (void)size;
@@ -606,7 +612,7 @@ public:
     virtual int getStats(EVStats & stats) = 0; 
     virtual int getCallInfo(EVCallInfo & call_info) = 0;
     virtual int getContentInfo(EVContentInfo & content_info) = 0;
-    virtual int enablePreviewFrameCb(EV_STREAM_TYPE type, bool enable) = 0;
+    virtual int enableRelayStreamDataCb(EV_STREAM_TYPE type, bool enable) = 0;
     virtual int setVideoActive(int active) = 0;
     virtual int videoActive() = 0;
     virtual int enableAdaptiveResolution(bool enable) = 0;

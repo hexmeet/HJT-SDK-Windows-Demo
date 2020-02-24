@@ -745,7 +745,7 @@ namespace EasyVideoWin.Model
 
         public void EnableContentAudio(bool enable)
         {
-            _log.Info("EnableContentAudio");
+            _log.InfoFormat("EnableContentAudio: {0}", enable);
             int rst = this.EVSdkWrapper.EVEngineEnableContentAudio(enable);
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {

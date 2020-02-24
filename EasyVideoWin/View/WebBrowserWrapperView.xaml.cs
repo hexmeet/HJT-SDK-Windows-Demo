@@ -502,7 +502,6 @@ namespace EasyVideoWin.View
                 return;
             }
 
-            CallController.Instance.UpdateUserImage(Utils.GetSuspendedVideoBackground(), Utils.GetCurrentAvatarPath());
             CallController.Instance.P2pCallPeer(userId, peerUser.imageUrl, peerUser.displayName);
         }
 

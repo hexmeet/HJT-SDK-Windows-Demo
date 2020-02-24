@@ -389,7 +389,7 @@ namespace EasyVideoWin.View
             _timerHideOperationbar.Interval = 5 * 1000;
             //_timerHideOperationbar.Enabled = true;
             _timerHideOperationbar.AutoReset = true;
-            
+
             _normalCellsSection.Show();
             _normalCellsSection.HideWindow();
             _normalCellsSection.InitDecorationBorder(NORMAL_CELLS_SHOW_MAX_COUNT);
@@ -405,7 +405,7 @@ namespace EasyVideoWin.View
             _layoutOperationbar.Owner = _messageOverlayWindow;
             this.Hide();
 
-         
+            CallController.Instance.ContentStreamStatusChanged += OnContentStreamStatusChanged;
         }
         
         public void ShowWindow(bool bFirst = false, bool isDpiChanged = false)
@@ -498,7 +498,10 @@ namespace EasyVideoWin.View
             }
 
             SetDialoutPeerInfoWindow2ProperPos();
-
+            if (ContentStreamStatus.SendingContentStarted == CallController.Instance.CurrentContentStreamStatus)
+            {
+                Utils.SetWindow2TopMost(_normalCellsSection);
+            }
             log.Info("Show window end.");
         }
         
@@ -510,16 +513,42 @@ namespace EasyVideoWin.View
             _recordingIndicationWindow.HideWindow();
             _speakerPromptWindow.HideWindow();
             _exitAudioModeWindow.HideWindow();
-            for (int i = 0; i < _layoutCells.Length; ++i)
-            {
-                _layoutCells[i].HideWindow();
-            }
+            //for (int i = 0; i < _layoutCells.Length; ++i)
+            //{
+            //    _layoutCells[i].HideWindow();
+            //}
 
-            _localVideoCell.HideWindow();
-            _titlebar.HideWindow();
+            if (!isCallEnded && ContentStreamStatus.SendingContentStarted == CallController.Instance.CurrentContentStreamStatus)
+            {
+                log.InfoFormat("Show _normalCellsSection for !isCallEnded and SendingContentStarted, _layoutMode: {0}", _layoutMode);
+                log.InfoFormat("_normalCellsSection, null == _normalCellsSection.Owner: {0}", null == _normalCellsSection.Owner);
+                _normalCellsSection.Owner = null;
+                if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
+                {
+                    _layoutCells[0].HideWindow(); // only hide speaker
+                }
+                else
+                {
+                    for (int i = 0; i < _layoutCells.Length; ++i)
+                    {
+                        _layoutCells[i].HideWindow();
+                    }
+                }
+            }
+            else
+            {
+                log.Info("HideWindow, hide _normalCellsSection");
+                _localVideoCell.HideWindow();
+                _localVideoCellOperationbar.HideWindow();
+                _normalCellsSection.HideWindow();
+                for (int i = 0; i < _layoutCells.Length; ++i)
+                {
+                    _layoutCells[i].HideWindow();
+                }
+            }
+            
+            _titlebar.HideWindow();            
             _layoutOperationbar.HideWindow();
-            _localVideoCellOperationbar.HideWindow();
-            _normalCellsSection.HideWindow();
             _messageOverlayWindow.HideWindow();
             _dialoutPeerInfoWindow.HideWindow();
 
@@ -697,6 +726,7 @@ namespace EasyVideoWin.View
             {
                 Application.Current.Dispatcher.InvokeAsync(() =>
                 {
+                    log.Info("Show SEND_CONTENT_DENIED");
                     string prompt = LanguageUtil.Instance.GetValueByKey("SEND_CONTENT_DENIED");
                     ShowPromptWindow(prompt, 5000);
                 });
@@ -815,10 +845,19 @@ namespace EasyVideoWin.View
             {
                 log.Info("LayoutCell_MouseDown, show layout operation bar.");
             }
-            SetShowStatus4LayoutOperationbar(_layoutOperationbar.IsWindowHidden, LayoutIndication);
-            if (!_layoutOperationbar.IsWindowHidden)
+            //SetShowStatus4LayoutOperationbar(_layoutOperationbar.IsWindowHidden, LayoutIndication);
+            //if (!_layoutOperationbar.IsWindowHidden)
+            //{
+            //    ShowLayoutCellOperationbar(LayoutIndication, cell);
+            //}
+
+            if (IsCellRelatedToOperationbar(cell))
             {
-                ShowLayoutCellOperationbar(LayoutIndication, cell);
+                SetShowStatus4LayoutOperationbar(_layoutOperationbar.IsWindowHidden, LayoutIndication);
+                if (!_layoutOperationbar.IsWindowHidden)
+                {
+                    ShowLayoutCellOperationbar(LayoutIndication, cell);
+                }
             }
         }
 
@@ -847,13 +886,26 @@ namespace EasyVideoWin.View
                 {
                     log.Info("LayoutCell_MouseMove, show layout operation bar.");
                 }
-                SetShowStatus4LayoutOperationbar(true, LayoutIndication);
+                if (ContentStreamStatus.SendingContentStarted == CallController.Instance.CurrentContentStreamStatus)
+                {
+                    if (_localVideoCell != cell)
+                    {
+                        SetShowStatus4LayoutOperationbar(true, LayoutIndication);
+                    }
+                }
+                else
+                {
+                    SetShowStatus4LayoutOperationbar(true, LayoutIndication);
+                }
             }
 
             ShowLayoutCellOperationbar(LayoutIndication, cell);
-            
-            SetTopWindows();
 
+            if (IsCellRelatedToOperationbar(cell))
+            {
+                SetTopWindows();
+            }
+            
             //if (_isSpeakerMode)
             //{
             //    if (_speakerModeMainCell != cell)
@@ -865,6 +917,33 @@ namespace EasyVideoWin.View
             //SetShowStatus4LayoutOperationbar(true);
         }
         
+        private bool IsCellRelatedToOperationbar(LayoutCellWindow cell)
+        {
+            if (ContentStreamStatus.SendingContentStarted == CallController.Instance.CurrentContentStreamStatus)
+            {
+                if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
+                {
+                    if (_speakerModeMainCell == cell)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (_localVideoCell != cell)
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         private void ShowLayoutCellOperationbar(ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication, LayoutCellWindow cell, bool forceUpdate = false)
         {
             if (null == cell)
@@ -1068,7 +1147,22 @@ namespace EasyVideoWin.View
 
         private void LayoutCell_Activated(object sender, EventArgs e)
         {
-            SetTopWindows();
+            //SetTopWindows();
+
+            LayoutCellWindow cell = sender as LayoutCellWindow;
+            if (null == cell)
+            {
+                LayoutCellOperationbarWindow barWin = sender as LayoutCellOperationbarWindow;
+                if (null != barWin)
+                {
+                    cell = barWin.Owner as LayoutCellWindow;
+                }
+            }
+
+            if (IsCellRelatedToOperationbar(cell))
+            {
+                SetTopWindows();
+            }
         }
         
         private bool HasActiveWindow()
@@ -1146,7 +1240,17 @@ namespace EasyVideoWin.View
             // set windows top in order
             if (LayoutModeType.NEW_SPEAKER_MODE == _layoutMode)
             {
-                Utils.SetWindow2Top(_normalCellsSection.Handle);
+                if (ContentStreamStatus.SendingContentStarted == CallController.Instance.CurrentContentStreamStatus)
+                {
+                    //log.Info("SetTopWindows NEW_SPEAKER_MODE - SendingContentStarted, SetWindow2TopMost _normalCellsSection");
+                    Utils.SetWindow2TopMost(_normalCellsSection.Handle);
+                }
+                else
+                {
+                    //log.Info("SetTopWindows NEW_SPEAKER_MODE - !SendingContentStarted, SetWindow2Top _normalCellsSection");
+                    Utils.SetWindow2Top(_normalCellsSection.Handle);
+                }
+                
                 SetSoftwareUpdateWindowTop();
                 Utils.SetWindow2Top(_layoutOperationbar.Handle);
                 Utils.SetWindow2Top(_messageOverlayWindow.Handle);
@@ -1155,7 +1259,16 @@ namespace EasyVideoWin.View
             {
                 Utils.SetWindow2Top(_titlebar.Handle);
                 Utils.SetWindow2Top(_layoutOperationbar.Handle);
-                Utils.SetWindow2Top(_normalCellsSection.Handle);
+                if (ContentStreamStatus.SendingContentStarted == CallController.Instance.CurrentContentStreamStatus)
+                {
+                    //log.Info("SetTopWindows !NEW_SPEAKER_MODE - SendingContentStarted, SetWindow2TopMost _normalCellsSection");
+                    Utils.SetWindow2TopMost(_normalCellsSection.Handle);
+                }
+                else
+                {
+                    //log.Info("SetTopWindows !NEW_SPEAKER_MODE - !SendingContentStarted, SetWindow2Top _normalCellsSection");
+                    Utils.SetWindow2Top(_normalCellsSection.Handle);
+                }
                 SetSoftwareUpdateWindowTop();
                 Utils.SetWindow2Top(_messageOverlayWindow.Handle);
             }
@@ -1822,15 +1935,41 @@ namespace EasyVideoWin.View
             double width = (SMALL_VIDEO_WINDOW_WIDTH + CELL_BORDER_LENGTH * 2) * ratio;
             height += (NORMAL_CELLS_SECTION_BAR_HEIGHT * 2 + SMALL_VIDEO_WINDOW_HEIGHT * showCount + CELL_BORDER_LENGTH * (showCount + 1)) * ratio;
             _normalCellsSection.SetProperWindowSize(width, height);
-            _normalCellsSection.Owner = _layoutOperationbar;
+            if (ContentStreamStatus.SendingContentStarted == CallController.Instance.CurrentContentStreamStatus)
+            {
+                _normalCellsSection.Owner = null;
+            }
+            else
+            {
+                _normalCellsSection.Owner = _layoutOperationbar;
+            }
+            
             _normalCellsSection.ShowWindow();
             log.InfoFormat("_normalCellsSection position, left: {0}, top: {1}, ratio: {2}", _normalCellsSection.Left, _normalCellsSection.Top, ratio);
 
             if (!HasActiveWindow())
             {
                 log.Info("Set normal cells section to top");
-                Utils.SetWindow2Top(_normalCellsSection.Handle);
+                if (ContentStreamStatus.SendingContentStarted == CallController.Instance.CurrentContentStreamStatus)
+                {
+                    log.Info("ShowNormalCells SendingContentStarted, SetWindow2TopMost _normalCellsSection");
+                    Utils.SetWindow2TopMost(_normalCellsSection.Handle);
+                }
+                else
+                {
+                    log.Info("ShowNormalCells SendingContentStarted, SetWindow2Top _normalCellsSection");
+                    Utils.SetWindow2Top(_normalCellsSection.Handle);
+                }
+                
                 SetSoftwareUpdateWindowTop();
+            }
+            else
+            {
+                if (ContentStreamStatus.SendingContentStarted == CallController.Instance.CurrentContentStreamStatus)
+                {
+                    log.Info("ShowNormalCells SendingContentStarted, SetWindow2TopMost _normalCellsSection");
+                    Utils.SetWindow2TopMost(_normalCellsSection.Handle);
+                }
             }
 
             Dictionary<LayoutCellWindow, int> usedSites = new Dictionary<LayoutCellWindow, int>();
@@ -1871,12 +2010,26 @@ namespace EasyVideoWin.View
                 if (!HasActiveWindow())
                 {
                     log.Info("Set normal cell to top");
-                    Utils.SetWindow2Top(cell.Handle);
+                    if (ContentStreamStatus.SendingContentStarted == CallController.Instance.CurrentContentStreamStatus)
+                    {
+                        Utils.SetWindow2TopMost(cell.Handle);
+                    }
+                    else
+                    {
+                        Utils.SetWindow2Top(cell.Handle);
+                    }
                 }
                 else
                 {
                     log.Info("Set normal cell to non top");
-                    Utils.SetWindow2NoTopMost(cell.Handle);
+                    if (ContentStreamStatus.SendingContentStarted == CallController.Instance.CurrentContentStreamStatus)
+                    {
+                        Utils.SetWindow2TopMost(cell.Handle);
+                    }
+                    else
+                    {
+                        Utils.SetWindow2NoTopMost(cell.Handle);
+                    }
                 }
                 usedSites.Add(cell, 0);
             }
@@ -1995,7 +2148,11 @@ namespace EasyVideoWin.View
             {
                 ShowNormalCells(layoutIndication);
             }
-            
+
+            //if (ContentStreamStatus.SendingContentStarted == CallController.Instance.CurrentContentStreamStatus)
+            //{
+            //    Utils.SetWindow2TopMost(_normalCellsSection);
+            //}
         }
 
         private void SetNormalCellBorder(LayoutCellWindow normalCell, int idx)
@@ -3251,6 +3408,28 @@ namespace EasyVideoWin.View
             _localVideoCell.CellName = displayName;
         }
 
+        private void OnContentStreamStatusChanged(object sender, ContentStreamInfo contentStreamInfo)
+        {
+            log.Info("OnContentStreamStatusChanged start.");
+            Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                log.InfoFormat("Content stream status changed, current status: {0}, last status: {1}", contentStreamInfo.CurrentStatus, contentStreamInfo.LastStatus);
+
+                if (ContentStreamStatus.SendingContentStarted == contentStreamInfo.CurrentStatus)
+                {
+                    log.Info("OnContentStreamStatusChanged SendingContentStarted, SetWindow2TopMost _normalCellsSection");
+                    _normalCellsSection.Owner = null;
+                    Utils.SetWindow2TopMost(_normalCellsSection);
+                }
+                else
+                {
+                    log.Info("OnContentStreamStatusChanged !SendingContentStarted, SetWindow2Top _normalCellsSection");
+                    _normalCellsSection.Owner = _layoutOperationbar;
+                    Utils.SetWindow2Top(_normalCellsSection);
+                }
+            });
+            log.Info("OnContentStreamStatusChanged end.");
+        }
 
         #endregion
 

@@ -464,7 +464,9 @@ namespace EasyVideoWin.Model
                                   )
         {
             log.InfoFormat("Join conference. conf number:{0}, display name:{1}, type: {2}", confNumber, displayName, type);
-            
+
+            UpdateUserImage(Utils.GetSuspendedVideoBackground(), Utils.GetCurrentAvatarPath());
+
             _conferenceDisplayName = displayName;
             ConferenceNumber = confNumber;
             
