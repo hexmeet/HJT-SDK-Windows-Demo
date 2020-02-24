@@ -281,7 +281,6 @@ namespace EasyVideoWin.ViewModel
         private void VideoAnswer(object parameter)
         {
             log.Info("VideoAnswer");
-            CallController.Instance.UpdateUserImage(Utils.GetSuspendedVideoBackground(), Utils.GetCurrentAvatarPath());
             CallController.Instance.JoinConference(CallController.Instance.CallInfo.conference_number, LoginManager.Instance.DisplayName, CallController.Instance.CallInfo.password, ManagedEVSdk.Structs.EV_SVC_CALL_TYPE_CLI.EV_SVC_CALL_CONF);
         }
 

@@ -315,6 +315,31 @@ namespace EasyVideoWin.Helpers
                                 );
         }
 
+        public static bool SetWindow2TopMost(Window window)
+        {
+            IntPtr handle = new WindowInteropHelper(window).Handle;
+            return SetWindow2TopMost(handle);
+        }
+
+        public static bool SetWindow2TopMost(IntPtr handle)
+        {
+            if (IntPtr.Zero == handle)
+            {
+                return false;
+            }
+            RECT rect;
+            GetWindowRect(handle, out rect);
+            return SetWindowPos(
+                handle
+                , HWND_TOPMOST
+                , (int)rect.left
+                , (int)rect.top
+                , (int)(rect.right - rect.left)
+                , (int)(rect.bottom - rect.top)
+                , SWP_SHOWWINDOW
+            );
+        }
+
         public static bool SetWindowPosTopMost(IntPtr handle, int left, int top, int width, int height)
         {
             return SetWindowPos(

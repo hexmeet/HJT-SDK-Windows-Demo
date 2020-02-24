@@ -133,10 +133,15 @@ namespace EasyVideoWin.ViewModel
                     ConferenceNumber = CallController.Instance.IsP2pCall ? "" : CallController.Instance.ConferenceNumber;
                     log.InfoFormat("Update ConferenceNumber: {0}", ConferenceNumber);
                     break;
-                case CallStatus.P2pOutgoing:
+                case CallStatus.P2pIncoming:
+                case CallStatus.ConfIncoming:
+                    CallDuration = "00:00:00";
+                    CallQuality = 5;
                     break;
                 case CallStatus.Connected:
                     StartRefreshCallDurationTimer();
+                    break;
+                default:
                     break;
             }
             

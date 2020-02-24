@@ -36,7 +36,7 @@
                 <DockPanel HorizontalAlignment="Right" Margin="0, 0, 0, 0">
                     <TextBlock Text="{DynamicResource SETTING}"
                                MouseLeftButtonDown="Setting_MouseLeftButtonDown"
-                               VerticalAlignment="Center" Foreground="#c1c1c1" FontSize="12" Cursor="Hand"/>
+                               VerticalAlignment="Center" Foreground="#4381ff" FontSize="12" Cursor="Hand"/>
                     <CustomControls:WpfImageButton ImageWidth="28" ImageHeight="28"
                                                    TextVisibility="Collapsed"
                                         NormalImage="pack://application:,,,/Resources/Icons/WindowTitlebar/minimize_normal.png"
