@@ -61,6 +61,8 @@ namespace EasyVideoWin.View
             }
         }
 
+        public bool IsClosed { get; set; } = false;
+
         #endregion
 
         #region -- Constructor --
@@ -70,6 +72,7 @@ namespace EasyVideoWin.View
             InitializeComponent();
             this.DataContext = this;
 
+            this.Closing += ConfManagementWindow_Closing;
             this.IsVisibleChanged += ConfManagementWindow_IsVisibleChanged;
             
             this.StateChanged += ConfManagementWindow_StateChanged;
@@ -78,11 +81,16 @@ namespace EasyVideoWin.View
             _confCtrlView = new EasyVideoWin.View.WebBrowserWrapperView(Enums.WebBrowserUrlType.CONF_MANAGEMENT, this);
             CurrentView = _confCtrlView;
         }
-        
+
+        private void ConfManagementWindow_Closing(object sender, CancelEventArgs e)
+        {
+            IsClosed = true;
+        }
+
         #endregion
 
         #region -- Public Method --
-        
+
         override protected void Dispose(bool disposing)
         {
             if (!IsDisposed)
@@ -111,15 +119,32 @@ namespace EasyVideoWin.View
         
         private void ConfManagementWindow_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            log.InfoFormat("ConfManagementWindow_IsVisibleChanged: {0}", this.Visibility);
             ConfManagementWindow_StateChanged(null, new EventArgs());
             
             if (Visibility.Visible == this.Visibility)
             {
-                _confCtrlView.UpdateData();
+                //_confCtrlView.UpdateData();
+
+                log.Info("show new conf management list");
+                if (null != _confCtrlView)
+                {
+                    _confCtrlView.Dispose();
+                }
+
+                _confCtrlView = new EasyVideoWin.View.WebBrowserWrapperView(Enums.WebBrowserUrlType.CONF_MANAGEMENT, this);
+                CurrentView = _confCtrlView;
             }
             else
             {
-                _confCtrlView.ClearConfManagementCache();
+                //_confCtrlView.ClearConfManagementCache();
+                log.Info("destroy conf management list");
+                CurrentView = null;
+                if (null != _confCtrlView)
+                {
+                    _confCtrlView.Dispose();
+                    _confCtrlView = null;
+                }
             }
         }
         
@@ -177,30 +202,30 @@ namespace EasyVideoWin.View
         private void OnCallStatusChanged(object sender, CallStatus status)
         {
             log.Info("OnCallStatusChanged");
-            switch (status)
-            {
-                case CallStatus.Connected:
-                    Application.Current.Dispatcher.InvokeAsync(() =>
-                    {
-                        if (null != _confCtrlView)
-                        {
-                            _confCtrlView.Dispose();
-                        }
+            //switch (status)
+            //{
+            //    case CallStatus.Connected:
+            //        Application.Current.Dispatcher.InvokeAsync(() =>
+            //        {
+            //            if (null != _confCtrlView)
+            //            {
+            //                _confCtrlView.Dispose();
+            //            }
                         
-                        _confCtrlView = new EasyVideoWin.View.WebBrowserWrapperView(Enums.WebBrowserUrlType.CONF_MANAGEMENT, this);
-                        CurrentView = _confCtrlView;
-                    });
-                    break;
-                case CallStatus.Ended:
-                    Application.Current.Dispatcher.InvokeAsync(() => {
-                        if (null != _confCtrlView)
-                        {
-                            _confCtrlView.Dispose();
-                            _confCtrlView = null;
-                        }
-                    });
-                    break;
-            }
+            //            _confCtrlView = new EasyVideoWin.View.WebBrowserWrapperView(Enums.WebBrowserUrlType.CONF_MANAGEMENT, this);
+            //            CurrentView = _confCtrlView;
+            //        });
+            //        break;
+            //    case CallStatus.Ended:
+            //        Application.Current.Dispatcher.InvokeAsync(() => {
+            //            if (null != _confCtrlView)
+            //            {
+            //                _confCtrlView.Dispose();
+            //                _confCtrlView = null;
+            //            }
+            //        });
+            //        break;
+            //}
 
             log.Info("OnCallStatusChanged done");
         }

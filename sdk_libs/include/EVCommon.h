@@ -443,6 +443,10 @@ public:
         (void)info;
     }
 
+    virtual void onCallState(EVCallInfo & info) {
+        (void)info;
+    }
+
     virtual void onCallPeerConnected(EVCallInfo & info) {
         (void)info;
     }

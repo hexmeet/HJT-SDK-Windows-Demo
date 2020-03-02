@@ -257,6 +257,7 @@ namespace EasyVideoWin.ViewModel
         
         private void SetDefaultSetting()
         {
+            log.Info("SetDefaultSetting");
             BackgroundImage = "pack://application:,,,/Resources/Icons/background_default.png";
             BackgroundOpacity = 1f;
             //HeaderImageVisibility = Visibility.Collapsed;

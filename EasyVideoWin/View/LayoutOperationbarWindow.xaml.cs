@@ -801,6 +801,7 @@ namespace EasyVideoWin.View
 
         private void ConfManagementBtn_Click(object sender, RoutedEventArgs e)
         {
+            log.Info("ConfManagementBtn_Click");
             ConfManagementChanged?.Invoke(sender, new EventArgs());
         }
         

@@ -344,7 +344,7 @@ namespace EasyVideoWin.Helpers
         // delete the useless file in the folder
         private void ClearTheFolder()
 		{
-			string[] files = Directory.GetFiles(this._appdatafolder, "HexMeetHJTLogs_*.zip", SearchOption.TopDirectoryOnly);
+			string[] files = Directory.GetFiles(this._appdatafolder, "*Logs*.zip", SearchOption.TopDirectoryOnly);
 			if (files != null)
 			{
 				foreach (string f in files)
