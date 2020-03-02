@@ -27,8 +27,8 @@ namespace EasyVideoWin.ViewModel
 
         private const int CONF_ID_HISTORY_MAX_COUNT = 5;
         private LoginManager _loginMgr = LoginManager.Instance;
-        private UserControl _callingView;
-        private UserControl _logoView;
+        private UserControl _callingView = (UserControl)Activator.CreateInstance(typeof(EasyVideoWin.View.CallingView));
+        private UserControl _logoView = (UserControl)Activator.CreateInstance(typeof(EasyVideoWin.View.LogoView));
         
         private UserControl _currentView;
 
@@ -85,9 +85,6 @@ namespace EasyVideoWin.ViewModel
                 || LoginStatus.AnonymousLoggedIn == LoginManager.Instance.CurrentLoginStatus
             )
             {
-                _callingView = (UserControl)Activator.CreateInstance(typeof(EasyVideoWin.View.CallingView));
-                _logoView = (UserControl)Activator.CreateInstance(typeof(EasyVideoWin.View.LogoView));
-                
                 CurrentView = _callingView;
             }
         }
@@ -175,16 +172,6 @@ namespace EasyVideoWin.ViewModel
                 {
                     App.Current.Dispatcher.InvokeAsync(() =>
                     {
-                        if (_callingView == null)
-                        {
-                            _callingView = (UserControl)Activator.CreateInstance(typeof(EasyVideoWin.View.CallingView));
-                        }
-
-                        if (_logoView == null)
-                        {
-                            _logoView = (UserControl)Activator.CreateInstance(typeof(EasyVideoWin.View.LogoView));
-                        }
-                        
                         CurrentView = _callingView;
                     });
                 }

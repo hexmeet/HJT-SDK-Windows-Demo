@@ -66,7 +66,7 @@ namespace EasyVideoWin.ViewModel
 
         private void OnCallStatusChanged(object sender, CallStatus status)
         {
-            log.Info("OnCallStatusChanged start.");
+            log.InfoFormat("OnCallStatusChanged start. {0}", status);
             switch (status)
             {
                 case CallStatus.Dialing:

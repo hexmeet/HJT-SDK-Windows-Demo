@@ -1780,9 +1780,18 @@ namespace EasyVideoWin.View
 
         private void LayoutOperationbar_ConfManagementChanged(object sender, EventArgs e)
         {
+            log.Info("LayoutOperationbar_ConfManagementChanged");
             if (null == _confManagermentWindow)
             {
                 _confManagermentWindow = new ConfManagementWindow();
+            }
+            else
+            {
+                log.InfoFormat("_confManagermentWindow is not null, IsClosed: {0}", _confManagermentWindow.IsClosed);
+                if (_confManagermentWindow.IsClosed)
+                {
+                    _confManagermentWindow = new ConfManagementWindow();
+                }
             }
             //_confManagermentWindow.Owner = _normalCellsSection;
             //_confManagermentWindow.ShowDialog();
@@ -1794,10 +1803,12 @@ namespace EasyVideoWin.View
 
             if (Visibility.Visible == _confManagermentWindow.Visibility)
             {
+                log.Info("_confManagermentWindow has been visible, so activate it.");
                 _confManagermentWindow.Activate();
             }
             else
             {
+                log.Info("_confManagermentWindow is not visible, so show it");
                 _confManagermentWindow.Show();
             }
         }

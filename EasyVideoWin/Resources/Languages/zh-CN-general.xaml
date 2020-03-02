@@ -402,7 +402,7 @@
     <sys:String x:Key="INVALID_ENDPOINT">无效的终端信息</sys:String>
     <sys:String x:Key="SERVER_UNLICENSED">您呼叫的云平台尚未激活</sys:String>
     <sys:String x:Key="SERVER_LICENSE_EXPIRED">服务器许可证过期</sys:String>
-    <sys:String x:Key="NEITHER_TEMPLATE_NOR_ONGOING_NOR_BINDED_ROOM">呼叫失败，会议号码不存在或者此会议还未开始，请检查后重试</sys:String>
+    <sys:String x:Key="NEITHER_TEMPLATE_NOR_ONGOING_NOR_BINDED_ROOM">会议号码不存在或者此会议还未开始，请检查后重试</sys:String>
     <sys:String x:Key="LOCK_TIMEOUT">呼叫超时，请重试</sys:String>
     <sys:String x:Key="TEMPLATE_CONF_WITHOUT_CONFROOM">您呼叫的群组尚未绑定云会议室</sys:String>
     <sys:String x:Key="ROOM_EXPIRED">您呼叫的云会议室已过期</sys:String>
