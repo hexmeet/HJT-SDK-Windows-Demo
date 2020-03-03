@@ -25,6 +25,11 @@ namespace EasyVideoWin.ViewModel
         static extern EXECUTION_STATE SetThreadExecutionState(EXECUTION_STATE esFlags);
 
         private System.Timers.Timer _timerCheckSystemStatus;
+
+        private const int EV_CALL_BYE_EP_NO_PACKET_RECEIVED = 11;       // ep can not receive stream from mru and teminate after 30 second
+        private const int EV_CALL_BYE_MRU_NORMAL = 100;                 // conf is ended
+        private const int EV_CALL_BYE_MRU_OPERATOR_DISCONNECT = 101;    // conf is ended or hung up by host 会议结束或被主持人挂断
+        private const int EV_CALL_BYE_MRU_NO_PACKET_RECEIVED = 102;     // mru can not receive stream from ep and teminate after 30 second
         
         private static Dictionary<int, string> _sdkSelfErrorInfo = new Dictionary<int, string>
         {
@@ -57,6 +62,10 @@ namespace EasyVideoWin.ViewModel
         private static Dictionary<int, string> _callErrorInfo = new Dictionary<int, string>
         {
             {2999,      "SERVICE_EXCEPTION"}
+            , {11,      "NETWORK_UNAVAILABLE"}
+            , {100,     "MEETING_ENDED"}
+            , {101,     "MEETING_ENDED"}
+            , {102,     "NETWORK_UNAVAILABLE"}
             , {1001,    "INVALID_NUMERICID"}
             , {1003,    "INVALID_USERNAME"}
             , {1005,    "INVALID_USERID"}
@@ -332,7 +341,7 @@ namespace EasyVideoWin.ViewModel
                 log.InfoFormat("Current login status:{0}. Login failed.", LoginManager.Instance.CurrentLoginStatus);
                 LoginManager.Instance.OnLoggingInFailed(LoginStatus.LoggingIn == LoginManager.Instance.CurrentLoginStatus);
             }
-
+            
             string errPrompt = null;
             switch (err.type)
             {
@@ -374,6 +383,11 @@ namespace EasyVideoWin.ViewModel
                     if (_callErrorInfo.ContainsKey(err.code))
                     {
                         errPrompt = LanguageUtil.Instance.GetValueByKey(_callErrorInfo[err.code]);
+                        if (EV_CALL_BYE_MRU_NORMAL == err.code || EV_CALL_BYE_MRU_OPERATOR_DISCONNECT == err.code || EV_CALL_BYE_EP_NO_PACKET_RECEIVED == err.code || EV_CALL_BYE_MRU_NO_PACKET_RECEIVED == err.code)
+                        {
+                            string meetingInfo = string.Format(LanguageUtil.Instance.GetValueByKey("CONF_PLUS_NUMBER"), CallController.Instance.ConferenceNumber);
+                            errPrompt = meetingInfo + "\n" + errPrompt;
+                        }
                     }
                     else
                     {

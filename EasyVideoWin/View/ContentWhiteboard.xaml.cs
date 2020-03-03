@@ -1634,7 +1634,7 @@ namespace EasyVideoWin.View
         
         public void getJwtParam()
         {
-            log.DebugFormat("getJwtParam");
+            log.Info("getJwtParam");
             if (CallController.Instance.acsInfo != null && !string.IsNullOrEmpty(CallController.Instance.acsInfo.acsJsonWebToken))
             {
                 this.JwtParam = CallController.Instance.acsInfo.acsJsonWebToken;

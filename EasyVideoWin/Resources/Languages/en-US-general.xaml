@@ -502,4 +502,7 @@
     <sys:String x:Key="CALL_DECLINED">Call failed due to the party is busy.</sys:String>
     <sys:String x:Key="CHANGE_NAME">Rename</sys:String>
     <sys:String x:Key="INPUT_NEW_DISPLAY_NAME">Input a new display name:</sys:String>
+    <sys:String x:Key="MEETING_ENDED">Meeting ended or terminated by meeting host.</sys:String>
+    <sys:String x:Key="NETWORK_UNAVAILABLE">Network unavailable. Please check and try again.</sys:String>
+    <sys:String x:Key="CONF_PLUS_NUMBER">Meeting {0}</sys:String>
 </ResourceDictionary>
