@@ -2193,7 +2193,7 @@ namespace EasyVideoWin.View
         
         private void EVSdkWrapper_EventLayoutIndication(ManagedEVSdk.Structs.EVLayoutIndicationCli layoutIndication)
         {
-            log.InfoFormat("EVSdkWrapper_EventLayoutIndication, layoutIndication.sites_size: {0}, LayoutIndication.sites_size: {1}, speaker_name to: {2}", layoutIndication.sites_size, LayoutIndication.sites_size, layoutIndication.speaker_name);            
+            log.InfoFormat("EVSdkWrapper_EventLayoutIndication, layoutIndication.sites_size: {0}, LayoutIndication.sites_size: {1}, speaker_name to: {2}, mode_settable: {3}", layoutIndication.sites_size, LayoutIndication.sites_size, layoutIndication.speaker_name, layoutIndication.mode_settable);            
             Application.Current.Dispatcher.InvokeAsync(() =>
             {
                 log.InfoFormat("EventLayoutIndication, _layoutMode: {0}, sites_size: {1}, setting_mode: {2}, mode: {3}", _layoutMode, layoutIndication.sites_size, layoutIndication.setting_mode, layoutIndication.mode);
@@ -2414,7 +2414,7 @@ namespace EasyVideoWin.View
         
         public void LayoutOperationbar_SvcLayoutModeChanged(LayoutModeType layoutMode, bool isDpiChanged=false)
         {
-            log.InfoFormat("LayoutOperationbar_SvcLayoutModeChanged, layoutMode: {0}, isDpiChanged: {1}, Current _layoutMode: {2}", layoutMode, isDpiChanged, _layoutMode);
+            log.InfoFormat("LayoutOperationbar_SvcLayoutModeChanged, layoutMode: {0}, isDpiChanged: {1}, Current _layoutMode: {2}, _disableChangeLayout: {3}", layoutMode, isDpiChanged, _layoutMode, _disableChangeLayout);
             if (_disableChangeLayout)
             {
                 ShowPromptWindow(LanguageUtil.Instance.GetValueByKey("LAYOUT_CHANGE_DISABLED"), 5000);

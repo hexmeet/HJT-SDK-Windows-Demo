@@ -49,10 +49,10 @@ namespace EasyVideoWin.CustomControls
         {
             TitleText.Text = title;
             MessageText.Text = msg.Replace($"\\n", "\n");
-            ButtonText.Text = btn;
+            ButtonText.ButtonContent = btn;
         }
 
-        private void OnClick_Close(object sender, MouseButtonEventArgs e)
+        private void OnClick_Close(object sender, RoutedEventArgs e)
         {
             this.Close();
         }

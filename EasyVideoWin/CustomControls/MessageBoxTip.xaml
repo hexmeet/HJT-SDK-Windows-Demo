@@ -6,36 +6,53 @@
         xmlns:local="clr-namespace:EasyVideoWin.CustomControls"
         mc:Ignorable="d"
         FontFamily="Arial, Microsoft YaHei"
-        Title="MessageBoxTip" Height="180" Width="360" WindowStyle="None" BorderThickness="1" ResizeMode="NoResize" ShowInTaskbar="False"
-        Background="#ffffff" AllowsTransparency="True" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded">
+        xmlns:CustomControls="clr-namespace:EasyVideoWin.CustomControls"
+        Title="MessageBoxTip" Height="160" Width="370" WindowStyle="None" BorderThickness="1" ResizeMode="NoResize" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner" Loaded="Window_Loaded">
     <Window.Effect>
         <DropShadowEffect BlurRadius="24" Color="#858484" Direction="90" ShadowDepth="2"/>
     </Window.Effect>
-    <Viewbox>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="30"/>
-                <RowDefinition Height="2"/>
-                <RowDefinition Height="90"/>
-                <RowDefinition Height="1"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="28"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="44"/>
+        </Grid.RowDefinitions>
 
-            <Grid x:Name="title" Grid.Row="0">
-                <TextBlock x:Name="TitleText" FontSize="16" Foreground="#000000" Text="{DynamicResource PROMPT}" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
-            </Grid>
-            <Grid Grid.Row="1">
-                <Path Stroke="#f4f4f4" StrokeThickness="3" Data="M 0,0 H 430"></Path>
-            </Grid>
-            <Grid Grid.Row="2" x:Name="Message" HorizontalAlignment="Center" >
-                <TextBlock x:Name="MessageText" FontSize="14" Foreground="#313131" Text="" VerticalAlignment="Center" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"  Width="250"></TextBlock>
-            </Grid>
-            <Grid Grid.Row="3"></Grid>
-            <Grid Grid.Row="4">
-                <Grid x:Name="GridButtonText" Background="#f04848"  Width="100" Height="36" HorizontalAlignment="Center"  Margin="5, 0, 5, 10" MouseLeftButtonDown="OnClick_Close">
-                    <TextBlock x:Name="ButtonText" FontSize="14" Foreground="#ffffff" Text="{DynamicResource CONFIRM}" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
-                </Grid>
-            </Grid>
+        <Grid x:Name="title" Grid.Row="0" Background="#f7f7f7" Margin="10, 0, 0, 0">
+            <DockPanel HorizontalAlignment="Left" VerticalAlignment="Center">
+                <TextBlock x:Name="TitleText" Text="{DynamicResource PROMPT}" Style="{StaticResource ChangePasswordTitle}"></TextBlock>
+            </DockPanel>
+            <DockPanel HorizontalAlignment="Right" Margin="0, 0, 0, 0">
+                <CustomControls:WpfImageButton ImageWidth="28" ImageHeight="28"
+                                                   TextVisibility="Collapsed"
+                                        NormalImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_normal.png"
+                                        PressedImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_click.png"
+                                        MouseOverImage="pack://application:,,,/Resources/Icons/WindowTitlebar/closed_hover.png"
+                                        Cursor="Hand" Click="OnClick_Close"/>
+            </DockPanel>
         </Grid>
-    </Viewbox>
+
+        <Grid Grid.Row="1" Margin="10, 0, 10, 0" VerticalAlignment="Center">
+            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" VerticalAlignment="Center">
+                <Image Width="36" Height="36" Source="pack://application:,,,/Resources/Icons/logo_about.png"/>
+                <StackPanel Margin="10, 0, 0, 0" Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock x:Name="MessageText" FontSize="14" LineHeight="22"  LineStackingStrategy="BlockLineHeight" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="#313131" Margin="0, 0, 0, 5" Width="300"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="2" VerticalAlignment="Center" Background="#f7f7f7">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Height="44">
+                <DockPanel HorizontalAlignment="Right" Margin="10, 0, 20, 0">
+                    <CustomControls:TextButton
+                            x:Name="ButtonText"
+                        ButtonWidth="80"
+                        ButtonHeight="28"
+                        Style="{StaticResource ConfirmButton}"
+                        Click="OnClick_Close" />
+                </DockPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
 </Window>

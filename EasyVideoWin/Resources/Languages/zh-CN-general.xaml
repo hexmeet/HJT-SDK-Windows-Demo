@@ -502,4 +502,7 @@
     <sys:String x:Key="CALL_DECLINED">呼叫失败，对方忙</sys:String>
     <sys:String x:Key="CHANGE_NAME">改名</sys:String>
     <sys:String x:Key="INPUT_NEW_DISPLAY_NAME">输入新的显示名称：</sys:String>
+    <sys:String x:Key="MEETING_ENDED">会议结束或被主持人挂断</sys:String>
+    <sys:String x:Key="NETWORK_UNAVAILABLE">网络异常，请检查网络</sys:String>
+    <sys:String x:Key="CONF_PLUS_NUMBER">会议 {0}</sys:String>
 </ResourceDictionary>
