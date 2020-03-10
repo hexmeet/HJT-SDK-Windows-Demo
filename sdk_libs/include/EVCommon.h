@@ -182,7 +182,8 @@ public:
 
 typedef enum _EV_ENCRYPT_TYPE {
     EV_ENCRYPT_SHA1 = 0,
-    EV_ENCRYPT_AES = 1
+    EV_ENCRYPT_AES = 1,
+    EV_ENCRYPT_DES = 2
 } EV_ENCRYPT_TYPE;
 
 //////////////////////////////
@@ -559,6 +560,8 @@ public:
     virtual int enableSecure(bool enable) = 0;
     virtual std::string encryptPassword(const char * password) = 0;
     virtual std::string encryptPassword(EV_ENCRYPT_TYPE type, const char * password) = 0;
+	virtual std::string encryptPassword(EV_ENCRYPT_TYPE type, const char * password, const char* key) = 0;
+	virtual std::string descryptPassword(EV_ENCRYPT_TYPE type, const char * password, const char* key) = 0;
     virtual std::string getSerialNumber() = 0;
     virtual std::string getPlatform() = 0;
 

@@ -1008,7 +1008,7 @@ namespace EasyVideoWin.Helpers
         public static bool GetDisableMicOnJoinConf()
         {
             string value = Utils.IniReadValue(CONFIG_TITLE, CONFIG_DISABLE_MIC_ON_JOIN_CONF, GetCurConfigFile());
-            return "TRUE" == value.ToUpper();
+            return "FALSE" != value.ToUpper();
         }
 
         public static bool GetIsConfRunning()

@@ -385,8 +385,10 @@ namespace EasyVideoWin.ViewModel
                         errPrompt = LanguageUtil.Instance.GetValueByKey(_callErrorInfo[err.code]);
                         if (EV_CALL_BYE_MRU_NORMAL == err.code || EV_CALL_BYE_MRU_OPERATOR_DISCONNECT == err.code || EV_CALL_BYE_EP_NO_PACKET_RECEIVED == err.code || EV_CALL_BYE_MRU_NO_PACKET_RECEIVED == err.code)
                         {
-                            string meetingInfo = string.Format(LanguageUtil.Instance.GetValueByKey("CONF_PLUS_NUMBER"), CallController.Instance.ConferenceNumber);
-                            errPrompt = meetingInfo + "\n" + errPrompt;
+                            if (!CallController.Instance.IsPreviousP2pCall)
+                            {
+                                errPrompt = CallController.Instance.ConferenceNumber + "\n" + errPrompt;
+                            }
                         }
                     }
                     else

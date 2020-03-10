@@ -149,7 +149,20 @@ namespace EasyVideoWin.Model
         public ManagedEVSdk.Structs.EVCallInfoCli CallInfo { get; set; }
         public string PeerAvatarUrl { get; set; }
         public string PeerDisplayName { get; set; }
-        public bool IsP2pCall { get; set; }
+        public bool IsPreviousP2pCall { get; set; }
+        bool _isP2pCall;
+        public bool IsP2pCall
+        {
+            get
+            {
+                return _isP2pCall;
+            }
+            set
+            {
+                IsPreviousP2pCall = _isP2pCall;
+                _isP2pCall = value;
+            }
+        }
         
         public event PropertyChangedEventHandler PropertyChanged;
 
