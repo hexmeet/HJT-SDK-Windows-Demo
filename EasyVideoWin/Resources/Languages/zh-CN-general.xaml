@@ -438,7 +438,8 @@
     <sys:String x:Key="MONITOR_OFF_CALL_HANGUP">由于系统电源管理关闭显示，退出呼叫</sys:String>
     <sys:String x:Key="AUTO_HIDE_PARTY_NAME">自动隐藏与会者名称显示</sys:String>
 
-    <sys:String x:Key="CAN_NOT_CONNECT_TO_LOCATION_SERVER">不能连接到定位服务器</sys:String>
+    <sys:String x:Key="INVALID_SERVER">无效服务器</sys:String>
+    <sys:String x:Key="SERVER_UNREACHABLE">服务器不可达</sys:String>
     <sys:String x:Key="LOCATION_INVALID_CONFERENCE_ID">无效的会议号码(10008)</sys:String>
     <sys:String x:Key="LOCATION_INVALID_USER_NAME_PASSWORD">无效的用户名或密码(10007)</sys:String>
     <sys:String x:Key="LOCATION_FAILED_LOG_IN">登录失败({0})</sys:String>
@@ -505,4 +506,9 @@
     <sys:String x:Key="MEETING_ENDED">会议结束或被主持人挂断</sys:String>
     <sys:String x:Key="NETWORK_UNAVAILABLE">网络异常，请检查网络</sys:String>
     <sys:String x:Key="CONF_PLUS_NUMBER">会议 {0}</sys:String>
+    <sys:String x:Key="CONFIRM_LEAVE_CONF">您确定离开该会议？</sys:String>
+    <sys:String x:Key="CALL_ROOM_BUSY">该会议室已被占用</sys:String>
+    <sys:String x:Key="CANNOT_CALL_FOR_INVALID_SERVER_ADDRESS">由于服务器地址无效，不能呼叫</sys:String>
+    <sys:String x:Key="FULL_SCREEN_ON_CALL_CONNECTED">进入会议自动全屏</sys:String>
+    
 </ResourceDictionary>

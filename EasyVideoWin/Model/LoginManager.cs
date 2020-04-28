@@ -47,10 +47,11 @@ namespace EasyVideoWin.Model
         
         private LoginManager()
         {
-            log.Info("LoginManager begin to construct");
+            log.InfoFormat("LoginManager begin to construct, CloudOnly: {0}", Properties.Settings.Default.CloudOnly);
             _loginStatus = LoginStatus.NotLogin;
 
-            Utils.ParseCloudServerAddress();
+            //Utils.ParseCloudServerAddress();
+            string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
             if (EasyVideoWin.Properties.Settings.Default.CloudOnly)
             {
                 ServiceType = Utils.ServiceTypeEnum.Cloud;
@@ -59,39 +60,44 @@ namespace EasyVideoWin.Model
             {
                 ServiceType = Utils.GetServiceType();
             }
-            string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
             if (!string.IsNullOrEmpty(joinConfAddress))
             {
                 // anonymous join conf
-                //ServiceType = Utils.ServiceTypeEnum.Enterprise;
-                //LoginProgress = LoginProgressEnum.EnterpriseJoinConf;
-                ServiceType = Utils.ServiceTypeEnum.None;
-                IsNeedAnonymousJoinConf = true;
-            }
-            else
-            {
-                if (CanAutoLogin())
+                log.Info("Anonymous join conf or link p2p call");
+                string joinConfId = Utils.GetAnonymousJoinConfId();
+                string joinConfContactId = Utils.GetAnonymousJoinConfContactId();
+                if (!string.IsNullOrEmpty(joinConfContactId))
                 {
-                    log.Info("Can auto login.");
-                    AutoLoginToProperServiceType();
+                    log.InfoFormat("Link P2p call and try to auto login, joinConfAddress: {0}, CloudServerDomain: {2}", joinConfAddress, Utils.CloudServerDomain);
+                    if (Properties.Settings.Default.CloudOnly && joinConfAddress != Utils.CloudServerDomain)
+                    {
+                        Utils.SetAnonymousJoinConfServerAddress("");
+                        Utils.SetAnonymousJoinConfContactId("");
+                        log.Info("Can not link p2p call for CloudOnly and invalid server address");
+                        //MessageBox.Show(LanguageUtil.Instance.GetValueByKey("CANNOT_CALL_FOR_INVALID_SERVER_ADDRESS"));
+                        SetProperLoginStatus(false);
+                    }
+                    else
+                    {
+                        if (joinConfAddress == Utils.CloudServerDomain)
+                        {
+                            ServiceType = Utils.ServiceTypeEnum.Cloud;
+                        }
+                        Utils.SetServerAddress(ServiceType, joinConfAddress);
+                        SetProperLoginStatus(true);
+                    }
                 }
                 else
                 {
-                    log.Info("Can not auto login.");
-                    switch (ServiceType)
-                    {
-                        case Utils.ServiceTypeEnum.None:
-                            LoginProgress = LoginProgressEnum.Idle;
-                            break;
-                        case Utils.ServiceTypeEnum.Enterprise:
-                            LoginProgress = LoginProgressEnum.EnterpriseOptions;
-                            break;
-                        case Utils.ServiceTypeEnum.Cloud:
-                            LoginProgress = LoginProgressEnum.CloudOptions;
-                            break;
-                    }
+                    log.Info("Anonymous join conf");
+                    ServiceType = Utils.ServiceTypeEnum.None;
+                    IsNeedAnonymousJoinConf = true;
                 }
-
+            }
+            else
+            {
+                log.Info("Normal startup and set proper login status");
+                SetProperLoginStatus(false);
             }
 
             log.InfoFormat("New login manager instance, hash code: {0}", this.GetHashCode());
@@ -163,6 +169,7 @@ namespace EasyVideoWin.Model
                     UpdateAvatarBmp(null); // release the used image or deleting it will be failed.
                     IsRegistered = false;
                 }
+
                 log.InfoFormat("Change login status from {0} to {1}", _loginStatus, value);
                 _loginStatus = value;
                 OnPropertyChanged("CurrentLoginStatus");
@@ -189,7 +196,18 @@ namespace EasyVideoWin.Model
 
         public LoginProgressEnum PreviousLoginProgress { get; set; }
 
-        public Utils.ServiceTypeEnum ServiceType { get; set; }
+        private Utils.ServiceTypeEnum _serviceType;
+        public Utils.ServiceTypeEnum ServiceType
+        {
+            get
+            {
+                return _serviceType;
+            }
+            set{
+                log.InfoFormat("ServiceType changing from {0} to {1}", _serviceType, value);
+                _serviceType = value;
+            }
+        }
 
         public bool _isNeedAutoLogin;
         public bool IsNeedAutoLogin
@@ -502,9 +520,13 @@ namespace EasyVideoWin.Model
 
         public void TryAutoLogin()
         {
-            if (!Utils.IsAutoLogin())
+            log.Info("TryAutoLogin");
+            string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
+            string joinConfContactId = Utils.GetAnonymousJoinConfContactId();
+            bool isLinkP2pCall = !string.IsNullOrEmpty(joinConfAddress) && !string.IsNullOrEmpty(joinConfContactId);
+            if (!Utils.IsAutoLogin() && !isLinkP2pCall)
             {
-                log.Info("Do not try to login for IsAutoLogin is false");
+                log.Info("Do not try to login for IsAutoLogin and isLinkP2pCall are false");
                 return;
             }
 
@@ -734,8 +756,9 @@ namespace EasyVideoWin.Model
             DisplayName = userInfo.displayName;
         }
         
-        private bool CanAutoLogin()
+        private bool CanAutoLogin(bool forceLogin)
         {
+            log.InfoFormat("CanAutoLogin, forceLogin: {0}", forceLogin);
             if (Utils.ServiceTypeEnum.None == ServiceType)
             {
                 log.Info("Service type is none, can not auto login");
@@ -745,7 +768,7 @@ namespace EasyVideoWin.Model
             string userName = Utils.GetUserName(ServiceType);
             string serverAddress = Utils.GetServerAddress(ServiceType);
             string password = Utils.GetPassword(ServiceType);
-            bool isAutoLogin = Utils.IsAutoLogin();
+            bool isAutoLogin = Utils.IsAutoLogin() || forceLogin;
             bool validPassword = !string.IsNullOrWhiteSpace(password);
             if (!string.IsNullOrWhiteSpace(userName) && !string.IsNullOrWhiteSpace(serverAddress) && validPassword && isAutoLogin)
             {
@@ -805,5 +828,56 @@ namespace EasyVideoWin.Model
                 return null;
             }
         }
+
+        private void SetProperLoginStatus(bool forceLogin)
+        {
+            if (CanAutoLogin(forceLogin))
+            {
+                log.Info("Can auto login.");
+                AutoLoginToProperServiceType();
+            }
+            else
+            {
+                log.Info("Can not auto login.");
+                switch (ServiceType)
+                {
+                    case Utils.ServiceTypeEnum.None:
+                        LoginProgress = LoginProgressEnum.Idle;
+                        break;
+                    case Utils.ServiceTypeEnum.Enterprise:
+                        LoginProgress = LoginProgressEnum.EnterpriseOptions;
+                        break;
+                    case Utils.ServiceTypeEnum.Cloud:
+                        LoginProgress = LoginProgressEnum.CloudOptions;
+                        break;
+                }
+            }
+        }
+
+        public void AutoLogin4LinkP2pCall(string serverAddress)
+        {
+            log.InfoFormat("AutoLogin4LinkP2pCall, serverAddress: {0}, CloudOnly: {1}, CloudServerDomain: {2}", serverAddress, Properties.Settings.Default.CloudOnly, Utils.CloudServerDomain);
+            if (EasyVideoWin.Properties.Settings.Default.CloudOnly || Utils.CloudServerDomain == serverAddress)
+            {
+                ServiceType = Utils.ServiceTypeEnum.Cloud;
+            }
+            else
+            {
+                ServiceType = Utils.ServiceTypeEnum.Enterprise;
+            }
+            
+            Utils.SetServerAddress(ServiceType, serverAddress);
+            switch (ServiceType)
+            {
+                case Utils.ServiceTypeEnum.Enterprise:
+                    LoginProgress = LoginProgressEnum.EnterpriseLogin;
+                    break;
+                case Utils.ServiceTypeEnum.Cloud:
+                    LoginProgress = LoginProgressEnum.CloudLogin;
+                    break;
+            }
+            IsNeedRelogin = true;
+        }
+
     }
 }

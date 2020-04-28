@@ -250,6 +250,18 @@ namespace EasyVideoWin.ViewModel
             }
         }
 
+        public bool FullScreenOnCallConnected
+        {
+            get
+            {
+                return Helpers.Utils.GetFullScreenOnCallConnected();
+            }
+            set
+            {
+                Helpers.Utils.SetFullScreenOnCallConnected(value);
+            }
+        }
+
         #endregion
 
         #region -- Constructor --
@@ -295,6 +307,7 @@ namespace EasyVideoWin.ViewModel
             OnPropertyChanged("AutoHidePartyName");
             OnPropertyChanged("Enable4x4Layout");
             OnPropertyChanged("DisablePrompt");
+            OnPropertyChanged("FullScreenOnCallConnected");
         }
         
         #endregion

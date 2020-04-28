@@ -445,6 +445,7 @@
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.3.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
@@ -1453,6 +1454,7 @@
     <Resource Include="Resources\Icons\bg_audio-mode.jpg" />
     <Resource Include="Resources\Icons\LayoutOperationbar\icon_show_share_click.png" />
     <Resource Include="Resources\Icons\LayoutOperationbar\icon_show_share_normal.png" />
+    <Resource Include="Resources\Icons\icon_encrypted.png" />
     <Content Include="Resources\sounds\camera.wav" />
     <Content Include="Resources\sounds\speaker.wav" />
     <Resource Include="Resources\Icons\icon_me_click.png" />

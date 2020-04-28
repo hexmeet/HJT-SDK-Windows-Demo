@@ -178,6 +178,12 @@ namespace EasyVideoWin.View
                 Utils.SetAnonymousLogoutAndAnonymousJoinConf(false);
             }
 
+            if (Utils.GetAnonymousLogoutAndLinkP2pCall())
+            {
+                // clear the flag
+                Utils.SetAnonymousLogoutAndLinkP2pCall(false);
+            }
+
             CefSharpUtil.ClearCefSharpCacheAndLog();
             CefSharpUtil.InitCefSharpSetting();
 

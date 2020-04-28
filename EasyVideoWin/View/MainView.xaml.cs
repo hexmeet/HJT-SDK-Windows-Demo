@@ -11,6 +11,7 @@ using log4net;
 using System.Windows.Input;
 using EasyVideoWin.Model.CloudModel;
 using System.Windows.Media.Imaging;
+using EasyVideoWin.ViewModel;
 
 namespace EasyVideoWin.View
 {
@@ -25,6 +26,7 @@ namespace EasyVideoWin.View
         private const string MY_SELF_SERVICE = "{0}/mymeetings?token={1}"; // 0: server address, 1: token value
 
         public event PropertyChangedEventHandler PropertyChanged;
+        MainViewViewModel _vm = null;
 
         public WindowState CurrentWindowState
         {
@@ -131,6 +133,7 @@ namespace EasyVideoWin.View
 
             this._firstLoad = true;
 
+            _vm = this.DataContext as MainViewViewModel;
             this.Loaded += MainView_Loaded;
             this.minButton.SetBinding(Button.VisibilityProperty, new Binding("MinButtonVisibility") { Source = this });
             this.maxButton.SetBinding(Button.VisibilityProperty, new Binding("MaxButtonVisibility") { Source = this });
@@ -145,7 +148,7 @@ namespace EasyVideoWin.View
             
             LanguageUtil.Instance.LanguageChanged += OnLanguageChanged;
             CallController.Instance.CallStatusChanged += OnCallStatusChanged;
-            LoginManager.Instance.PropertyChanged += LoginManager_PropertyChanged;
+            //LoginManager.Instance.PropertyChanged += LoginManager_PropertyChanged;
 
             if (LanguageUtil.Instance.CurrentLanguage != LanguageType.ZH_CN)
             {
@@ -300,7 +303,7 @@ namespace EasyVideoWin.View
             log.Info("OnCallStatusChanged end.");
         }
 
-        private void LoginManager_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        public void LoginManager_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if ("CurrentLoginStatus" == e.PropertyName)
             {
@@ -314,8 +317,14 @@ namespace EasyVideoWin.View
                     });
                 }
             }
+
+            if (null != _vm)
+            {
+                _vm.LoginManager_PropertyChanged(null, e);
+            }
         }
 
+        
     }
 
 }

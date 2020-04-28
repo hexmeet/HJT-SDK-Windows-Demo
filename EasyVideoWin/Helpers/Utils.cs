@@ -1069,6 +1069,26 @@ namespace EasyVideoWin.Helpers
             Utils.IniWriteValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "ConfId", confId, Utils.GetCurConfigFile());
         }
 
+        public static string GetAnonymousJoinConfContactId()
+        {
+            return Utils.IniReadValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "ContactId", Utils.GetCurConfigFile());
+        }
+
+        public static void SetAnonymousJoinConfContactId(string contactId)
+        {
+            Utils.IniWriteValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "ContactId", contactId, Utils.GetCurConfigFile());
+        }
+
+        public static string GetAnonymousJoinConfContactName()
+        {
+            return Utils.IniReadValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "ContactName", Utils.GetCurConfigFile());
+        }
+
+        public static void SetAnonymousJoinConfContactName(string contactName)
+        {
+            Utils.IniWriteValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "ContactName", contactName, Utils.GetCurConfigFile());
+        }
+
         public static string GetAnonymousJoinConfPassword()
         {
             return Utils.IniReadValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "ConfPassword", Utils.GetCurConfigFile());
@@ -1115,7 +1135,18 @@ namespace EasyVideoWin.Helpers
         {
             Utils.IniWriteValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "LogoutAndAnonymousJoinConf", logoutAndAnonymousJoinConf.ToString(), Utils.GetCurConfigFile());
         }
-        
+
+        public static bool GetAnonymousLogoutAndLinkP2pCall()
+        {
+            string value = Utils.IniReadValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "LogoutAndLinkP2pCall", Utils.GetCurConfigFile());
+            return "TRUE" == value.ToUpper();
+        }
+
+        public static void SetAnonymousLogoutAndLinkP2pCall(bool logoutAndAnonymousJoinConf)
+        {
+            Utils.IniWriteValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "LogoutAndLinkP2pCall", logoutAndAnonymousJoinConf.ToString(), Utils.GetCurConfigFile());
+        }
+
         public static string GetAcsServerAddressFromConfig()
         {
             string addr = Utils.IniReadValue(Utils.CONFIG_TITLE, "Acs", Utils.GetCurConfigFile());
@@ -1488,6 +1519,17 @@ namespace EasyVideoWin.Helpers
         public static bool GetEnable4x4Layout()
         {
             string value = Utils.IniReadValue(Utils.CONFIG_TITLE, "Enable4x4Layout", Utils.GetCurConfigFile());
+            return "TRUE" == value.ToUpper();
+        }
+
+        public static void SetFullScreenOnCallConnected(bool fullScreenOnCallConnected)
+        {
+            Utils.IniWriteValue(Utils.CONFIG_TITLE, "FullScreenOnCallConnected", fullScreenOnCallConnected.ToString(), Utils.GetCurConfigFile());
+        }
+
+        public static bool GetFullScreenOnCallConnected()
+        {
+            string value = Utils.IniReadValue(Utils.CONFIG_TITLE, "FullScreenOnCallConnected", Utils.GetCurConfigFile());
             return "TRUE" == value.ToUpper();
         }
 

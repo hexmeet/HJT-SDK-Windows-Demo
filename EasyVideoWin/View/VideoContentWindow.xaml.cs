@@ -38,6 +38,18 @@ namespace EasyVideoWin.View
             CallController.Instance.CallStatusChanged += OnCallStatusChanged;
             
             this.Loaded += VideoContentWindow_Loaded;
+            this.Activated += VideoContentWindow_Activated;
+            this.Deactivated += VideoContentWindow_Deactivated;
+        }
+
+        private void VideoContentWindow_Deactivated(object sender, EventArgs e)
+        {
+            log.Info("VideoContentWindow_Deactivated");
+        }
+
+        private void VideoContentWindow_Activated(object sender, EventArgs e)
+        {
+            log.Info("VideoContentWindow_Activated");
         }
 
         private void VideoContentWindow_Loaded(object sender, RoutedEventArgs e)

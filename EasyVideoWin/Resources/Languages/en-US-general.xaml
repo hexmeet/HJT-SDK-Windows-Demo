@@ -438,7 +438,8 @@
     <sys:String x:Key="MONITOR_OFF_CALL_HANGUP">Call is hung up for monitor is turned off by system power manager.</sys:String>
     <sys:String x:Key="AUTO_HIDE_PARTY_NAME">Hide participant's names automatically</sys:String>
 
-    <sys:String x:Key="CAN_NOT_CONNECT_TO_LOCATION_SERVER">Cannot connect to the location server</sys:String>
+    <sys:String x:Key="INVALID_SERVER">Invalid server.</sys:String>
+    <sys:String x:Key="SERVER_UNREACHABLE">Server unreachable.</sys:String>
     <sys:String x:Key="LOCATION_INVALID_CONFERENCE_ID">Invalid meeting ID. (10008)</sys:String>
     <sys:String x:Key="LOCATION_INVALID_USER_NAME_PASSWORD">Invalid user name or password. (10007)</sys:String>
     <sys:String x:Key="LOCATION_FAILED_LOG_IN">Failed to log in. ({0})</sys:String>
@@ -505,4 +506,8 @@
     <sys:String x:Key="MEETING_ENDED">Meeting ended or terminated by meeting host.</sys:String>
     <sys:String x:Key="NETWORK_UNAVAILABLE">Network unavailable. Please check and try again.</sys:String>
     <sys:String x:Key="CONF_PLUS_NUMBER">Meeting {0}</sys:String>
+    <sys:String x:Key="CONFIRM_LEAVE_CONF">Are you sure to leave the meeting?</sys:String>
+    <sys:String x:Key="CALL_ROOM_BUSY">The meeting room is being used.</sys:String>
+    <sys:String x:Key="CANNOT_CALL_FOR_INVALID_SERVER_ADDRESS">Can not call for invalid server address.</sys:String>
+    <sys:String x:Key="FULL_SCREEN_ON_CALL_CONNECTED">Full screen when entering a meeting</sys:String>
 </ResourceDictionary>

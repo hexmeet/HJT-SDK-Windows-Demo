@@ -24,6 +24,12 @@
                                         ImageSource="{Binding CallQualityImageSource}"
                                         Command="{Binding MediaStatisticsCommand}"
                                         Cursor="Hand" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <CustomControls:SimpleImageButton Margin="10, 0, 0, 0" ImageWidth="24" ImageHeight="24"
+                                        Width="24" Height="24"
+                                        TextVisibility="Collapsed"
+                                        ImageSource="pack://application:,,,/Resources/Icons/icon_encrypted.png"
+                                        Visibility="{Binding EncryptionVisibility}"
+                                        HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <Label Name="callDurationLabel" Margin="10, 0, 0, 0" FontSize="16" Foreground="White" Content="{Binding CallDuration}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
             </DockPanel>
             <DockPanel HorizontalAlignment="Right">

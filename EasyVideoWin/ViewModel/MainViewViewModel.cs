@@ -2,6 +2,8 @@
 using EasyVideoWin.Model;
 using log4net;
 using System;
+using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -180,7 +182,7 @@ namespace EasyVideoWin.ViewModel
             _settingView = (UserControl)Activator.CreateInstance(typeof(EasyVideoWin.View.SettingView));
             
             CurrentView = _conferenceView;
-            LoginManager.Instance.PropertyChanged += LoginManager_PropertyChanged;
+            //LoginManager.Instance.PropertyChanged += LoginManager_PropertyChanged;
 
             // update current register status for UI display
             UpdateRegisterStatus(LoginManager.Instance.IsRegistered);
@@ -189,15 +191,18 @@ namespace EasyVideoWin.ViewModel
         #endregion
 
         #region -- Private Method --
-        
-        private void LoginManager_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+
+        // do not use listen event from login manager for main view is not constructed yet when logined.
+        public void LoginManager_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if ("CurrentLoginStatus" == e.PropertyName)
             {
+                log.InfoFormat("CurrentLoginStatus changed to: {0}", LoginManager.Instance.CurrentLoginStatus);
                 if (LoginStatus.LoggedIn == LoginManager.Instance.CurrentLoginStatus)
                 {
                     Application.Current.Dispatcher.InvokeAsync(() =>
                     {
+                        log.Info("LoggedIn, init _conferenceView and _contactView");
                         if (null == _conferenceView)
                         {
                             _conferenceView = new View.WebBrowserWrapperView(Enums.WebBrowserUrlType.CONFERENCES, (MainWindow)Application.Current.MainWindow);
@@ -208,12 +213,37 @@ namespace EasyVideoWin.ViewModel
                             _contactView = new View.WebBrowserWrapperView(Enums.WebBrowserUrlType.CONTACTS, (MainWindow)Application.Current.MainWindow, false);
                         }
                         CurrentView = _conferenceView;
+                        
+                        string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
+                        string joinConfContactId = Utils.GetAnonymousJoinConfContactId();
+                        log.InfoFormat("LoggedIn, joinConfAddress: {0}, joinConfContactId: {1}", joinConfAddress, joinConfContactId);
+                        if (!string.IsNullOrEmpty(joinConfAddress) && !string.IsNullOrEmpty(joinConfContactId))
+                        {
+                            log.Info("Valid link p2p call");
+                            string contactName = System.Web.HttpUtility.UrlDecode(Utils.GetAnonymousJoinConfContactName());
+                            log.InfoFormat("contactName: {0}", contactName);
+                            Utils.SetAnonymousJoinConfServerAddress("");
+                            Utils.SetAnonymousJoinConfContactId("");
+                            Utils.SetAnonymousJoinConfContactName("");
+
+                            // p2p call in 1 second to make sure the content view in main view show correctly.
+                            // or the content view can not be initialized when relogin and then p2p call
+                            Timer timer = new Timer();
+                            timer.Interval = 1000;
+                            timer.AutoReset = false;
+                            timer.Elapsed += (object sender2, ElapsedEventArgs e2) =>
+                            {
+                                CallController.Instance.P2pCallPeer(joinConfContactId, null, contactName);
+                            };
+                            timer.Start();
+                        }
                     });
                 }
                 else if (LoginStatus.NotLogin == LoginManager.Instance.CurrentLoginStatus)
                 {
                     // destruct confrence view object to release the browser
                     Application.Current.Dispatcher.InvokeAsync(() => {
+                        log.Info("NotLogin, destroy _conferenceView and _contactView");
                         if (null != _conferenceView)
                         {
                             (_conferenceView as IDisposable)?.Dispose();
@@ -226,6 +256,25 @@ namespace EasyVideoWin.ViewModel
                             _contactView = null;
                         }
                     });
+
+                    // to ensure destroy the view and then relogin
+                    if (Utils.GetAnonymousLogoutAndLinkP2pCall())
+                    {
+                        log.Info("Login status changed to NotLogin and GetAnonymousLogoutAndLinkP2pCall is true.");
+                        string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
+                        string joinConfContactId = Utils.GetAnonymousJoinConfContactId();
+                        if (!string.IsNullOrEmpty(joinConfAddress) && !string.IsNullOrEmpty(joinConfContactId))
+                        {
+                            log.Info("Login status changed to NotLogin and begin to login for link p2p call.");
+                            LoginManager.Instance.SaveCurrentLoginInfo();
+                            Application.Current.Dispatcher.InvokeAsync(() => {
+                                log.Info("Begin AutoLogin4LinkP2pCall");
+                                LoginManager.Instance.AutoLogin4LinkP2pCall(joinConfAddress);
+                            });
+                        }
+
+                        Utils.SetAnonymousLogoutAndLinkP2pCall(false);
+                    }
                 }
             }
             else if ("DisplayName" == e.PropertyName)
@@ -255,16 +304,19 @@ namespace EasyVideoWin.ViewModel
 
         private void ShowConference(object parameter)
         {
+            log.Info("ShowConference");
             CurrentView = _conferenceView;
         }
 
         private void ShowContact(object parameter)
         {
+            log.Info("ShowContact");
             CurrentView = _contactView;
         }
 
         private void ShowLoginUser(object parameter)
         {
+            log.Info("ShowLoginUser");
             CurrentView = _settingView;
         }
         

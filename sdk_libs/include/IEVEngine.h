@@ -1,6 +1,8 @@
 #ifndef IEV_ENGINE_H
 #define IEV_ENGINE_H
 #include "EVCommon.h"
+#include <string>
+#include <vector>
 
 namespace ev {
 namespace common {
@@ -173,7 +175,9 @@ typedef enum _EV_CALL_ERROR {
     EV_CALL_NOT_ALLOW_ANONYMOUS_PARTY = 2033,
     EV_CALL_TRIAL_ORG_EXPIRED = 2035,
     EV_CALL_LOCAL_ZONE_NOT_STARTED = 2043,
-    EV_CALL_LOCAL_ZONE_STOPPED = 2045
+    EV_CALL_LOCAL_ZONE_STOPPED = 2045,
+
+    EV_CALL_ROOM_BUSY = 4057
 } EV_CALL_ERROR;
 
 }
@@ -406,12 +410,15 @@ public:
 	virtual void onPeerImageUrl(const char* imageUrl) {
 		(void)imageUrl;
 	}
+	
+	virtual void onUploadFeedback(int number) {
+		(void)number;
+	}
 };
 
 //////////////////////////////
 //  EVEngine
 //////////////////////////////
-
 class EV_CLASS_API IEVEngine : public IEVCommon {
 public:
     //CallBack
@@ -430,6 +437,7 @@ public:
     virtual int joinConference(const char * number, const char * display_name, const char * password, EV_SVC_CALL_TYPE type) = 0;
     EV_DEPRECATED virtual int joinConference(const char * server, unsigned int port, const char * conference_number, const char * display_name, const char * password) = 0;
     virtual int joinConferenceWithLocation(const char * location_server, unsigned int port, const char * conference_number, const char * display_name, const char * password) = 0;
+    virtual int terminateConference() = 0;
     virtual int leaveConference() = 0;
     virtual int declineIncommingCall(const char * conference_number) = 0;
     virtual int setLayout(EVLayoutRequest & layout) = 0;
@@ -438,12 +446,17 @@ public:
     //Set Windows
     virtual int setRemoteVideoWindow(void * id[], unsigned int size) = 0;
     virtual int getRemoteVideoWindow(void * id[], unsigned int size) = 0;
-	
+    virtual bool isConferenceHoster() = 0;	
 	//IM
 	virtual const char *getIMAddress() = 0;
     virtual const char *getIMGroupID() = 0;
     virtual void setIMUserID(const char* im_usrid) = 0;
 	virtual int getContactInfo(const char* usrid, EVContactInfo & contactInfo, int timeout_sec) = 0;
+	virtual int uploadFeedbackFiles(std::vector<std::string> filePath, std::string contact, std::string description) = 0;
+    //thumbnails
+	virtual std::vector<std::string> getThumbnailWindows() = 0;
+    virtual int setThumbnailWindowContainer(std::string &windowTitle, void* windowid) = 0;
+    virtual int releaseThumbnails() = 0 ;
 };
 
 }

@@ -144,6 +144,24 @@ namespace EasyVideoWin.View
             _controlToolBar.ListenerToolBarMove += new ContentControlToolBarView.ListenerMoveHnadler(ToolBarMove_Click);
             _whiteboardPopup.WhiteboardPopupMouseLeftButtonDown += new ContentWhiteboardPopup.ListenerWhiteboardPopupMouseLeftButtonDownHandler(WhiteboardPopup_MouseLeftButtonDown);
             this.Browser.ConsoleMessage += OnBrowserConsoleMessage;
+            this.Activated += ContentWhiteboard_Activated;
+            this.Deactivated += ContentWhiteboard_Deactivated;
+            this.Loaded += ContentWhiteboard_Loaded;
+        }
+
+        private void ContentWhiteboard_Loaded(object sender, RoutedEventArgs e)
+        {
+            log.Info("ContentWhiteboard_Loaded");
+        }
+
+        private void ContentWhiteboard_Deactivated(object sender, EventArgs e)
+        {
+            log.Info("ContentWhiteboard_Deactivated");
+        }
+
+        private void ContentWhiteboard_Activated(object sender, EventArgs e)
+        {
+            log.Info("ContentWhiteboard_Activated");
         }
 
         //protected override void OnClosing(CancelEventArgs e)
@@ -1557,6 +1575,7 @@ namespace EasyVideoWin.View
         
         private void ContentWhiteBoard_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
+            log.InfoFormat("ContentWhiteBoard_IsVisibleChanged: {0}", this.Visibility);
             ChangeToolbarButtonsStatus();
         }
 

@@ -172,6 +172,7 @@ namespace EasyVideoWin.View
         {
             Utils.SetAnonymousJoinConfType("");
             Utils.SetAnonymousJoinConfServerProtocol("");
+            log.Info("SetAnonymousJoinConfServerAddress empty");
             Utils.SetAnonymousJoinConfServerAddress("");
             Utils.SetAnonymousJoinConfId("");
             Utils.SetAnonymousJoinConfPassword("");
