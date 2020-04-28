@@ -72,6 +72,26 @@ namespace ev {
 namespace engine {
 
 //////////////////////////////
+//  Platform
+//////////////////////////////
+typedef enum _EV_PLATFORM {
+    EV_PLATFORM_UNKNOWN = 0,
+    EV_PLATFORM_WIN = 1,
+    EV_PLATFORM_ANDROID = 2,
+    EV_PLATFORM_OSX = 3,
+    EV_PLATFORM_IOS = 4,
+    EV_PLATFORM_AMLOGIC = 5,
+    EV_PLATFORM_ALLWINNER = 6,
+    EV_PLATFORM_ALLWINNER260 = 7,
+    EV_PLATFORM_MINGRI = 8,
+    EV_PLATFORM_HISI_LINUX = 9,
+    EV_PLATFORM_TPE = 10,
+    EV_PLATFORM_OEM = 11,
+    EV_PLATFORM_UT30 = 12,
+    EV_PLATFORM_UT33 = 13,
+} EV_PLATFORM;
+
+//////////////////////////////
 //  Common
 //////////////////////////////
 #define EV_LAYOUT_SIZE 16
@@ -81,7 +101,8 @@ typedef enum _EV_CALL_TYPE {
 	EV_CALL_UNKNOWN = 0,
 	EV_CALL_SIP = 1,
 	EV_CALL_H323 = 2,
-	EV_CALL_SVC = 3
+	EV_CALL_SVC = 3,
+    EV_CALL_MAX_TYPE = 4
 } EV_CALL_TYPE;
 
 typedef enum _EV_SVC_CALL_TYPE {
@@ -116,7 +137,9 @@ typedef enum _EV_STREAM_TYPE {
 
 typedef enum _EV_STREAM_DIR {
 	EV_STREAM_UPLOAD = 0,
-	EV_STREAM_DOWNLOAD = 1
+	EV_STREAM_DOWNLOAD = 1,
+	EV_STREAM_PLUGIN   = 2,
+	EV_STREAM_PLUGOUT  = 3
 } EV_STREAM_DIR;
 
 typedef enum _EV_CONTENT_STATUS {
@@ -320,6 +343,14 @@ public:
 
 };
 
+typedef enum _EV_REGISTER_STATE {
+    EV_REGISTER_STATE_NONE = 0,
+    EV_REGISTER_STATE_SUCCEED = 1,
+    EV_REGISTER_STATE_FAILED = 2,
+    EV_REGISTER_STATE_PROGRESS = 3,
+    EV_REGISTER_STATE_FORCE_CLEAR = 4
+} EV_REGISTER_STATE;
+
 class EV_CLASS_API EVUserInfo {
 public:
     uint64_t userId;
@@ -344,6 +375,7 @@ public:
     std::string urlSuffixForMobile;
     std::string urlSuffixForPC;
 	EVFeatureSupport featureSupport;
+    std::string vmr;
 };
 
 class EV_CLASS_API EVCallInfo {
@@ -389,6 +421,7 @@ public:
         status = EV_CONTENT_UNKNOWN;
         isBigConference = FALSE;
         isRemoteMuted = FALSE;
+        isExtern = FALSE;
     }
 
     bool enabled;
@@ -397,6 +430,7 @@ public:
     EV_CONTENT_STATUS status;
     bool isBigConference;
     bool isRemoteMuted;
+    bool isExtern;
 };
 
 class EV_CLASS_API EVWhiteBoardInfo {
@@ -418,6 +452,11 @@ public:
 
     virtual void onLoginSucceed(EVUserInfo & user) {
         (void)user;
+    }
+
+    virtual void onRegisterState(EV_CALL_TYPE type, EV_REGISTER_STATE state) {
+        (void)type;
+        (void)state;
     }
 
     virtual void onDownloadUserImageComplete(const char * path) {
@@ -467,18 +506,18 @@ public:
         (void)call_log;
     }
 
-    virtual void onAudioData(int sample_rate, void * data, int len) {
+    virtual void onAudioData(int sample_rate, const unsigned char * data, int len) {
         (void)sample_rate;
         (void)data;
         (void)len;
     }
 
-    virtual void onVideoPreviewFrame(void * frame, int size) {
+    virtual void onVideoPreviewFrame(const unsigned char * frame, int size) {
         (void)frame;
         (void)size;
     }
 
-    virtual void onContentPreviewFrame(void * frame, int size) {
+    virtual void onContentPreviewFrame(const unsigned char * frame, int size) {
         (void)frame;
         (void)size;
     }
@@ -540,7 +579,17 @@ typedef struct VMainMixerCfg_t {
     int cell_count;
     VCellStruct cells[MAX_VOUT_MAIN_MIXER_CELL_COUNT];
     VSubMixerCfg sub_cfgs[MAX_VOUT_MAIN_MIXER_CELL_COUNT];
+
+    VCellStruct overlay;
 } VMainMixerCfg;
+
+typedef struct HWVOBackgroundPicsCfg_t{
+    
+    char const *BackPicPath; 
+    char const *Win1PicPath; 
+    char const *Win2PicPath; 
+    char const *Win3PicPath; 
+} HWVOBackgroundPicsCfg;
 
 class EV_CLASS_API IEVCommon {
 public:
@@ -563,14 +612,17 @@ public:
 	virtual std::string encryptPassword(EV_ENCRYPT_TYPE type, const char * password, const char* key) = 0;
 	virtual std::string descryptPassword(EV_ENCRYPT_TYPE type, const char * password, const char* key) = 0;
     virtual std::string getSerialNumber() = 0;
-    virtual std::string getPlatform() = 0;
+    virtual EV_PLATFORM getPlatform() = 0;
 
     //Device
     virtual std::vector<EVDevice> getDevices(EV_DEVICE_TYPE type) = 0;
     virtual EVDevice getDevice(EV_DEVICE_TYPE type) = 0;
     virtual void setDevice(EV_DEVICE_TYPE type, unsigned int id) = 0;
-    virtual int enableMicMeter(bool enable) = 0;
+    virtual int enableMicMeter(bool enable) = 0; //deprecated
+    virtual int enableAudioTest(bool enable, const char * play_file) = 0;
     virtual float getMicVolume() = 0;
+    virtual int startAudioPlay() = 0;
+    virtual int stopAudioPlay() = 0;
     virtual int setDeviceRotation(int rotation) = 0;
     virtual int audioInterruption(int type) = 0;
     virtual void setVideoEncoderMixerCfg(VEncMixerCfg const & cfg, int is_content) = 0;
@@ -584,12 +636,16 @@ public:
     virtual int setPreviewVideoWindow(void * id) = 0;
     virtual int zoomRemoteWindow(EV_STREAM_TYPE stream_type, float zoom_factor, 
     float x, float y) = 0;
+    virtual int setLocalVideoPreviewWindow(void * id) = 0;
+    virtual int setLocalContentPreviewWindow(void * id) = 0;
 
     virtual void * getLocalVideoWindow() = 0;
     virtual void * getRemoteVideoWindow() = 0;
     virtual void * getRemoteContentWindow() = 0;
     virtual void * getLocalContentWindow() = 0;
     virtual void * getPreviewVideoWindow() = 0;
+    virtual void * getLocalVideoPreviewWindow() = 0;
+    virtual void * getLocalContentPreviewWindow() = 0;
 
     //Login
     virtual int downloadUserImage(const char * path) = 0;
@@ -598,6 +654,7 @@ public:
     virtual int changeDisplayName(const char * display_name) = 0;
     virtual int getUserInfo(EVUserInfo & userinfo) = 0;
     virtual std::string getDisplayName() = 0;
+    virtual EV_REGISTER_STATE getRegisterState(EV_CALL_TYPE type) = 0;
 
     //Conference
     virtual int enablePreview(bool enable) = 0;
@@ -645,6 +702,7 @@ public:
     //Codec
     virtual int enableHardDecoding(bool enable) = 0;
     virtual bool hardDecodingEnabled() = 0;
+    virtual int enableFilterByName(std::string filterName,bool enable) = 0;
 
     virtual int setVideoOutParameters(int devid, int width, int height, int herz, int interlaced) = 0;
     virtual int setAudioInputVolume(MW_AUD_SRC_CHN_TYPE_E audio_in_channel, int vol) = 0;  // for hisi based linux sdk
@@ -652,6 +710,8 @@ public:
     virtual int setHWVOMixerCfgNoCall(std::vector<VMainMixerCfg> const & cfg) = 0;
     virtual int setHWVOMixerCfgWithRemoteContent(std::vector<VMainMixerCfg> const & cfg) = 0;
     virtual int setHWVOMixerCfgWithoutRemoteContent(std::vector<VMainMixerCfg> const & cfg) = 0;
+    virtual int setHWVOShowLocalContent(int show) = 0;
+    virtual int setHWVOBackgroundPictureCfg(int devId, HWVOBackgroundPicsCfg const & cfg) = 0;
 };
 
 }

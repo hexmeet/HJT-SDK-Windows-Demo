@@ -973,7 +973,7 @@ namespace EasyVideoWin.View
                 {
                     if (layoutIndication.sites[i].device_id == cell.DeviceId)
                     {
-                        cell.Operationbar.IsMicMuted = layoutIndication.sites[i].mic_muted;
+                        cell.Operationbar.IsMicMuted = layoutIndication.sites[i].mic_muted || layoutIndication.sites[i].remote_muted;
                         break;
                     }
                 }
@@ -2205,7 +2205,7 @@ namespace EasyVideoWin.View
 
                 for (int i=0; i< layoutIndication.sites_size; ++i)
                 {
-                    log.InfoFormat("sites {0} -- device_id: {1}, name: {2}, mic_muted: {3}", i, layoutIndication.sites[i].device_id, layoutIndication.sites[i].name, layoutIndication.sites[i].mic_muted);
+                    log.InfoFormat("sites {0} -- device_id: {1}, name: {2}, mic_muted: {3}, remote_muted: {4}", i, layoutIndication.sites[i].device_id, layoutIndication.sites[i].name, layoutIndication.sites[i].mic_muted, layoutIndication.sites[i].remote_muted);
                 }
 
                 if (ManagedEVSdk.Structs.EV_LAYOUT_MODE_CLI.EV_LAYOUT_GALLERY_MODE == layoutIndication.mode)
@@ -2771,7 +2771,7 @@ namespace EasyVideoWin.View
                         }
 
                         _layoutCells[j].Operationbar.CellName = site.name;
-                        _layoutCells[j].Operationbar.IsMicMuted = site.mic_muted;
+                        _layoutCells[j].Operationbar.IsMicMuted = site.mic_muted || site.remote_muted;
                         break;
                     }
                 }
@@ -3327,7 +3327,7 @@ namespace EasyVideoWin.View
 
         private void LayoutBackgroundWindow_Deactivated(object sender, EventArgs e)
         {
-            log.InfoFormat("LayoutBackgroundWindow_Deactivated, IsActive: {0}", this.IsActive);
+            log.InfoFormat("LayoutBackgroundWindow_Deactivated, IsActive: {0}, VideoPeopleWindow.Instance.IsActive: {1}", this.IsActive, VideoPeopleWindow.Instance.IsActive);
         }
 
         private void LayoutBackgroundWindow_Activated(object sender, EventArgs e)
@@ -3438,6 +3438,8 @@ namespace EasyVideoWin.View
                     _normalCellsSection.Owner = _layoutOperationbar;
                     Utils.SetWindow2Top(_normalCellsSection);
                 }
+
+                _layoutOperationbar.OnContentStreamStatusChanged(sender, contentStreamInfo);
             });
             log.Info("OnContentStreamStatusChanged end.");
         }

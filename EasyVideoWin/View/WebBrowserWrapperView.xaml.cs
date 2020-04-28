@@ -356,7 +356,7 @@ namespace EasyVideoWin.View
 
         public void JoinConf(string confNumber, string confPassword)
         {
-            log.Info("Join conf is called.");
+            log.InfoFormat("Join conf is called: {0}", confNumber);
             Application.Current.Dispatcher.InvokeAsync(() => {
                 log.Info("Begin to show join conf dialog.");
                 JoinConfWindow joinConfWindow = new JoinConfWindow(confNumber, confPassword);
@@ -386,6 +386,7 @@ namespace EasyVideoWin.View
 
         public void Go2Reservation(string url)
         {
+            log.InfoFormat("Go2Reservation: {0}", url);
             Application.Current.Dispatcher.Invoke(() => {
                 System.Diagnostics.Process.Start(url);
             });
@@ -393,8 +394,10 @@ namespace EasyVideoWin.View
 
         public void ClearConfListCache()
         {
+            log.Info("ClearConfListCache");
             if (null == this._browser.GetBrowser() || null == this._browser.GetBrowser().GetFrame(null))
             {
+                log.Info("browser is null");
                 return;
             }
             string cmd = "window.clearConfListCache()";
@@ -403,8 +406,10 @@ namespace EasyVideoWin.View
 
         public void ClearConfManagementCache()
         {
+            log.Info("ClearConfManagementCache");
             if (null == this._browser.GetBrowser() || null == this._browser.GetBrowser().GetFrame(null))
             {
+                log.Info("browser is null");
                 return;
             }
             string cmd = "window.clearConfCtrlCache()";
@@ -413,8 +418,10 @@ namespace EasyVideoWin.View
 
         public void UpdateData()
         {
+            log.Info("UpdateData");
             if (null == this._browser.GetBrowser() || null == this._browser.GetBrowser().GetFrame(null))
             {
+                log.Info("browser is null");
                 return;
             }
             string cmd = "window.reloadDataByApp()";
@@ -472,6 +479,7 @@ namespace EasyVideoWin.View
 
         public void PageCreated()
         {
+            log.Info("PageCreated");
             PageCreatedEvent?.Invoke();
         }
 
@@ -555,6 +563,11 @@ namespace EasyVideoWin.View
         public void clearCache()
         {
             log.Info("Received clearCache, but do nothing.");
+        }
+
+        public void webLog(string value)
+        {
+            log.InfoFormat("webLog:{0}", value);
         }
     }
 

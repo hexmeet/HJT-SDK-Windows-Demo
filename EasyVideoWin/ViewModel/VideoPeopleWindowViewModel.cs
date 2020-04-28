@@ -130,6 +130,10 @@ namespace EasyVideoWin.ViewModel
                         CurrentView = _logoView;
                         LayoutBackgroundWindow.Instance.InitSetting();
                         LayoutBackgroundWindow.Instance.ShowWindow(true);
+                        if (Utils.GetFullScreenOnCallConnected())
+                        {
+                            VideoPeopleWindow.Instance.SetFullScreen();
+                        }
                     });
 
                     if (CallStatus.Connected == status)

@@ -319,7 +319,7 @@ namespace EasyVideoWin.View
             this.showShareBtn.SetBinding(Button.VisibilityProperty, new Binding("ShowShareVisibility") { Source = this });
             
             CallController.Instance.CallStatusChanged += OnCallStatusChanged;
-            CallController.Instance.ContentStreamStatusChanged += OnContentStreamStatusChanged;
+            //CallController.Instance.ContentStreamStatusChanged += OnContentStreamStatusChanged;
             
             this.Loaded += LayoutOperationbarWindow_Loaded;
             EVSdkManager.Instance.EventWhiteBoardIndication += EVSdkWrapper_EventWhiteBoardIndication;
@@ -546,7 +546,7 @@ namespace EasyVideoWin.View
             }
         }
         
-        private void OnContentStreamStatusChanged(object sender, ContentStreamInfo contentStreamInfo)
+        public void OnContentStreamStatusChanged(object sender, ContentStreamInfo contentStreamInfo)
         {
             log.Info("OnContentStreamStatusChanged start.");
             Application.Current.Dispatcher.InvokeAsync(() =>
@@ -662,6 +662,7 @@ namespace EasyVideoWin.View
             //    _receiveContentWin.MaximizeWindow();
             //    log.Info("Receive content window is set to max");
             //}
+            _receiveContentWin.Activate();
             log.Info("OnReceivingContentStarted end");
         }
 
@@ -922,7 +923,22 @@ namespace EasyVideoWin.View
         private void HangupBtn_Click(object sender, RoutedEventArgs e)
         {
             log.Info("HangupBtn_Click");
-            CallController.Instance.TerminateCall();
+            MessageBoxConfirm confirmBox = new MessageBoxConfirm(null);
+            confirmBox.Owner = this;
+            confirmBox.SetTitleAndMsg(LanguageUtil.Instance.GetValueByKey("PROMPT"), LanguageUtil.Instance.GetValueByKey("CONFIRM_LEAVE_CONF"));
+            confirmBox.ConfirmEvent += (sender1, e1) =>
+            {
+                log.Info("Confirm to hangup conf.");
+                this.Activate();
+                CallController.Instance.TerminateCall();
+                confirmBox.Close();
+            };
+            confirmBox.CloseEvent += (sender1, e1) =>
+            {
+                this.Activate();
+            };
+
+            confirmBox.ShowDialog();
         }
 
         private void SendWhiteboard()
@@ -1299,10 +1315,16 @@ namespace EasyVideoWin.View
                 // note: if not load whiteboard, this issue is not occurred.
                 if (!VideoPeopleWindow.Instance.IsActive)
                 {
+                    log.Info("Activate VideoPeopleWindow");
                     VideoPeopleWindow.Instance.Activate();
                     VideoPeopleWindow.Instance.Topmost = true;
                     VideoPeopleWindow.Instance.Topmost = false;
                     VideoPeopleWindow.Instance.Focus();
+                    if (ContentStreamStatus.ReceivingContentStarted == CallController.Instance.CurrentContentStreamStatus)
+                    {
+                        log.Info("VideoContentWindow is needed to be acitivated");
+                        VideoContentWindow.Instance.Activate();
+                    }
                 }
             });
 
@@ -1523,7 +1545,7 @@ namespace EasyVideoWin.View
         protected override void OnClosed(EventArgs e)
         {
             CallController.Instance.CallStatusChanged -= OnCallStatusChanged;
-            CallController.Instance.ContentStreamStatusChanged -= OnContentStreamStatusChanged;
+            //CallController.Instance.ContentStreamStatusChanged -= OnContentStreamStatusChanged;
             EVSdkManager.Instance.EventWhiteBoardIndication -= EVSdkWrapper_EventWhiteBoardIndication;
 
             base.OnClosed(e);

@@ -41,8 +41,8 @@ namespace EasyVideoWin.ViewModel
             , {(int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_BAD_PARAM,           "SDK_BAD_PARAM"}
             //, {6,   "SDK_REGISTER_FAILED"}
             , {(int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_INTERNAL_ERROR,      "SDK_INTERNAL_ERROR"}
-            , {(int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_SERVER_UNREACHABLE,  "CAN_NOT_CONNECT_TO_LOCATION_SERVER"}
-            , {(int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_SERVER_INVALID,      "CAN_NOT_CONNECT_TO_LOCATION_SERVER"}
+            , {(int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_SERVER_UNREACHABLE,  "SERVER_UNREACHABLE"}
+            , {(int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_SERVER_INVALID,      "INVALID_SERVER"}
         };
 
         private static Dictionary<int, string> _locationErrorInfo = new Dictionary<int, string>
@@ -95,6 +95,7 @@ namespace EasyVideoWin.ViewModel
             , {4049,    "CALL_FAILED_FOR_PARTY_IN_CALL"}
             , {4051,    "PARTY_OFFLINE"}
             , {4055,    "FAILED_JOIN_CONF_FOR_LOCKED"}
+            , {4057,    "CALL_ROOM_BUSY"}
         };
 
         public static readonly int SERVER_ERROR_LOGIN_FAILED_MORE_THAN_5_TIMES = 1101;
@@ -227,7 +228,7 @@ namespace EasyVideoWin.ViewModel
         }
 
         private LoginManager _loginMgr = LoginManager.Instance;
-        private UserControl _mainView;
+        private MainView _mainView = null;
         
         private UserControl _currentView;
         public UserControl CurrentView
@@ -288,7 +289,7 @@ namespace EasyVideoWin.ViewModel
                 || LoginStatus.AnonymousLoggedIn == LoginManager.Instance.CurrentLoginStatus
             )
             {
-                _mainView = (UserControl)Activator.CreateInstance(typeof(EasyVideoWin.View.MainView));
+                _mainView = new MainView();
                 if (LoginStatus.AnonymousLoggedIn == LoginManager.Instance.CurrentLoginStatus)
                 {
                 }
@@ -501,7 +502,7 @@ namespace EasyVideoWin.ViewModel
                     {
                         if (_mainView == null)
                         {
-                            _mainView = (UserControl)Activator.CreateInstance(typeof(EasyVideoWin.View.MainView));
+                            _mainView = new MainView();
                         }
                         
                         if (LoginStatus.AnonymousLoggedIn == status)
@@ -511,6 +512,14 @@ namespace EasyVideoWin.ViewModel
                         else
                         {
                             CurrentView = _mainView;
+                            //string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
+                            //string joinConfContactId = Utils.GetAnonymousJoinConfContactId();
+                            //if (!string.IsNullOrEmpty(joinConfAddress) && !string.IsNullOrEmpty(joinConfContactId))
+                            //{
+                            //    Utils.SetAnonymousJoinConfServerAddress("");
+                            //    Utils.SetAnonymousJoinConfContactId("");
+                            //    CallController.Instance.P2pCallPeer(joinConfContactId, null, joinConfContactId);
+                            //}
                         }
                     });
                 }
@@ -530,7 +539,6 @@ namespace EasyVideoWin.ViewModel
                                 LoginManager.Instance.LoginProgress = LoginProgressEnum.EnterpriseJoinConf;
                                 LoginManager.Instance.IsNeedAnonymousJoinConf = true;
                             });
-                            return;
                         }
                         else
                         {
@@ -544,8 +552,46 @@ namespace EasyVideoWin.ViewModel
                             Utils.SetAnonymousLogoutAndAnonymousJoinConf(false);
                         }
                     }
+                    //else if (Utils.GetAnonymousLogoutAndLinkP2pCall())
+                    //{
+                    //    log.Info("Login status changed to NotLogin and GetAnonymousLogoutAndLinkP2pCall is true.");
+                    //    string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
+                    //    string joinConfContactId = Utils.GetAnonymousJoinConfContactId();
+                    //    if (!string.IsNullOrEmpty(joinConfAddress) && !string.IsNullOrEmpty(joinConfContactId))
+                    //    {
+                    //        log.Info("Login status changed to NotLogin and begin to login for link p2p call.");
+                    //        LoginManager.Instance.SaveCurrentLoginInfo();
+                    //        Application.Current.Dispatcher.InvokeAsync(() => {
+                    //            LoginManager.Instance.AutoLogin4LinkP2pCall(joinConfAddress);
+                    //            LoginManager.Instance.IsNeedRelogin = true;
+                    //        });
+                    //    }
+
+                    //    Utils.SetAnonymousLogoutAndLinkP2pCall(false);
+                    //}
+                }
+                else if (LoginStatus.LoginFailed == status)
+                {
+                    string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
+                    string joinConfContactId = Utils.GetAnonymousJoinConfContactId();
+                    if (!string.IsNullOrEmpty(joinConfAddress) && !string.IsNullOrEmpty(joinConfContactId))
+                    {
+                        log.Info("LoginFailed, clear link p2p call info");
+                        log.Info("SetAnonymousJoinConfServerAddress empty");
+                        Utils.SetAnonymousJoinConfServerAddress("");
+                        Utils.SetAnonymousJoinConfContactId("");
+                    }
                 }
             }
+
+            Application.Current.Dispatcher.InvokeAsync(() => {
+                // in the thread to make sure _mainView is constructed.
+                if (null != _mainView)
+                {
+                    // call this to ensure the order for login status
+                    _mainView.LoginManager_PropertyChanged(sender, arg);
+                }
+            });
         }
         
         private void UpdateWindowVisibility()

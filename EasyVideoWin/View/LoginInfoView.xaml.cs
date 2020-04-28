@@ -150,6 +150,7 @@ namespace EasyVideoWin.View
             {
                 if (LoginManager.Instance.IsInitFinished)
                 {
+                    log.Info("IsInitFinished changed to true");
                     TryAutoLogin();
                 }
             }
@@ -157,6 +158,10 @@ namespace EasyVideoWin.View
             {
                 if (LoginManager.Instance.IsNeedRelogin)
                 {
+                    log.Info("IsNeedRelogin is true and begin to login");
+                    Application.Current.Dispatcher.InvokeAsync(() => {
+                        this.textBoxServerAddress.Text = Utils.GetServerAddress(LoginManager.Instance.ServiceType);
+                    });
                     LoginManager.Instance.IsNeedRelogin = false;
                     LoginManager.Instance.LoginWithConfigInfo();
                 }
@@ -182,6 +187,7 @@ namespace EasyVideoWin.View
 
         private void TryAutoLogin()
         {
+            log.Info("TryAutoLogin");
             if (!LoginManager.Instance.IsNeedAutoLogin)
             {
                 log.Info("Try auto login but IsNeedAutoLogin is false.");

@@ -102,9 +102,9 @@ namespace EasyVideoWin.ViewModel
                 {
                     Codec           = null != streamStats.payload_type ? streamStats.payload_type : "",
                     LineRate        = streamStats.nego_bandwidth.ToString(),
-                    ActualLineRate  = Math.Round(streamStats.real_bandwidth, 1).ToString(),
+                    ActualLineRate  = ((int)Math.Ceiling(streamStats.real_bandwidth)).ToString(),
                     Resolution      = EV_STREAM_TYPE_CLI.EV_STREAM_AUDIO == streamStats.type ? "-" : TranslateResolution(streamStats.resolution),
-                    FrameRate       = EV_STREAM_TYPE_CLI.EV_STREAM_AUDIO == streamStats.type ? "-" : Math.Round(streamStats.fps, 1).ToString(),
+                    FrameRate       = EV_STREAM_TYPE_CLI.EV_STREAM_AUDIO == streamStats.type ? "-" : ((int)Math.Ceiling(streamStats.fps)).ToString(),
                     PacketLossInfo  = streamStats.cum_packet_loss.ToString() + "(" + Math.Round(streamStats.packet_loss_rate, 1).ToString() + "%)",
                     Encrypted       = streamStats.is_encrypted ? encrypted : notEncrypted
                 };

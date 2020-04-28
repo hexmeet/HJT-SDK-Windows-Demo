@@ -1,4 +1,5 @@
 ﻿using EasyVideoWin.Helpers;
+using EasyVideoWin.ManagedEVSdk.Structs;
 using EasyVideoWin.Model;
 using EasyVideoWin.View;
 using log4net;
@@ -22,6 +23,7 @@ namespace EasyVideoWin.ViewModel
         private string _callDuration;
         private int _callQuality = 0;
         private string _callQualityImageSource;
+        private Visibility _encryptionVisibility = Visibility.Collapsed;
 
         #endregion
 
@@ -95,6 +97,19 @@ namespace EasyVideoWin.ViewModel
                 OnPropertyChanged("CallQualityImageSource");
             }
         }
+            
+        public Visibility EncryptionVisibility
+        {
+            get
+            {
+                return _encryptionVisibility;
+            }
+            set
+            {
+                _encryptionVisibility = value;
+                OnPropertyChanged("EncryptionVisibility");
+            }
+        }
 
         #endregion
 
@@ -125,8 +140,10 @@ namespace EasyVideoWin.ViewModel
                 case CallStatus.Idle:
                     StopRefreshCallDurationTimer();
                     ConferenceNumber = "";
+                    EncryptionVisibility = Visibility.Collapsed;
                     break;
                 case CallStatus.Dialing:
+                    EncryptionVisibility = Visibility.Collapsed;
                     CallDuration = "00:00:00";
                     CallQuality = 5;
                     // ConferenceNumber = CallController.Instance.IsP2pCall ? CallController.Instance.PeerDisplayName : CallController.Instance.ConferenceNumber;
@@ -140,6 +157,7 @@ namespace EasyVideoWin.ViewModel
                     break;
                 case CallStatus.Connected:
                     StartRefreshCallDurationTimer();
+                    CheckEncryptionStatus();
                     break;
                 default:
                     break;
@@ -202,6 +220,22 @@ namespace EasyVideoWin.ViewModel
             log.Info("EventNetworkQuality");
             CallQuality = (int)qualityRating;
             log.Info("EventNetworkQuality end");
+        }
+
+        private void CheckEncryptionStatus()
+        {
+            EVStatsCli mediaStats = new EVStatsCli();
+            EVSdkManager.Instance.GetStats(ref mediaStats);
+
+            if (mediaStats.size > 0)
+            {
+                EncryptionVisibility = mediaStats.stats[0].is_encrypted ? Visibility.Visible : Visibility.Collapsed;
+            }
+            else
+            {
+                EncryptionVisibility = Visibility.Collapsed;
+            }
+            log.InfoFormat("EncryptionVisibility: {0}", EncryptionVisibility);
         }
 
         #endregion
