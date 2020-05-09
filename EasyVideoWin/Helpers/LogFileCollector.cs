@@ -26,8 +26,8 @@ namespace EasyVideoWin.Helpers
 		public static string _collectorFolderName = "LogCollect";
 		public static string _logFilename = "HexMeet.log";
 		public static string _logSubFolderName = "log";
-        private static string ALI_OSS_KEY = "LTAIoTDUxeJqMI7x";
-        private static string ALI_OSS_SECRET = "EjslX2fUAZ30zVcG1y3ruLUWn8Uwt2";
+        private static string ALI_OSS_KEY = "YOUR_OSS_KEY";
+        private static string ALI_OSS_SECRET = "YOUR_OSS_SECRET";
         private static string OSS_ENDPOINT = "oss-cn-beijing.aliyuncs.com";
         private static string OSS_BUCKET = "hexmeet-log";
         private static string OSS_UPLOAD_KEY = "hexmeethjt/win/";
