@@ -365,6 +365,12 @@ public:
     std::string imageUrl;
 };
 
+class EV_CLASS_API EVChatGroupInfo {
+public:
+    std::string chat_addr;
+    std::string chat_grp_id;
+};
+
 class EV_CLASS_API IEVEventHandler : public IEVEventCallBack {
 public:
     virtual void onRegister(bool registered) {
@@ -414,6 +420,10 @@ public:
 	virtual void onUploadFeedback(int number) {
 		(void)number;
 	}
+
+	virtual void onNotifyChatInfo(EVChatGroupInfo &chatInfo) {
+		(void)chatInfo;
+	}
 };
 
 //////////////////////////////
@@ -453,10 +463,7 @@ public:
     virtual void setIMUserID(const char* im_usrid) = 0;
 	virtual int getContactInfo(const char* usrid, EVContactInfo & contactInfo, int timeout_sec) = 0;
 	virtual int uploadFeedbackFiles(std::vector<std::string> filePath, std::string contact, std::string description) = 0;
-    //thumbnails
-	virtual std::vector<std::string> getThumbnailWindows() = 0;
-    virtual int setThumbnailWindowContainer(std::string &windowTitle, void* windowid) = 0;
-    virtual int releaseThumbnails() = 0 ;
+
 };
 
 }

@@ -107,7 +107,8 @@ typedef enum _EV_CALL_TYPE {
 
 typedef enum _EV_SVC_CALL_TYPE {
     EV_SVC_CALL_CONF = 0,
-    EV_SVC_CALL_P2P = 1
+    EV_SVC_CALL_P2P = 1,
+    EV_SVC_CALL_QUEUE = 2
 } EV_SVC_CALL_TYPE;
 
 typedef enum _EV_SVC_CALL_ACTION {
@@ -159,6 +160,11 @@ typedef enum _EV_WHITE_BOARD_TYPE {
     EV_ACS_WHITE_BOARD = 0,
     EV_BELUGA_WHITE_BOARD = 1
 } EV_WHITE_BOARD_TYPE;
+
+typedef enum EV_CONTENT_TYPE_t {
+    EV_CONTENT_LOCAL,
+    EV_CONTENT_EXTERN,
+} EV_CONTENT_TYPE;
 
 class EV_CLASS_API EVError {
 public:
@@ -440,6 +446,12 @@ public:
     std::string server;
 };
 
+class EV_CLASS_API EVThumbnailInfo {
+public:
+    std::string windowTitle;
+    void* windowId;
+};
+
 class EV_CLASS_API IEVEventCallBack {
 public:
     virtual void onError(EVError & err) {
@@ -524,6 +536,10 @@ public:
     
     virtual void onMicMutedShow(int mic_muted) {
         (void)mic_muted;
+    }
+    
+    virtual void onWaitQueue(int queue_size) {
+        (void)queue_size;
     }
 
     virtual void onVidInputStateChanged(int id, int active, int width, int height, int fps) {
@@ -711,7 +727,15 @@ public:
     virtual int setHWVOMixerCfgWithRemoteContent(std::vector<VMainMixerCfg> const & cfg) = 0;
     virtual int setHWVOMixerCfgWithoutRemoteContent(std::vector<VMainMixerCfg> const & cfg) = 0;
     virtual int setHWVOShowLocalContent(int show) = 0;
+    virtual int setHWVideoInMute(int devid, char const * picture) = 0;
+    virtual int setHWVideoInUnmute(int devid) = 0;
     virtual int setHWVOBackgroundPictureCfg(int devId, HWVOBackgroundPicsCfg const & cfg) = 0;
+    virtual int setIPCam(int enable, char const * ip, int port, char const * user, char const * passwd) = 0;
+    virtual int toggleIPCam(int on) = 0;
+	virtual std::vector<EVThumbnailInfo> getThumbnailWindows() = 0;
+	virtual int setThumbnailWindowContainer(void* captureWindowId, void* windowid) = 0;
+    virtual int releaseThumbnails() = 0;
+    virtual void setContentType(int type) = 0;
 };
 
 }
