@@ -153,7 +153,7 @@ typedef enum _EV_CALL_ERROR {
     EV_CALL_BYE_MRU_NO_PACKET_RECEIVED = 102,
 
     EV_CALL_INVALID_NUMERICID = 1001,
-    EV_CALL_INVALID_USERNAME = 1003,
+    //EV_CALL_INVALID_USERNAME = 1003,
     EV_CALL_INVALID_USERID = 1005,
     EV_CALL_INVALID_DEVICEID = 1007,
     EV_CALL_INVALID_ENDPOINT = 1009,
@@ -177,7 +177,8 @@ typedef enum _EV_CALL_ERROR {
     EV_CALL_LOCAL_ZONE_NOT_STARTED = 2043,
     EV_CALL_LOCAL_ZONE_STOPPED = 2045,
 
-    EV_CALL_ROOM_BUSY = 4057
+    EV_CALL_ROOM_BUSY = 4057,
+    EV_CALL_INVALID_FROM_URL = 4064
 } EV_CALL_ERROR;
 
 }
@@ -323,6 +324,49 @@ public:
     EVSite sites[EV_LAYOUT_SIZE];
 };
 
+class EV_CLASS_API EVCellSite {
+public:
+    EVCellSite() {
+        clear();
+    }
+    void clear() {
+        device_id = (uint64_t)-1;
+        x_start = 0;
+        y_start = 0;
+        width = 0;
+        height = 0;
+    }
+    uint64_t device_id;
+    uint16_t x_start;
+    uint16_t y_start;
+    uint16_t width;
+    uint16_t height;
+};
+
+class EV_CLASS_API EVCellSiteInfoIndication {
+public:
+    EVCellSiteInfoIndication() {
+        clear();
+    }
+    void clear() {
+        vo_idx = -1;
+        count = 0;
+    }
+
+    int vo_idx;
+    int count;
+    EVCellSite sites[EV_LAYOUT_SIZE];
+};
+
+class EV_CLASS_API EVNumberOfStandingIndication {
+public:
+    EVNumberOfStandingIndication() {
+        numberOfStanding = 0;
+    }
+
+    int numberOfStanding;
+};
+
 class EV_CLASS_API EVLayoutSpeakerIndication {
 public:
     std::string speaker_name;
@@ -385,6 +429,14 @@ public:
         (void)layout;
     }
 
+    virtual void onSiteCellInfoIndication(EVCellSiteInfoIndication & indic) {
+        (void)indic;
+    }
+
+    virtual void onNumberOfStandingIndication(EVNumberOfStandingIndication & nos) {
+        (void)nos;
+    }
+
     virtual void onLayoutSiteIndication(EVSite & site) {
         (void)site;
     }
@@ -417,10 +469,6 @@ public:
 		(void)imageUrl;
 	}
 	
-	virtual void onUploadFeedback(int number) {
-		(void)number;
-	}
-
 	virtual void onNotifyChatInfo(EVChatGroupInfo &chatInfo) {
 		(void)chatInfo;
 	}
@@ -436,7 +484,6 @@ public:
     virtual int unregisterEventHandler(IEVEventHandler * handler) = 0;
 
     //Login
-    EV_DEPRECATED virtual int login(const char * server, unsigned int port, const char * username, const char * encrypted_password) = 0;
     virtual int loginWithLocation(const char * location_server, unsigned int port, const char * username, const char * encrypted_password) = 0;
     virtual int logout() = 0;
 
@@ -444,9 +491,12 @@ public:
     virtual int setMaxRecvVideo(unsigned int num) = 0;
     virtual int setLayoutCapacity(EV_LAYOUT_MODE mode, EV_LAYOUT_TYPE types[], unsigned int size) = 0;
     virtual int joinConference(const char * conference_number, const char * display_name, const char * password) = 0;
-    virtual int joinConference(const char * number, const char * display_name, const char * password, EV_SVC_CALL_TYPE type) = 0;
-    EV_DEPRECATED virtual int joinConference(const char * server, unsigned int port, const char * conference_number, const char * display_name, const char * password) = 0;
+    virtual int joinConference(const char * conference_number, const char * display_name, const char * password, EV_SVC_CALL_TYPE type) = 0;
+    virtual int joinConference(const char * conference_name, EV_SVC_CONFERENCE_NAME_TYPE name_type, const char * display_name, const char * password, EV_SVC_CALL_TYPE type) = 0;
+
     virtual int joinConferenceWithLocation(const char * location_server, unsigned int port, const char * conference_number, const char * display_name, const char * password) = 0;
+    virtual int joinConferenceWithLocation(const char * location_server, unsigned int port, const char * conference_name, EV_SVC_CONFERENCE_NAME_TYPE name_type, const char * display_name, const char * password) = 0;
+
     virtual int terminateConference() = 0;
     virtual int leaveConference() = 0;
     virtual int declineIncommingCall(const char * conference_number) = 0;
@@ -462,7 +512,6 @@ public:
     virtual const char *getIMGroupID() = 0;
     virtual void setIMUserID(const char* im_usrid) = 0;
 	virtual int getContactInfo(const char* usrid, EVContactInfo & contactInfo, int timeout_sec) = 0;
-	virtual int uploadFeedbackFiles(std::vector<std::string> filePath, std::string contact, std::string description) = 0;
 
 };
 

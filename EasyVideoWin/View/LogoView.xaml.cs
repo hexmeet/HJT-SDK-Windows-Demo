@@ -1,4 +1,5 @@
 ﻿using EasyVideoWin.Helpers;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,8 @@ namespace EasyVideoWin.View
     /// </summary>
     public partial class LogoView : UserControl
     {
+        private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private Window _window;
         private bool _firstLoad;
 
@@ -58,17 +61,34 @@ namespace EasyVideoWin.View
 
         private void AdjustWindowSize()
         {
+            if (_window.ActualHeight < 0)
+            {
+                log.WarnFormat("Invalid _window.ActualHeight: {0}", _window.ActualHeight);
+                return;
+            }
             this.Height = _window.ActualHeight;
             Rect mainWindowRect = VideoPeopleWindow.Instance.GetWindowRect();
             double titlebarHeight = VideoPeopleWindow.Instance.FullScreenStatus ? 0 : VideoPeopleWindow.Instance.TitlebarHeight;
             if ((mainWindowRect.Width / (mainWindowRect.Height - titlebarHeight)) > (16.0 / 9.0))
             {
-                this.Height = mainWindowRect.Height - titlebarHeight;
+                double height = mainWindowRect.Height - titlebarHeight;
+                if (height < 0)
+                {
+                    log.WarnFormat("Invalid height: {0}", height);
+                    height = 720;
+                }
+                this.Height = height;
                 this.Width = this.Height * 16.0 / 9.0;
             }
             else
             {
-                this.Width = mainWindowRect.Width;
+                double width = mainWindowRect.Width;
+                if (width < 0)
+                {
+                    log.WarnFormat("Invalid width: {0}", width);
+                    width = 1280;
+                }
+                this.Width = width;
                 this.Height = this.Width * 9.0 / 16.0;
             }
             this.bgDecoration.Height = (mainWindowRect.Height - titlebarHeight - this.Height) / 2;

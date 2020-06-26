@@ -406,7 +406,7 @@ namespace EasyVideoWin.Model
                     {
                         if (JoinConfTypeEnum.Direct == _joinConfType)
                         {
-                            JoinConference(_conferenceServer, _conferencePort, ConferenceNumber, _conferenceDisplayName, passwordDialog.ConfPassword);
+                            //JoinConference(_conferenceServer, _conferencePort, ConferenceNumber, _conferenceDisplayName, passwordDialog.ConfPassword);
                         }
                         else if (JoinConfTypeEnum.Location == _joinConfType)
                         {
@@ -469,6 +469,15 @@ namespace EasyVideoWin.Model
             JoinConference(peerUserId, LoginManager.Instance.DisplayName, "", ManagedEVSdk.Structs.EV_SVC_CALL_TYPE_CLI.EV_SVC_CALL_P2P);
         }
 
+        public void P2pCallPeerByUserName(string peerUserName, string peerAvatarUrl, string peerDisplayName)
+        {
+            log.Info("P2pCallPeer, set IsP2pCall to true");
+            IsP2pCall = true;
+            PeerAvatarUrl = peerAvatarUrl;
+            PeerDisplayName = peerDisplayName;
+            JoinConference(peerUserName, ManagedEVSdk.Structs.EV_SVC_CONFERENCE_NAME_TYPE_CLI.EV_SVC_CONFERENCE_NAME_ALIAS, LoginManager.Instance.DisplayName, "", ManagedEVSdk.Structs.EV_SVC_CALL_TYPE_CLI.EV_SVC_CALL_P2P);
+        }
+
         public void JoinConference(
                                       string confNumber
                                     , string displayName
@@ -496,19 +505,30 @@ namespace EasyVideoWin.Model
             }
         }
 
-        public void JoinConference(string server, uint port, string conferenceNumber, string displayName, string password)
+        public void JoinConference(
+                                      string confName
+                                    , ManagedEVSdk.Structs.EV_SVC_CONFERENCE_NAME_TYPE_CLI nameType
+                                    , string displayName
+                                    , string password
+                                    , ManagedEVSdk.Structs.EV_SVC_CALL_TYPE_CLI type = ManagedEVSdk.Structs.EV_SVC_CALL_TYPE_CLI.EV_SVC_CALL_CONF
+                                  )
         {
-            log.InfoFormat("Join conference. server:{0}, port:{1} conf number:{2}, display name:{3}", server, port, conferenceNumber, displayName);
-            _joinConfType = JoinConfTypeEnum.Direct;
-            _conferenceServer = server;
-            _conferencePort = port;
+            log.InfoFormat("Join conference. confName:{0}, display name:{1}, type: {2}, nameType: {3}", confName, displayName, type, nameType);
+
+            UpdateUserImage(Utils.GetSuspendedVideoBackground(), Utils.GetCurrentAvatarPath());
+
             _conferenceDisplayName = displayName;
-            ConferenceNumber = conferenceNumber;
-            CurrentCallStatus = CallStatus.Dialing;
-            bool rst = EVSdkManager.Instance.JoinConference(server, port, conferenceNumber, displayName, password);
+            ConferenceNumber = confName;
+
+            if (CallStatus.P2pIncoming != CurrentCallStatus)
+            {
+                CurrentCallStatus = CallStatus.Dialing;
+            }
+
+            bool rst = EVSdkManager.Instance.JoinConference(confName, nameType, displayName, password, type);
             if (!rst)
             {
-                log.Info("Failed to join conference directly and change call status to ended.");
+                log.Info("Failed to join conference and change call status to ended.");
                 CurrentCallStatus = CallStatus.Ended;
             }
         }
@@ -523,6 +543,23 @@ namespace EasyVideoWin.Model
             ConferenceNumber = conferenceNumber;
             CurrentCallStatus = CallStatus.Dialing;
             bool rst = EVSdkManager.Instance.JoinConferenceWithLocation(locationServer, port, conferenceNumber, displayName, password);
+            if (!rst)
+            {
+                log.Info("Failed to join conference with location and change call status to ended.");
+                CurrentCallStatus = CallStatus.Ended;
+            }
+        }
+
+        public void JoinConferenceWithLocation(string locationServer, uint port, string conferenceName, ManagedEVSdk.Structs.EV_SVC_CONFERENCE_NAME_TYPE_CLI nameType, string displayName, string password)
+        {
+            log.InfoFormat("Join conference with location. location server:{0}, port:{1} conf number:{2}, display name:{3}, nameType: {4}", locationServer, port, conferenceName, displayName, nameType);
+            _joinConfType = JoinConfTypeEnum.Location;
+            _conferenceServer = locationServer;
+            _conferencePort = port;
+            _conferenceDisplayName = displayName;
+            ConferenceNumber = conferenceName;
+            CurrentCallStatus = CallStatus.Dialing;
+            bool rst = EVSdkManager.Instance.JoinConferenceWithLocation(locationServer, port, conferenceName, nameType, displayName, password);
             if (!rst)
             {
                 log.Info("Failed to join conference with location and change call status to ended.");

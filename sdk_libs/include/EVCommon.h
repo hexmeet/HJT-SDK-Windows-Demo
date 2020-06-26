@@ -94,7 +94,7 @@ typedef enum _EV_PLATFORM {
 //////////////////////////////
 //  Common
 //////////////////////////////
-#define EV_LAYOUT_SIZE 16
+#define EV_LAYOUT_SIZE 25
 #define EV_STREAM_SIZE 32
 
 typedef enum _EV_CALL_TYPE {
@@ -110,6 +110,11 @@ typedef enum _EV_SVC_CALL_TYPE {
     EV_SVC_CALL_P2P = 1,
     EV_SVC_CALL_QUEUE = 2
 } EV_SVC_CALL_TYPE;
+
+typedef enum _EV_SVC_CONFERENCE_NAME_TYPE {
+    EV_SVC_CONFERENCE_NAME_ID = 1,
+    EV_SVC_CONFERENCE_NAME_ALIAS = 2
+} EV_SVC_CONFERENCE_NAME_TYPE;
 
 typedef enum _EV_SVC_CALL_ACTION {
     EV_SVC_NO_ACTION = 0,
@@ -153,7 +158,8 @@ typedef enum _EV_CONTENT_STATUS {
 
 typedef enum _EV_CONTENT_MODE {
     EV_CONTENT_FULL_MODE = 0,
-    EV_CONTENT_APPLICATION_MODE = 1
+    EV_CONTENT_APPLICATION_MODE = 1,
+    EV_CONTENT_WHITE_BOARD = 2
 } EV_CONTENT_MODE;
 
 typedef enum _EV_WHITE_BOARD_TYPE {
@@ -161,7 +167,7 @@ typedef enum _EV_WHITE_BOARD_TYPE {
     EV_BELUGA_WHITE_BOARD = 1
 } EV_WHITE_BOARD_TYPE;
 
-typedef enum EV_CONTENT_TYPE_t {
+typedef enum _EV_CONTENT_TYPE {
     EV_CONTENT_LOCAL,
     EV_CONTENT_EXTERN,
 } EV_CONTENT_TYPE;
@@ -215,6 +221,26 @@ typedef enum _EV_ENCRYPT_TYPE {
     EV_ENCRYPT_DES = 2
 } EV_ENCRYPT_TYPE;
 
+typedef enum _EV_DESCRYPT_TYPE {
+    EV_DECSRYPT_SHA1 = 0,
+    EV_DESCRYPT_AES = 1,
+    EV_DESCRYPT_DES = 2
+} EV_DESCRYPT_TYPE;
+
+typedef enum _EV_REGISTER_STATE {
+    EV_REGISTER_STATE_NONE = 0,
+    EV_REGISTER_STATE_SUCCEED = 1,
+    EV_REGISTER_STATE_FAILED = 2,
+    EV_REGISTER_STATE_PROGRESS = 3,
+    EV_REGISTER_STATE_FORCE_CLEAR = 4
+} EV_REGISTER_STATE;
+
+typedef enum _EV_TRANS_PROTOCOL {
+    EV_TRANS_PROTOCOL_UDP = 0,
+    EV_TRANS_PROTOCOL_TCP = 1,
+    EV_TRANS_PROTOCOL_TLS = 2
+} EV_TRANS_PROTOCOL;
+
 //////////////////////////////
 //  Log
 //////////////////////////////
@@ -237,6 +263,33 @@ typedef enum _EV_DEVICE_TYPE {
     EV_DEVICE_VIDEO_CAPTURE = 2,
     EV_DEVICE_CONTENT_CAPTURE = 3
 } EV_DEVICE_TYPE;
+
+typedef enum _EV_PIX_FMT{
+    EV_PIX_FMT_UNKNOWN, /* First, so that it's value does not change. */
+    EV_PIX_FMT_YUV420P,
+    EV_PIX_FMT_YUYV,
+    EV_PIX_FMT_RGB24,
+    EV_PIX_FMT_RGB24_REV, /*->microsoft down-top bitmaps */
+    EV_PIX_FMT_MJPEG,
+    EV_PIX_FMT_UYVY,
+    EV_PIX_FMT_YUY2,   /* -> same as MS_YUYV */
+    EV_PIX_FMT_RGBA32,
+    EV_PIX_FMT_RGB565,
+    EV_PIX_FMT_H264,
+    EV_PIX_FMT_ARGB32,
+    EV_PIX_FMT_ABGR32,
+    EV_PIX_FMT_BGRA32,
+    EV_PIX_FMT_BGRA32_REV, /*->microsoft down-top bitmaps */
+    EV_PIX_FMT_HEVC,
+    EV_PIX_FMT_MAX,
+}EV_PIX_FMT;
+
+typedef enum _EV_RENDER_TYPE {
+    EV_RENDER_TYPE_AUTO = 0,
+    EV_RENDER_TYPE_D3D = 1,
+    EV_RENDER_TYPE_GDI = 2,
+    EV_RENDER_TYPE_UNKNOWN = 3
+}EV_RENDER_TYPE;
 
 class EV_CLASS_API EVDevice {
 public:
@@ -349,13 +402,26 @@ public:
 
 };
 
-typedef enum _EV_REGISTER_STATE {
-    EV_REGISTER_STATE_NONE = 0,
-    EV_REGISTER_STATE_SUCCEED = 1,
-    EV_REGISTER_STATE_FAILED = 2,
-    EV_REGISTER_STATE_PROGRESS = 3,
-    EV_REGISTER_STATE_FORCE_CLEAR = 4
-} EV_REGISTER_STATE;
+class EV_CLASS_API EVRegisterInfo {
+public:
+    EVRegisterInfo() {
+        clear();
+    }
+    void clear() {
+        type = EV_CALL_UNKNOWN;
+        state = EV_REGISTER_STATE_NONE;
+        useInternalServer = false;
+        internalServer.clear();
+        externalServer.clear();
+        transProtocol = EV_TRANS_PROTOCOL_UDP;
+    }
+    EV_CALL_TYPE type;
+    EV_REGISTER_STATE state;
+    bool useInternalServer;
+    std::string internalServer;
+    std::string externalServer;
+    EV_TRANS_PROTOCOL transProtocol;
+};
 
 class EV_CLASS_API EVUserInfo {
 public:
@@ -428,6 +494,8 @@ public:
         isBigConference = FALSE;
         isRemoteMuted = FALSE;
         isExtern = FALSE;
+        senderName.clear();
+        senderDeviceId = 0;
     }
 
     bool enabled;
@@ -437,6 +505,8 @@ public:
     bool isBigConference;
     bool isRemoteMuted;
     bool isExtern;
+    std::string senderName;
+    uint64_t senderDeviceId;
 };
 
 class EV_CLASS_API EVWhiteBoardInfo {
@@ -446,10 +516,56 @@ public:
     std::string server;
 };
 
-class EV_CLASS_API EVThumbnailInfo {
+class EV_CLASS_API EVContentSourceInfo {
 public:
+    EV_CONTENT_MODE type;
     std::string windowTitle;
     void* windowId;
+    bool keepRatio;
+    int captureX;
+    int captureY;
+    EVVideoSize captureSize;
+    bool valid;
+};
+
+typedef enum _EV_BITMAP_TYPE {
+    EV_BITMAP_TYPE_THUMBNAIL = 0,
+    EV_BITMAP_TYPE_ICON = 1
+} EV_BITMAP_TYPE;
+    
+class EV_CLASS_API EVBitmap {
+public:
+    EVVideoSize size;
+    void* buffer;
+};
+
+class EV_CLASS_API EVThumbnail {
+public:
+    EVVideoSize size;
+    void* pthumbnail;
+};
+
+class EV_CLASS_API EVCameraCaptureInfo {
+public:
+    EVCameraCaptureInfo() {
+        clear();
+    }
+
+    void clear() {
+        size.width = 0;
+        size.height = 0;
+        fps = 15.0;
+        format = EV_PIX_FMT_YUV420P;
+    }
+
+    EVVideoSize size;
+    float fps;
+    EV_PIX_FMT format;
+};
+
+class EV_CLASS_API EVVoteInfo {
+public:
+    std::string voteid;
 };
 
 class EV_CLASS_API IEVEventCallBack {
@@ -469,6 +585,10 @@ public:
     virtual void onRegisterState(EV_CALL_TYPE type, EV_REGISTER_STATE state) {
         (void)type;
         (void)state;
+    }
+
+    virtual void onRegisterInfo(EVRegisterInfo & info) {
+        (void)info;
     }
 
     virtual void onDownloadUserImageComplete(const char * path) {
@@ -511,6 +631,10 @@ public:
         (void)info;
     }
 
+    virtual void onConntentSourceUpdated(EVContentSourceInfo & info) {
+        (void)info;
+    }
+
     virtual void onMuteSpeakingDetected() {
     } 
 
@@ -544,6 +668,22 @@ public:
 
     virtual void onVidInputStateChanged(int id, int active, int width, int height, int fps) {
         (void)id; (void)active; (void)width; (void)height; (void)fps;
+    }
+	
+    virtual void onUploadFeedback(int number) {
+        (void)number;
+    }
+
+    virtual void onContentSourceStatusChange( EVVideoSize size, int x, int y, bool isOverlaidorMinimized, bool isAlive){
+        (void)size;
+        (void) x;
+        (void) y;
+        (void) isOverlaidorMinimized;
+        (void) isAlive;
+    }
+    
+    virtual void onVoteInvitation( EVVoteInfo info) {
+        (void)info;
     }
 };
 
@@ -626,7 +766,7 @@ public:
     virtual std::string encryptPassword(const char * password) = 0;
     virtual std::string encryptPassword(EV_ENCRYPT_TYPE type, const char * password) = 0;
 	virtual std::string encryptPassword(EV_ENCRYPT_TYPE type, const char * password, const char* key) = 0;
-	virtual std::string descryptPassword(EV_ENCRYPT_TYPE type, const char * password, const char* key) = 0;
+    virtual std::string descryptPassword(EV_DESCRYPT_TYPE type, const char * password, const char* akey, const char* iv) = 0;
     virtual std::string getSerialNumber() = 0;
     virtual EV_PLATFORM getPlatform() = 0;
 
@@ -642,13 +782,27 @@ public:
     virtual int setDeviceRotation(int rotation) = 0;
     virtual int audioInterruption(int type) = 0;
     virtual void setVideoEncoderMixerCfg(VEncMixerCfg const & cfg, int is_content) = 0;
+    virtual int setCameraCapture(EVCameraCaptureInfo & info) = 0;
+    virtual int getCameraCapture(EVCameraCaptureInfo & info) = 0;
+    virtual std::vector<EVCameraCaptureInfo> getCameraCaptureList() = 0;
+    virtual int setRenderType(EV_RENDER_TYPE type) = 0;
+    virtual EV_RENDER_TYPE getRenderType() = 0;
 
     //Set Windows
     virtual int setLocalVideoWindow(void * id) = 0;
     virtual int setRemoteVideoWindow(void * id) = 0;
     virtual int setRemoteContentWindow(void * id) = 0;
-    virtual int setLocalContentWindow(void * id, EV_CONTENT_MODE mode) = 0;
-    virtual int setLocalContentArea(int x, int y, int width, int height) = 0;
+    
+    EV_DEPRECATED virtual int setLocalContentWindow(void * id, EV_CONTENT_MODE mode) = 0;
+    EV_DEPRECATED virtual int setLocalContentArea(int x, int y, int width, int height) = 0;
+
+    virtual std::vector<EVContentSourceInfo> getContentSourceList() = 0;
+    virtual int registerContentSourceThumbnailContainer(EVContentSourceInfo & info, void * contain_window,int maxWidth, int maxHeight, EVThumbnail & thumbnail) = 0;
+    virtual int unregisterContentSourceThumbnailContainer(EVThumbnail & thumbnail) = 0 ;
+    virtual int getContentSourceBitmap(EVContentSourceInfo & info, EV_BITMAP_TYPE bitmapType, int maxWidth, int maxHeight, EVBitmap & bitmap) = 0;
+    virtual void releaseContentSourceBitmap(EVBitmap & bitmap)= 0;
+    virtual int setLocalContentSource(EVContentSourceInfo & info) = 0;
+    
     virtual int setPreviewVideoWindow(void * id) = 0;
     virtual int zoomRemoteWindow(EV_STREAM_TYPE stream_type, float zoom_factor, 
     float x, float y) = 0;
@@ -663,6 +817,8 @@ public:
     virtual void * getLocalVideoPreviewWindow() = 0;
     virtual void * getLocalContentPreviewWindow() = 0;
 
+    virtual int repaintVideo() = 0;
+
     //Login
     virtual int downloadUserImage(const char * path) = 0;
     virtual int uploadUserImage(const char * path) = 0;
@@ -671,6 +827,7 @@ public:
     virtual int getUserInfo(EVUserInfo & userinfo) = 0;
     virtual std::string getDisplayName() = 0;
     virtual EV_REGISTER_STATE getRegisterState(EV_CALL_TYPE type) = 0;
+    virtual int getRegisterInfo(EV_CALL_TYPE type, EVRegisterInfo & info) = 0;
 
     //Conference
     virtual int enablePreview(bool enable) = 0;
@@ -698,6 +855,10 @@ public:
     virtual int enableAdaptiveResolution(bool enable) = 0;
     virtual bool adaptiveResolutionEnabled() = 0;
     virtual int setSubtitle(EVSubtitle & subtitle) = 0;
+    virtual int setEnhanceBrightness(int brightness) = 0;
+    virtual int getEnhanceBrightness() = 0;
+    virtual int setBeautifyFace(int beautify) = 0;
+    virtual int getBeautifyFace() = 0;
 
     //Send Content
     virtual int sendContent() = 0;
@@ -705,6 +866,10 @@ public:
     virtual int stopContent() = 0;
     virtual int enableContentAudio(bool enable) = 0;
     virtual bool contentAudioEnabled() = 0;
+    virtual int enableContentHighFPS(bool enable) = 0;
+    virtual bool contentHighFPSEnabled() = 0;
+    virtual int enableContent(bool enable) = 0;
+    virtual bool contentEnabled() = 0;
 
     //Call Log
     virtual int setCallLogMaxSize(unsigned int num) = 0;
@@ -720,6 +885,7 @@ public:
     virtual bool hardDecodingEnabled() = 0;
     virtual int enableFilterByName(std::string filterName,bool enable) = 0;
 
+    //Hardware Endpoint Used
     virtual int setVideoOutParameters(int devid, int width, int height, int herz, int interlaced) = 0;
     virtual int setAudioInputVolume(MW_AUD_SRC_CHN_TYPE_E audio_in_channel, int vol) = 0;  // for hisi based linux sdk
     virtual int setAudioOutputVolume(int vol) = 0;
@@ -732,10 +898,11 @@ public:
     virtual int setHWVOBackgroundPictureCfg(int devId, HWVOBackgroundPicsCfg const & cfg) = 0;
     virtual int setIPCam(int enable, char const * ip, int port, char const * user, char const * passwd) = 0;
     virtual int toggleIPCam(int on) = 0;
-	virtual std::vector<EVThumbnailInfo> getThumbnailWindows() = 0;
-	virtual int setThumbnailWindowContainer(void* captureWindowId, void* windowid) = 0;
-    virtual int releaseThumbnails() = 0;
+    virtual int getNumberOfCalls() = 0;
+    virtual int setIPCamCheckStandingConfig(int enableCheck, int enableBox, int sensitivity) = 0;
+    
     virtual void setContentType(int type) = 0;
+    virtual int uploadFeedbackFiles(std::vector<std::string> filePath, std::string contact, std::string description) = 0;
 };
 
 }

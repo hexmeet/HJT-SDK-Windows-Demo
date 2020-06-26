@@ -62,6 +62,7 @@ public:
     virtual int dialOut(const char * number, bool enable_video) = 0;
     virtual int acceptCall(bool enable_video) = 0;
     virtual int hangUp() = 0;
+    virtual int declineCall() = 0;
 };
 
 }

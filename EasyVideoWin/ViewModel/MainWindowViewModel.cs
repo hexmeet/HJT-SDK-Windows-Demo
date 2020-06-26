@@ -530,13 +530,14 @@ namespace EasyVideoWin.ViewModel
                         log.Info("Login status changed to NotLogin and LogoutAndAnonymousJoinConf is true.");
                         string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
                         string joinConfId = Utils.GetAnonymousJoinConfId();
-                        if (!string.IsNullOrEmpty(joinConfAddress) && !string.IsNullOrEmpty(joinConfId))
+                        string joinConfAlias = Utils.GetAnonymousJoinConfAlias();
+                        if (!string.IsNullOrEmpty(joinConfAddress) && (!string.IsNullOrEmpty(joinConfId) || !string.IsNullOrEmpty(joinConfAlias)))
                         {
                             log.Info("Login status changed to NotLogin and begin to join conf anonymously.");
                             LoginManager.Instance.SaveCurrentLoginInfo();
                             Application.Current.Dispatcher.InvokeAsync(() => {
-                                LoginManager.Instance.ServiceType = Utils.ServiceTypeEnum.Enterprise;
-                                LoginManager.Instance.LoginProgress = LoginProgressEnum.EnterpriseJoinConf;
+                                LoginManager.Instance.ServiceType = Properties.Settings.Default.CloudOnly ? Utils.ServiceTypeEnum.Cloud : Utils.ServiceTypeEnum.Enterprise;
+                                LoginManager.Instance.LoginProgress = Properties.Settings.Default.CloudOnly ? LoginProgressEnum.CloudJoinConf : LoginProgressEnum.EnterpriseJoinConf;
                                 LoginManager.Instance.IsNeedAnonymousJoinConf = true;
                             });
                         }
@@ -574,12 +575,11 @@ namespace EasyVideoWin.ViewModel
                 {
                     string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
                     string joinConfContactId = Utils.GetAnonymousJoinConfContactId();
-                    if (!string.IsNullOrEmpty(joinConfAddress) && !string.IsNullOrEmpty(joinConfContactId))
+                    string joinConfContactAlias = Utils.GetAnonymousJoinConfContactAlias();
+                    if (!string.IsNullOrEmpty(joinConfAddress) && (!string.IsNullOrEmpty(joinConfContactId) || !string.IsNullOrEmpty(joinConfContactAlias)))
                     {
                         log.Info("LoginFailed, clear link p2p call info");
-                        log.Info("SetAnonymousJoinConfServerAddress empty");
-                        Utils.SetAnonymousJoinConfServerAddress("");
-                        Utils.SetAnonymousJoinConfContactId("");
+                        Utils.ClearAnonymousJoinConfData();
                     }
                 }
             }

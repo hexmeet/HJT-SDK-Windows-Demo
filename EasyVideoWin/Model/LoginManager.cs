@@ -2,12 +2,15 @@
 using EasyVideoWin.Helpers;
 using EasyVideoWin.ManagedEVSdk.Structs;
 using EasyVideoWin.Model.CloudModel;
+using EasyVideoWin.Model.CloudModel.CloudRest;
 using EasyVideoWin.View;
 using log4net;
+using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,7 +47,10 @@ namespace EasyVideoWin.Model
         private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private const string CLIENT_USER_AGENT     = "windows-client";
         private AutoResetEvent _loginResetEvent = new AutoResetEvent(false);
-        
+
+        private const string DXJC_AES_KEY = "yzr9dy8x60hv7z82";
+        private const string DXJC_AES_IV = "0000000000000000";
+
         private LoginManager()
         {
             log.InfoFormat("LoginManager begin to construct, CloudOnly: {0}", Properties.Settings.Default.CloudOnly);
@@ -64,15 +70,14 @@ namespace EasyVideoWin.Model
             {
                 // anonymous join conf
                 log.Info("Anonymous join conf or link p2p call");
-                string joinConfId = Utils.GetAnonymousJoinConfId();
                 string joinConfContactId = Utils.GetAnonymousJoinConfContactId();
-                if (!string.IsNullOrEmpty(joinConfContactId))
+                string joinConfContactAlias = Utils.GetAnonymousJoinConfContactAlias();
+                if (!string.IsNullOrEmpty(joinConfContactId) || !string.IsNullOrEmpty(joinConfContactAlias))
                 {
                     log.InfoFormat("Link P2p call and try to auto login, joinConfAddress: {0}, CloudServerDomain: {2}", joinConfAddress, Utils.CloudServerDomain);
                     if (Properties.Settings.Default.CloudOnly && joinConfAddress != Utils.CloudServerDomain)
                     {
-                        Utils.SetAnonymousJoinConfServerAddress("");
-                        Utils.SetAnonymousJoinConfContactId("");
+                        Utils.ClearAnonymousJoinConfData();
                         log.Info("Can not link p2p call for CloudOnly and invalid server address");
                         //MessageBox.Show(LanguageUtil.Instance.GetValueByKey("CANNOT_CALL_FOR_INVALID_SERVER_ADDRESS"));
                         SetProperLoginStatus(false);
@@ -90,7 +95,7 @@ namespace EasyVideoWin.Model
                 else
                 {
                     log.Info("Anonymous join conf");
-                    ServiceType = Utils.ServiceTypeEnum.None;
+                    ServiceType = Properties.Settings.Default.CloudOnly ? Utils.ServiceTypeEnum.Cloud : Utils.ServiceTypeEnum.None;
                     IsNeedAnonymousJoinConf = true;
                 }
             }
@@ -185,6 +190,7 @@ namespace EasyVideoWin.Model
             }
             set
             {
+                log.InfoFormat("Set LoginProgress from {0} to {1}", _loginProgress, value);
                 if (_loginProgress != value)
                 {
                     PreviousLoginProgress = _loginProgress;
@@ -205,6 +211,25 @@ namespace EasyVideoWin.Model
             }
             set{
                 log.InfoFormat("ServiceType changing from {0} to {1}", _serviceType, value);
+                if (EasyVideoWin.Properties.Settings.Default.CloudOnly)
+                {
+                    if (Utils.ServiceTypeEnum.Cloud != value)
+                    {
+                        log.WarnFormat("Set error value to ServiceType for CloudOnly, value: {0}", value);
+                    }
+                    else
+                    {
+                        if (
+                               LoginProgressEnum.CloudOptions != LoginProgress
+                            && LoginProgressEnum.CloudLogin != LoginProgress
+                            && LoginProgressEnum.CloudJoinConf != LoginProgress
+                        )
+                        {
+                            log.InfoFormat("Invaid LoginProgress for CloudOnly and set to valid value, LoginProgress: {0}", LoginProgress);
+                            LoginProgress = LoginProgressEnum.CloudOptions;
+                        }
+                    }
+                }
                 _serviceType = value;
             }
         }
@@ -382,6 +407,11 @@ namespace EasyVideoWin.Model
         {
             get
             {
+                if (IsUrlLoginMode)
+                {
+                    return UrlLoginEnableSecure;
+                }
+
                 if (
                        LoginProgressEnum.CloudOptions == LoginProgress
                     || LoginProgressEnum.CloudLogin == LoginProgress
@@ -401,6 +431,11 @@ namespace EasyVideoWin.Model
         {
             get
             {
+                if (IsUrlLoginMode)
+                {
+                    return UrlLoginPort;
+                }
+
                 if (
                        LoginProgressEnum.CloudOptions == LoginProgress
                     || LoginProgressEnum.CloudLogin == LoginProgress
@@ -415,6 +450,10 @@ namespace EasyVideoWin.Model
                 }
             }
         }
+
+        private bool IsUrlLoginMode { get; set; }
+        private bool UrlLoginEnableSecure { get; set; }
+        private uint UrlLoginPort { get; set; }
         
         public void DownloadLoginUserAvatar()
         {
@@ -523,7 +562,8 @@ namespace EasyVideoWin.Model
             log.Info("TryAutoLogin");
             string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
             string joinConfContactId = Utils.GetAnonymousJoinConfContactId();
-            bool isLinkP2pCall = !string.IsNullOrEmpty(joinConfAddress) && !string.IsNullOrEmpty(joinConfContactId);
+            string joinConfContactAlias = Utils.GetAnonymousJoinConfContactAlias();
+            bool isLinkP2pCall = !string.IsNullOrEmpty(joinConfAddress) && (!string.IsNullOrEmpty(joinConfContactId) || !string.IsNullOrEmpty(joinConfContactAlias));
             if (!Utils.IsAutoLogin() && !isLinkP2pCall)
             {
                 log.Info("Do not try to login for IsAutoLogin and isLinkP2pCall are false");
@@ -566,17 +606,22 @@ namespace EasyVideoWin.Model
         private bool _useHttps = false;
         public string LoginPassword { get; set; }
         
-        public bool Login(string userName, string pwd, string domainAddress)
+        public bool Login(string userName, string pwd, string domainAddress, bool isPasswdEncrypted = false)
         {
+            log.InfoFormat("Login, domainAddress: {0}, username: {1}, password: {2}: isPasswordEncrypted: {3}", domainAddress, userName, pwd, isPasswdEncrypted);
             if(CurrentLoginStatus != LoginStatus.NotLogin)
             {
+                log.InfoFormat("Can not login for login status is: {0}", CurrentLoginStatus);
                 return false;
             }
 
             if (string.IsNullOrEmpty(pwd) || string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(domainAddress))
             {
+                log.Info("Can not login for login status is not invalid login parameters");
                 return false;
             }
+
+            IsUrlLoginMode = isPasswdEncrypted;
 
             EVSdkManager.Instance.EnableSecure(EnableSecure);
             _serverDomainAddress = domainAddress;
@@ -586,7 +631,14 @@ namespace EasyVideoWin.Model
             Task.Run(() => {
                 // When click button login in login dialog, the LoginWithLocation may block the UI thread and ProgressDialogLogin can not be displayed.
                 // So exec LoginWithLocation in another thread.
-                EVSdkManager.Instance.LoginWithLocation(domainAddress, ServerPort, userName, pwd);
+                if (isPasswdEncrypted)
+                {
+                    EVSdkManager.Instance.LoginWithLocationByEncPasswd(domainAddress, ServerPort, userName, pwd);
+                }
+                else
+                {
+                    EVSdkManager.Instance.LoginWithLocation(domainAddress, ServerPort, userName, pwd);
+                }
             });
 
             Application.Current.Dispatcher.InvokeAsync(() =>
@@ -598,7 +650,84 @@ namespace EasyVideoWin.Model
 
             return true;
         }
-        
+
+        public bool UrlLogin(string serverAddress, uint port, bool isSecure, string username, string encryptedPasswd)
+        {
+            UrlLoginEnableSecure = isSecure;
+            UrlLoginPort = port;
+            if (LoginStatus.LoginFailed == CurrentLoginStatus)
+            {
+                CurrentLoginStatus = LoginStatus.NotLogin;
+            }
+            return Login(username, encryptedPasswd, serverAddress, true);
+        }
+
+        public void LoginByToken(string serverAddress, string protocol, int port, string token)
+        {
+            if (Utils.ServiceTypeEnum.Cloud == ServiceType)
+            {
+                LoginProgress = LoginProgressEnum.CloudLogin;
+            }
+            else
+            {
+                LoginProgress = LoginProgressEnum.EnterpriseLogin;
+            }
+            Utils.SetAnonymousLogoutAndAnonymousJoinConf(false);
+            log.InfoFormat("LoginByToken, serverAddress: {0}, protocol: {1}, port: {2}", serverAddress, protocol, port);
+            IsNeedAnonymousJoinConf = false;
+            Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                log.Info("Show ProgressDialogLogin");
+                ProgressDialogLogin.Instance.ShowDialog();
+            });
+            LoginResultByTokenRest dxjcLoginInfo = CloudApiManager.Instance.GetDxjcLoginInfo(serverAddress, protocol, port, token, (response) =>
+            {
+                try
+                {
+                    Utils.ClearAnonymousJoinConfData();
+                    ErrorMessageRest errMsg = JsonConvert.DeserializeObject<ErrorMessageRest>(response.Content);
+                    log.ErrorFormat("loginByToken failed, errorCode: {0}, errorInfo: {0}", errMsg.errorCode, errMsg.errorInfo);
+                }
+                catch (Exception e)
+                {
+                    log.InfoFormat("Exception for handle error of loginByToken, exception:{0}", e);
+                }
+            });
+            if (null == dxjcLoginInfo)
+            {
+                Utils.ClearAnonymousJoinConfData();
+                log.Info("GetDxjcLoginInfo response null");
+                return;
+            }
+            log.InfoFormat("url login info, token: {0}, dxjckey: {1},", dxjcLoginInfo.token, dxjcLoginInfo.dxjckey);
+            string plainKey = CryptoUtil.AESDecrypt(dxjcLoginInfo.dxjckey, DXJC_AES_KEY, DXJC_AES_IV, false, PaddingMode.None);
+            LoginUserRest loginInfo = JsonConvert.DeserializeObject<LoginUserRest>(plainKey);
+            log.InfoFormat("url login user: {0}", loginInfo.username);
+
+            Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                ProgressDialogLogin.Instance.Hide();
+            });
+            if (string.IsNullOrEmpty(loginInfo.username) || string.IsNullOrEmpty(loginInfo.password))
+            {
+                log.Info("Invalid url login username or password");
+                Utils.ClearAnonymousJoinConfData();
+                return;
+            }
+            bool rst = UrlLogin(
+                Utils.GetAnonymousJoinConfServerAddress()
+                , (uint)Utils.GetAnonymousJoinConfServerPort()
+                , "https" == Utils.GetAnonymousJoinConfServerProtocol()
+                , loginInfo.username
+                , loginInfo.password
+                );
+            if (!rst)
+            {
+                log.Info("Failed to UrlLogin and clear data");
+                Utils.ClearAnonymousJoinConfData();
+            }
+        }
+
         public void OnLoggingInFailed(bool forceLogout)
         {
             if (forceLogout)
@@ -606,6 +735,10 @@ namespace EasyVideoWin.Model
                 EVSdkManager.Instance.Logout();
             }
             CurrentLoginStatus = LoginStatus.LoginFailed;
+            if (IsUrlLoginMode)
+            {
+                Utils.ClearAnonymousJoinConfData();
+            }
             _loginResetEvent.Set();
             Application.Current.Dispatcher.InvokeAsync(() =>
             {
@@ -649,16 +782,19 @@ namespace EasyVideoWin.Model
             Utils.SetIsConfRunning(false);
             Utils.SetRunningConfId("");
 
-            LoginSuccessToSaveData(_serverDomainAddress);
-            if (LoginStatus.AnonymousLoggedIn == CurrentLoginStatus)
+            if (!IsUrlLoginMode)
             {
-                Utils.SetServerPort((int)_domainPort);
-                Utils.SetUseHttps(_useHttps);
-            }
-            else
-            {
-                Utils.SetPassword(ServiceType, LoginPassword);
-                Utils.SetUserName(ServiceType, userInfo.username);
+                LoginSuccessToSaveData(_serverDomainAddress);
+                if (LoginStatus.AnonymousLoggedIn == CurrentLoginStatus)
+                {
+                    Utils.SetServerPort((int)_domainPort);
+                    Utils.SetUseHttps(_useHttps);
+                }
+                else
+                {
+                    Utils.SetPassword(ServiceType, LoginPassword);
+                    Utils.SetUserName(ServiceType, userInfo.username);
+                }
             }
 
             _loginResetEvent.Set();
@@ -670,7 +806,7 @@ namespace EasyVideoWin.Model
             log.Info("EventLoginSucceed end");
         }
         
-        public void AnonymousJoinConference(bool isJoinDirectly, bool useHttps, string domainAddress, uint domainPort, string confNumber, string confPassword, bool enableCamera, bool enableMicrophone)
+        public void AnonymousJoinConference(bool isJoinDirectly, bool useHttps, string domainAddress, uint domainPort, string confNumber, string confPassword, bool enableCamera, bool enableMicrophone, ManagedEVSdk.Structs.EV_SVC_CONFERENCE_NAME_TYPE_CLI nameType=ManagedEVSdk.Structs.EV_SVC_CONFERENCE_NAME_TYPE_CLI.EV_SVC_CONFERENCE_NAME_ID)
         {
             if (LoginStatus.NotLogin != CurrentLoginStatus && LoginStatus.LoginFailed != CurrentLoginStatus)
             {
@@ -696,14 +832,7 @@ namespace EasyVideoWin.Model
             
             UpdateValidDisplayName();
             CallController.Instance.UpdateUserImage(Utils.GetSuspendedVideoBackground(), Utils.GetDefaultUserAvatar());
-            if (isJoinDirectly)
-            {
-                CallController.Instance.JoinConference(domainAddress, domainPort, confNumber, DisplayName, confPassword);
-            }
-            else
-            {
-                CallController.Instance.JoinConferenceWithLocation(domainAddress, domainPort, confNumber, DisplayName, confPassword);
-            }
+            CallController.Instance.JoinConferenceWithLocation(domainAddress, domainPort, confNumber, nameType, DisplayName, confPassword);
         }
         
         private void UpdateValidDisplayName()

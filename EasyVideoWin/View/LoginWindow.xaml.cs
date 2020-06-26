@@ -224,7 +224,7 @@ namespace EasyVideoWin.View
                 }
 
                 EVSdkManager.Instance.CreateEVEngine();
-                EVSdkManager.Instance.SetLog(ManagedEVSdk.Structs.EV_LOG_LEVEL_CLI.EV_LOG_LEVEL_MESSAGE, appDataFolder, "evsdk", 20 * 1024 * 1024);
+                EVSdkManager.Instance.SetLog(ManagedEVSdk.Structs.EV_LOG_LEVEL_CLI.EV_LOG_LEVEL_MESSAGE, appDataFolder, "evsdk", 40 * 1024 * 1024);
                 EVSdkManager.Instance.EnableLog(true);
                 EVSdkManager.Instance.Initialize(appDataFolder, "hexmeetrc");
                 EVSdkManager.Instance.EnablePreview(false);

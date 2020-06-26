@@ -25,6 +25,7 @@ namespace EasyVideoWin.Model.CloudModel
 
         private const string REST_GET_ACS_API               = "/api/rest/v2.0/acsToken";
         private const string REST_GET_PARTY_NAME_API        = "/api/rest/v2.0/partName";
+        private const string REST_GET_DXJC_LOGIN_INFO_API   = "/api/rest/v2.0/web/login?token={0}&&dxjckey=true";
         
         private string _doradoZoneAddress;
         
@@ -90,6 +91,35 @@ namespace EasyVideoWin.Model.CloudModel
             uriParams.Add("deviceId", deviceId);
             string url = GetFullAcsUrl(REST_GET_PARTY_NAME_API, true, uriParams);
             return GetObject<RestPartNameInfo>(url, null, hdlErrMsg);
+        }
+
+        public LoginResultByTokenRest GetDxjcLoginInfo(string serverAddress, string protocol, int port, string token, HandleErrorMessage hdlErrMsg)
+        {
+            log.InfoFormat("GetDxjcLoginInfo, protocol: {0}, port: {1}, token: {2}", protocol, port, token);
+            string url = string.Format(REST_GET_DXJC_LOGIN_INFO_API, token);
+            string curProtocol = protocol;
+            int curPort = port;
+            if (string.IsNullOrEmpty(protocol))
+            {
+                curProtocol = "http";
+            }
+
+            if (0 == curPort)
+            {
+                curPort = "http" == curProtocol ? 80 : 443;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append(curProtocol)
+                .Append("://")
+                .Append(serverAddress)
+                .Append(":")
+                .Append(string.Format("{0}", curPort))
+                .Append(url);
+
+            string fullUrl = sb.ToString();
+            log.InfoFormat("GetDxjcLoginInfo full url: {0}", fullUrl);
+            return GetObject<LoginResultByTokenRest>(fullUrl, null, hdlErrMsg);
         }
 
         #endregion
