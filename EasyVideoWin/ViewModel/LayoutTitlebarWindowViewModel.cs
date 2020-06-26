@@ -121,6 +121,7 @@ namespace EasyVideoWin.ViewModel
 
             CallController.Instance.CallStatusChanged += OnCallStatusChanged;
             EVSdkManager.Instance.EventNetworkQuality += EVSdkWrapper_EventNetworkQuality;
+            CallController.Instance.PropertyChanged += OnCallControllerPropertyChanged;
         }
         
         #endregion
@@ -236,6 +237,14 @@ namespace EasyVideoWin.ViewModel
                 EncryptionVisibility = Visibility.Collapsed;
             }
             log.InfoFormat("EncryptionVisibility: {0}", EncryptionVisibility);
+        }
+
+        private void OnCallControllerPropertyChanged(object sender, PropertyChangedEventArgs args)
+        {
+            if ("ConferenceNumber" == args.PropertyName)
+            {
+                ConferenceNumber = CallController.Instance.ConferenceNumber;
+            }
         }
 
         #endregion

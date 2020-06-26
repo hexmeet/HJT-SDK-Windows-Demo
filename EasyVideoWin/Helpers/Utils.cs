@@ -123,13 +123,14 @@ namespace EasyVideoWin.Helpers
 
         public enum WM
         {
-            WM_SIZE = 0x0005,
-            WINDOWPOSCHANGING = 0x0046,
+            WM_SIZE             = 0x0005,
+            WINDOWPOSCHANGING   = 0x0046,
             WM_WINDOWPOSCHANGED = 0x0047,
-            EXITSIZEMOVE = 0x0232,
-            WM_SYSCOMMAND = 0x0112,
-            WM_GETMINMAXINFO = 0x0024,
-            WM_DPICHANGED = 0x02E0
+            EXITSIZEMOVE        = 0x0232,
+            WM_SYSCOMMAND       = 0x0112,
+            WM_GETMINMAXINFO    = 0x0024,
+            WM_DPICHANGED       = 0x02E0,
+            WM_CHAR             = 0x0102
         }
 
         public struct RECT
@@ -920,39 +921,58 @@ namespace EasyVideoWin.Helpers
         public static void SetDisplayNameInConf(string displayName)
         {
             // base64 display name for there are messy codes in some windows
-            byte[] bytes = Encoding.Unicode.GetBytes(displayName);
+            byte[] bytes = Encoding.UTF8.GetBytes(displayName);
             string base64Str = Convert.ToBase64String(bytes);
-            Utils.IniWriteValue(Utils.CONFIG_TITLE, "DisplayName", base64Str, Utils.GetCurConfigFile());
+            Utils.IniWriteValue(Utils.CONFIG_TITLE, "DisplayNameUtf8", base64Str, Utils.GetCurConfigFile());
         }
 
         public static string GetDisplayNameInConf()
         {
-            string base64DisplayName = Utils.IniReadValue(Utils.CONFIG_TITLE, "DisplayName", Utils.GetCurConfigFile());
-            if (!string.IsNullOrEmpty(base64DisplayName))
+            string base64DisplayNameUtf8 = Utils.IniReadValue(Utils.CONFIG_TITLE, "DisplayNameUtf8", Utils.GetCurConfigFile());
+            if (!string.IsNullOrEmpty(base64DisplayNameUtf8))
             {
                 try
                 {
-                    byte[] bytes = Convert.FromBase64String(base64DisplayName);
-                    string str = Encoding.Unicode.GetString(bytes);
+                    byte[] bytes = Convert.FromBase64String(base64DisplayNameUtf8);
+                    string str = Encoding.UTF8.GetString(bytes);
                     return str;
                 }
                 catch (Exception e)
                 {
-                    log.InfoFormat("Failed to format display name in config file, display name:{0} exception:{1}", base64DisplayName, e);
+                    log.InfoFormat("Failed to format DisplayNameUtf8 in config file, display name:{0}, exception:{1}", base64DisplayNameUtf8, e);
                     return "";
                 }
             }
-
-            // compatible with the old config
-            string displayName = Utils.IniReadValue(Utils.CONFIG_TITLE, "DisplayNameInConf", Utils.GetCurConfigFile());
-            if (!string.IsNullOrEmpty(displayName))
+            else
             {
-                SetDisplayNameInConf(displayName);
-                Utils.IniWriteValue(Utils.CONFIG_TITLE, "DisplayNameInConf", null, Utils.GetCurConfigFile());
-                return displayName;
-            }
+                string base64DisplayName = Utils.IniReadValue(Utils.CONFIG_TITLE, "DisplayName", Utils.GetCurConfigFile());
+                if (!string.IsNullOrEmpty(base64DisplayName))
+                {
+                    try
+                    {
+                        byte[] bytes = Convert.FromBase64String(base64DisplayName);
+                        string str = Encoding.Unicode.GetString(bytes);
+                        SetDisplayNameInConf(str);
+                        return str;
+                    }
+                    catch (Exception e)
+                    {
+                        log.InfoFormat("Failed to format DisplayName in config file, display name:{0} exception:{1}", base64DisplayName, e);
+                        return "";
+                    }
+                }
 
-            return "";
+                // compatible with the old config
+                string displayName = Utils.IniReadValue(Utils.CONFIG_TITLE, "DisplayNameInConf", Utils.GetCurConfigFile());
+                if (!string.IsNullOrEmpty(displayName))
+                {
+                    SetDisplayNameInConf(displayName);
+                    Utils.IniWriteValue(Utils.CONFIG_TITLE, "DisplayNameInConf", null, Utils.GetCurConfigFile());
+                    return displayName;
+                }
+
+                return "";
+            }           
         }
 
         public static int GetServerPort()
@@ -1069,6 +1089,16 @@ namespace EasyVideoWin.Helpers
             Utils.IniWriteValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "ConfId", confId, Utils.GetCurConfigFile());
         }
 
+        public static string GetAnonymousJoinConfAlias()
+        {
+            return Utils.IniReadValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "ConfAlias", Utils.GetCurConfigFile());
+        }
+
+        public static void SetAnonymousJoinConfAlias(string confAlias)
+        {
+            Utils.IniWriteValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "ConfAlias", confAlias, Utils.GetCurConfigFile());
+        }
+
         public static string GetAnonymousJoinConfContactId()
         {
             return Utils.IniReadValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "ContactId", Utils.GetCurConfigFile());
@@ -1079,6 +1109,16 @@ namespace EasyVideoWin.Helpers
             Utils.IniWriteValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "ContactId", contactId, Utils.GetCurConfigFile());
         }
 
+        public static string GetAnonymousJoinConfContactAlias()
+        {
+            return Utils.IniReadValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "ContactAlias", Utils.GetCurConfigFile());
+        }
+
+        public static void SetAnonymousJoinConfContactAlias(string contactAlias)
+        {
+            Utils.IniWriteValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "ContactAlias", contactAlias, Utils.GetCurConfigFile());
+        }
+
         public static string GetAnonymousJoinConfContactName()
         {
             return Utils.IniReadValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "ContactName", Utils.GetCurConfigFile());
@@ -1087,6 +1127,16 @@ namespace EasyVideoWin.Helpers
         public static void SetAnonymousJoinConfContactName(string contactName)
         {
             Utils.IniWriteValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "ContactName", contactName, Utils.GetCurConfigFile());
+        }
+
+        public static string GetAnonymousJoinConfDisplayName()
+        {
+            return Utils.IniReadValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "DisplayName", Utils.GetCurConfigFile());
+        }
+
+        public static void SetAnonymousJoinConfDisplayName(string displayName)
+        {
+            Utils.IniWriteValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "DisplayName", displayName, Utils.GetCurConfigFile());
         }
 
         public static string GetAnonymousJoinConfPassword()
@@ -1145,6 +1195,33 @@ namespace EasyVideoWin.Helpers
         public static void SetAnonymousLogoutAndLinkP2pCall(bool logoutAndAnonymousJoinConf)
         {
             Utils.IniWriteValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "LogoutAndLinkP2pCall", logoutAndAnonymousJoinConf.ToString(), Utils.GetCurConfigFile());
+        }
+
+        public static string GetAnonymousJoinConfToken()
+        {
+            return Utils.IniReadValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "Token", Utils.GetCurConfigFile());
+        }
+        
+        public static void SetAnonymousJoinConfToken(string token)
+        {
+            Utils.IniWriteValue(ANONYMOUS_JOIN_CONFERENCE_TITLE, "Token", token, Utils.GetCurConfigFile());
+        }
+
+        public static void ClearAnonymousJoinConfData()
+        {
+            log.Info("ClearAnonymousJoinConfData");
+            SetAnonymousJoinConfType("");
+            SetAnonymousJoinConfServerProtocol("");
+            SetAnonymousJoinConfServerAddress("");
+            SetAnonymousJoinConfId("");
+            SetAnonymousJoinConfAlias("");
+            SetAnonymousJoinConfDisplayName("");
+            SetAnonymousJoinConfContactId("");
+            SetAnonymousJoinConfContactAlias("");
+            SetAnonymousJoinConfContactName("");
+            SetAnonymousJoinConfPassword("");
+            SetAnonymousJoinConfServerPort(0);
+            SetAnonymousJoinConfToken("");
         }
 
         public static string GetAcsServerAddressFromConfig()

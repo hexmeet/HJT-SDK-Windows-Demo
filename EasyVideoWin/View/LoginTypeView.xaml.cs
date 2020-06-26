@@ -1,8 +1,13 @@
-﻿using EasyVideoWin.Model;
+﻿using EasyVideoWin.Helpers;
+using EasyVideoWin.Model;
+using EasyVideoWin.Model.CloudModel;
+using EasyVideoWin.Model.CloudModel.CloudRest;
 using log4net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -25,6 +30,8 @@ namespace EasyVideoWin.View
         #region -- Members --
 
         private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private const string DXJC_AES_KEY = "yzr9dy8x60hv7z82";
+        private const string DXJC_AES_IV = "0000000000000000";
 
         #endregion
 
@@ -59,9 +66,23 @@ namespace EasyVideoWin.View
                     {
                         return;
                     }
-                    Application.Current.Dispatcher.InvokeAsync(() => {
-                        ShowJoinConfDisplayNameWindow();
-                    });
+
+                    string anonymousJoinConfToken = Helpers.Utils.GetAnonymousJoinConfToken();
+                    if (string.IsNullOrEmpty(anonymousJoinConfToken))
+                    {
+                        Application.Current.Dispatcher.InvokeAsync(() => {
+                            ShowJoinConfDisplayNameWindow();
+                        });
+                    }
+                    else
+                    {
+                        LoginManager.Instance.LoginByToken(
+                                         Helpers.Utils.GetAnonymousJoinConfServerAddress()
+                                        , Helpers.Utils.GetAnonymousJoinConfServerProtocol()
+                                        , Helpers.Utils.GetAnonymousJoinConfServerPort()
+                                        , anonymousJoinConfToken
+                                    );
+                    }
                 }
             }
             else if ("IsNeedAnonymousJoinConf" == e.PropertyName)
@@ -71,9 +92,22 @@ namespace EasyVideoWin.View
                 {
                     return;
                 }
-                Application.Current.Dispatcher.InvokeAsync(() => {
-                    ShowJoinConfDisplayNameWindow();
-                });
+                string anonymousJoinConfToken = Helpers.Utils.GetAnonymousJoinConfToken();
+                if (string.IsNullOrEmpty(anonymousJoinConfToken))
+                {
+                    Application.Current.Dispatcher.InvokeAsync(() => {
+                        ShowJoinConfDisplayNameWindow();
+                    });
+                }
+                else
+                {
+                    LoginManager.Instance.LoginByToken(
+                                     Helpers.Utils.GetAnonymousJoinConfServerAddress()
+                                    , Helpers.Utils.GetAnonymousJoinConfServerProtocol()
+                                    , Helpers.Utils.GetAnonymousJoinConfServerPort()
+                                    , anonymousJoinConfToken
+                                );
+                }
             }
         }
 
@@ -89,7 +123,7 @@ namespace EasyVideoWin.View
             JoinConfDisplayNameWindow.Instance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             JoinConfDisplayNameWindow.Instance.ShowDialog();
         }
-
+        
         #endregion
     }
 }

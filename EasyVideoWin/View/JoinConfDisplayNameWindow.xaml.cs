@@ -30,6 +30,7 @@ namespace EasyVideoWin.View
         private readonly ILog log = LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private static JoinConfDisplayNameWindow _instance = null;
 
+        ManagedEVSdk.Structs.EV_SVC_CONFERENCE_NAME_TYPE_CLI _joinConfNameType = ManagedEVSdk.Structs.EV_SVC_CONFERENCE_NAME_TYPE_CLI.EV_SVC_CONFERENCE_NAME_ID;
         private bool        _isJoinDirectly;
         private string      _joinConfProtocol;
         private string      _joinConfAddress;
@@ -75,6 +76,15 @@ namespace EasyVideoWin.View
             _joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
             _joinConfPort = Utils.GetAnonymousJoinConfServerPort();
             _joinConfId = Utils.GetAnonymousJoinConfId();
+            if (string.IsNullOrEmpty(_joinConfId))
+            {
+                _joinConfId = Utils.GetAnonymousJoinConfAlias();
+                _joinConfNameType = ManagedEVSdk.Structs.EV_SVC_CONFERENCE_NAME_TYPE_CLI.EV_SVC_CONFERENCE_NAME_ALIAS;
+            }
+            else
+            {
+                _joinConfNameType = ManagedEVSdk.Structs.EV_SVC_CONFERENCE_NAME_TYPE_CLI.EV_SVC_CONFERENCE_NAME_ID;
+            }
             _joinConfPassword = Utils.GetAnonymousJoinConfPassword();
             this.textBlockJoiningMeeting.Text = string.Format(LanguageUtil.Instance.GetValueByKey("JOINING_MEETING"), _joinConfId);
             this.textBoxDisplayName.Text = Utils.GetDisplayNameInConf();
@@ -163,6 +173,7 @@ namespace EasyVideoWin.View
                     , _joinConfPassword
                     , enableCamera
                     , enableMicrophone
+                    , _joinConfNameType
                 );
             });
             ClearJoinConfData();
@@ -170,13 +181,7 @@ namespace EasyVideoWin.View
 
         private void ClearJoinConfData()
         {
-            Utils.SetAnonymousJoinConfType("");
-            Utils.SetAnonymousJoinConfServerProtocol("");
-            log.Info("SetAnonymousJoinConfServerAddress empty");
-            Utils.SetAnonymousJoinConfServerAddress("");
-            Utils.SetAnonymousJoinConfId("");
-            Utils.SetAnonymousJoinConfPassword("");
-            Utils.SetAnonymousJoinConfServerPort(0);
+            Utils.ClearAnonymousJoinConfData();
             LoginManager.Instance.IsNeedAnonymousJoinConf = false;
         }
 

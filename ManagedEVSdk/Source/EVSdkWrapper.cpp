@@ -109,20 +109,11 @@ int EVSdkWrapper::EVEngineEnableSecure(bool enable)
     return m_pEVEngine->enableSecure(enable);
 }
 
-//System::String^ EVSdkWrapper::EVEngineEncryptPassword(System::String^ password)
-//{
-//    std::string szPassword = msclr::interop::marshal_as<std::string>(password);
-//    std::string szEnc = m_pEVEngine->encryptPassword(szPassword.c_str());
-//    return msclr::interop::marshal_as<System::String ^>(szEnc);
-//}
-
-int EVSdkWrapper::EVEngineLogin(System::String^ server, unsigned int port, System::String^ username, System::String^ password)
+System::String^ EVSdkWrapper::EVEngineEncryptPassword(System::String^ password)
 {
-    std::string szServer = msclr::interop::marshal_as<std::string>(server);
-    std::string szUsername = msclr::interop::marshal_as<std::string>(username);
     std::string szPassword = msclr::interop::marshal_as<std::string>(password);
-    std::string szEncryptedPassword = m_pEVEngine->encryptPassword(szPassword.c_str());
-    return m_pEVEngine->login(szServer.c_str(), port, szUsername.c_str(), szEncryptedPassword.c_str());
+    std::string szEnc = m_pEVEngine->encryptPassword(szPassword.c_str());
+    return msclr::interop::marshal_as<System::String ^>(szEnc);
 }
 
 int EVSdkWrapper::EVEngineLoginWithLocation(System::String^ locationServer, unsigned int port, System::String^ username, System::String^ password)
@@ -132,6 +123,14 @@ int EVSdkWrapper::EVEngineLoginWithLocation(System::String^ locationServer, unsi
     std::string szPassword = msclr::interop::marshal_as<std::string>(password);
     std::string szEncryptedPassword = m_pEVEngine->encryptPassword(szPassword.c_str());
     return m_pEVEngine->loginWithLocation(szLocationServer.c_str(), port, szUsername.c_str(), szEncryptedPassword.c_str());
+}
+
+int EVSdkWrapper::EVEngineLoginWithLocationByEncPasswd(System::String^ locationServer, unsigned int port, System::String^ username, System::String^ encPassword)
+{
+    std::string szLocationServer = msclr::interop::marshal_as<std::string>(locationServer);
+    std::string szUsername = msclr::interop::marshal_as<std::string>(username);
+    std::string szPassword = msclr::interop::marshal_as<std::string>(encPassword);
+    return m_pEVEngine->loginWithLocation(szLocationServer.c_str(), port, szUsername.c_str(), szPassword.c_str());
 }
 
 int EVSdkWrapper::EVEngineLogout()
@@ -304,13 +303,12 @@ int EVSdkWrapper::EVEngineJoinConference(System::String^ number, System::String^
     return rst;
 }
 
-int EVSdkWrapper::EVEngineJoinConference(System::String^ server, unsigned int port, System::String^ conferenceNumber, System::String^ displayName, System::String^ password)
+int EVSdkWrapper::EVEngineJoinConference(System::String^ conferenceName, Structs::EV_SVC_CONFERENCE_NAME_TYPE_CLI nameType, System::String^ displayName, System::String^ password, Structs::EV_SVC_CALL_TYPE_CLI type)
 {
+    std::string szConferenceName = msclr::interop::marshal_as<std::string>(conferenceName);
     char * pszName = Utils::ManagedStr2Utf8Char(displayName);
-    std::string szServer = msclr::interop::marshal_as<std::string>(server);
-	std::string szConferenceNumber = msclr::interop::marshal_as<std::string>(conferenceNumber);
     std::string szPassword = msclr::interop::marshal_as<std::string>(password);
-    int rst = m_pEVEngine->joinConference(szServer.c_str(), port, szConferenceNumber.c_str(), pszName, szPassword.c_str());
+    int rst = m_pEVEngine->joinConference(szConferenceName.c_str(), safe_cast<ev::engine::EV_SVC_CONFERENCE_NAME_TYPE>(nameType), pszName, szPassword.c_str(), safe_cast<ev::engine::EV_SVC_CALL_TYPE>(type));
     delete[] pszName;
     return rst;
 }
@@ -322,6 +320,17 @@ int EVSdkWrapper::EVEngineJoinConferenceWithLocation(System::String^ locationSer
     std::string szConferenceNumber = msclr::interop::marshal_as<std::string>(conferenceNumber);
     std::string szPassword = msclr::interop::marshal_as<std::string>(password);
     int rst = m_pEVEngine->joinConferenceWithLocation(szLocationServer.c_str(), port, szConferenceNumber.c_str(), pszName, szPassword.c_str());
+    delete[] pszName;
+    return rst;
+}
+
+int EVSdkWrapper::EVEngineJoinConferenceWithLocation(System::String^ locationServer, unsigned int port, System::String^ conferenceName, Structs::EV_SVC_CONFERENCE_NAME_TYPE_CLI nameType, System::String^ displayName, System::String^ password)
+{
+    char * pszName = Utils::ManagedStr2Utf8Char(displayName);
+    std::string szLocationServer = msclr::interop::marshal_as<std::string>(locationServer);
+    std::string szConferenceName = msclr::interop::marshal_as<std::string>(conferenceName);
+    std::string szPassword = msclr::interop::marshal_as<std::string>(password);
+    int rst = m_pEVEngine->joinConferenceWithLocation(szLocationServer.c_str(), port, szConferenceName.c_str(), safe_cast<ev::engine::EV_SVC_CONFERENCE_NAME_TYPE>(nameType), pszName, szPassword.c_str());
     delete[] pszName;
     return rst;
 }

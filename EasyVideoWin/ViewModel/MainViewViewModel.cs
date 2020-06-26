@@ -216,15 +216,16 @@ namespace EasyVideoWin.ViewModel
                         
                         string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
                         string joinConfContactId = Utils.GetAnonymousJoinConfContactId();
-                        log.InfoFormat("LoggedIn, joinConfAddress: {0}, joinConfContactId: {1}", joinConfAddress, joinConfContactId);
-                        if (!string.IsNullOrEmpty(joinConfAddress) && !string.IsNullOrEmpty(joinConfContactId))
+                        string joinConfContactAlias = Utils.GetAnonymousJoinConfContactAlias();
+                        string joinConfId = Utils.GetAnonymousJoinConfId();
+                        string joinConfAlias = Utils.GetAnonymousJoinConfAlias();
+                        log.InfoFormat("LoggedIn, joinConfAddress: {0}, joinConfContactId: {1}, joinConfId: {2}, joinConfContactAlias: {3}, joinConfAlias: {4}", joinConfAddress, joinConfContactId, joinConfId, joinConfContactAlias, joinConfAlias);
+                        if (!string.IsNullOrEmpty(joinConfAddress) && (!string.IsNullOrEmpty(joinConfContactId) || !string.IsNullOrEmpty(joinConfContactAlias)))
                         {
                             log.Info("Valid link p2p call");
                             string contactName = System.Web.HttpUtility.UrlDecode(Utils.GetAnonymousJoinConfContactName());
                             log.InfoFormat("contactName: {0}", contactName);
-                            Utils.SetAnonymousJoinConfServerAddress("");
-                            Utils.SetAnonymousJoinConfContactId("");
-                            Utils.SetAnonymousJoinConfContactName("");
+                            Utils.ClearAnonymousJoinConfData();
 
                             // p2p call in 1 second to make sure the content view in main view show correctly.
                             // or the content view can not be initialized when relogin and then p2p call
@@ -233,7 +234,38 @@ namespace EasyVideoWin.ViewModel
                             timer.AutoReset = false;
                             timer.Elapsed += (object sender2, ElapsedEventArgs e2) =>
                             {
-                                CallController.Instance.P2pCallPeer(joinConfContactId, null, contactName);
+                                if (!string.IsNullOrEmpty(joinConfContactId))
+                                {
+                                    CallController.Instance.P2pCallPeer(joinConfContactId, null, contactName);
+                                }
+                                else
+                                {
+                                    CallController.Instance.P2pCallPeerByUserName(joinConfContactAlias, null, contactName);
+                                }
+                            };
+                            timer.Start();
+                        }
+                        if (!string.IsNullOrEmpty(joinConfAddress) && (!string.IsNullOrEmpty(joinConfId) || !string.IsNullOrEmpty(joinConfAlias)))
+                        {
+                            log.Info("Valid url join conf");
+                            string joinConfPasswd = Utils.GetAnonymousJoinConfPassword();
+                            Utils.ClearAnonymousJoinConfData();
+
+                            // url join call in 1 second to make sure the content view in main view show correctly.
+                            // or the content view can not be initialized when relogin and then p2p call
+                            Timer timer = new Timer();
+                            timer.Interval = 1000;
+                            timer.AutoReset = false;
+                            timer.Elapsed += (object sender2, ElapsedEventArgs e2) =>
+                            {
+                                if (!string.IsNullOrEmpty(joinConfId))
+                                {
+                                    CallController.Instance.JoinConference(joinConfId, LoginManager.Instance.DisplayName, joinConfPasswd);
+                                }
+                                else
+                                {
+                                    CallController.Instance.JoinConference(joinConfAlias, ManagedEVSdk.Structs.EV_SVC_CONFERENCE_NAME_TYPE_CLI.EV_SVC_CONFERENCE_NAME_ALIAS, LoginManager.Instance.DisplayName, joinConfPasswd);
+                                }
                             };
                             timer.Start();
                         }
@@ -263,7 +295,8 @@ namespace EasyVideoWin.ViewModel
                         log.Info("Login status changed to NotLogin and GetAnonymousLogoutAndLinkP2pCall is true.");
                         string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
                         string joinConfContactId = Utils.GetAnonymousJoinConfContactId();
-                        if (!string.IsNullOrEmpty(joinConfAddress) && !string.IsNullOrEmpty(joinConfContactId))
+                        string joinConfContactAlias = Utils.GetAnonymousJoinConfContactAlias();
+                        if (!string.IsNullOrEmpty(joinConfAddress) && (!string.IsNullOrEmpty(joinConfContactId) || !string.IsNullOrEmpty(joinConfContactAlias)))
                         {
                             log.Info("Login status changed to NotLogin and begin to login for link p2p call.");
                             LoginManager.Instance.SaveCurrentLoginInfo();

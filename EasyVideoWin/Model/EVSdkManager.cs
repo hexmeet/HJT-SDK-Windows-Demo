@@ -220,7 +220,7 @@ namespace EasyVideoWin.Model
         //{
         //    return this.EVSdkWrapper.EVEngineEncryptPassword(password);
         //}
-
+        /*
         public void Login(string server, uint port, string username, string password)
         {
             _log.InfoFormat("Login, server:{0}, port:{1}, username:{2}", server, port, username);
@@ -231,6 +231,7 @@ namespace EasyVideoWin.Model
             }
             _log.Info("Login done");
         }
+        */
 
         public void LoginWithLocation(string locationServer, uint port, string username, string password)
         {
@@ -241,6 +242,17 @@ namespace EasyVideoWin.Model
                 _log.InfoFormat("Failed to LoginWithLocation, result:{0}, location server:{1}, port:{2}, username:{3}", rst, locationServer, port, username);
             }
             _log.Info("LoginWithLocation done");
+        }
+
+        public void LoginWithLocationByEncPasswd(string locationServer, uint port, string username, string encPassword)
+        {
+            _log.InfoFormat("LoginWithLocationByEncPasswd, location server:{0}, port:{1}, username:{2}", locationServer, port, username);
+            int rst = this.EVSdkWrapper.EVEngineLoginWithLocationByEncPasswd(locationServer, port, username, encPassword);
+            if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
+            {
+                _log.InfoFormat("Failed to LoginWithLocationByEncPasswd, result:{0}, location server:{1}, port:{2}, username:{3}", rst, locationServer, port, username);
+            }
+            _log.Info("LoginWithLocationByEncPasswd done");
         }
 
         public void Logout()
@@ -486,9 +498,9 @@ namespace EasyVideoWin.Model
             return true;
         }
 
-        public bool JoinConference(string server, uint port, string conferenceNumber, string displayName, string password)
+        public bool JoinConference(string conferenceName, EV_SVC_CONFERENCE_NAME_TYPE_CLI nameType, string displayName, string password, EV_SVC_CALL_TYPE_CLI type)
         {
-            _log.InfoFormat("JoinConference with server directly, conf number:{0}, display name:{1}", conferenceNumber, displayName);
+            _log.InfoFormat("JoinConference, conferenceName:{0}, display name:{1}", conferenceName, displayName);
             if (null == displayName)
             {
                 _log.Info("display name is null and set it to empty");
@@ -499,20 +511,16 @@ namespace EasyVideoWin.Model
                 _log.Info("password is null and set it to empty");
                 password = "";
             }
-            int rst = this.EVSdkWrapper.EVEngineJoinConference(server, port, conferenceNumber, displayName, password);
-            _log.Info("JoinConference with server directly done");
+            int rst = this.EVSdkWrapper.EVEngineJoinConference(conferenceName, nameType, displayName, password, type);
+            _log.Info("JoinConference done");
             if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
             {
-                _log.InfoFormat("Failed to JoinConference, server:{0}, port:{1} conference number:{2}, display name:{3}, result:{4}"
-                    , server
-                    , port
-                    , conferenceNumber
-                    , displayName
-                    , rst);
+                _log.InfoFormat("Failed to JoinConference, conferenceName:{0}, display name:{1}, result:{2}", conferenceName, displayName, rst);
                 return false;
             }
             return true;
         }
+
 
         public bool JoinConferenceWithLocation(string locationServer, uint port, string conferenceNumber, string displayName, string password)
         {
@@ -537,6 +545,34 @@ namespace EasyVideoWin.Model
                     , conferenceNumber
                     , displayName
                     , rst );
+                return false;
+            }
+            return true;
+        }
+
+        public bool JoinConferenceWithLocation(string locationServer, uint port, string conferenceName, EV_SVC_CONFERENCE_NAME_TYPE_CLI nameType, string displayName, string password)
+        {
+            _log.InfoFormat("JoinConferenceWithLocation, location server:{0}, port:{1}, conferenceName:{2} display name:{3}", locationServer, port, conferenceName, displayName);
+            if (null == displayName)
+            {
+                _log.Info("display name is null and set it to empty");
+                displayName = "";
+            }
+            if (null == password)
+            {
+                _log.Info("password is null and set it to empty");
+                password = "";
+            }
+            int rst = this.EVSdkWrapper.EVEngineJoinConferenceWithLocation(locationServer, port, conferenceName, nameType, displayName, password);
+            _log.Info("JoinConferenceWithLocation done");
+            if ((int)ManagedEVSdk.ErrorInfo.EV_ERROR_CLI.EV_OK != rst)
+            {
+                _log.InfoFormat("Failed to JoinConferenceWithLocation, location server:{0}, port:{1} conferenceName:{2}, display name:{3}, result:{4}"
+                    , locationServer
+                    , port
+                    , conferenceName
+                    , displayName
+                    , rst);
                 return false;
             }
             return true;

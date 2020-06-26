@@ -79,9 +79,9 @@ public:
 
     //Login
     int EVEngineEnableSecure(bool enable);
-    //System::String^ EVEngineEncryptPassword(System::String^ password);
-    int EVEngineLogin(System::String^ server, unsigned int port, System::String^ username, System::String^ encryptedPassword);
+    System::String^ EVEngineEncryptPassword(System::String^ password);
     int EVEngineLoginWithLocation(System::String^ locationServer, unsigned int port, System::String^ username, System::String^ password);
+    int EVEngineLoginWithLocationByEncPasswd(System::String^ locationServer, unsigned int port, System::String^ username, System::String^ encPassword);
     int EVEngineLogout();
     int EVEngineDownloadUserImage(System::String^ path);
     int EVEngineUploadUserImage(System::String^ path);
@@ -111,8 +111,9 @@ public:
     int EVEngineSetLayoutCapacity(Structs::EV_LAYOUT_MODE_CLI mode, array<Structs::EV_LAYOUT_TYPE_CLI>^ types);
     int EVEngineJoinConference(System::String^ conferenceNumber, System::String^ displayName, System::String^ password);
     int EVEngineJoinConference(System::String^ number, System::String^ displayName, System::String^ password, Structs::EV_SVC_CALL_TYPE_CLI type);
-    int EVEngineJoinConference(System::String^ server, unsigned int port, System::String^ conferenceNumber, System::String^ displayName, System::String^ password);
+    int EVEngineJoinConference(System::String^ conferenceName, Structs::EV_SVC_CONFERENCE_NAME_TYPE_CLI nameType, System::String^ displayName, System::String^ password, Structs::EV_SVC_CALL_TYPE_CLI type);
     int EVEngineJoinConferenceWithLocation(System::String^ locationServer, unsigned int port, System::String^ conferenceNumber, System::String^ displayName, System::String^ password);
+    int EVEngineJoinConferenceWithLocation(System::String^ locationServer, unsigned int port, System::String^ conferenceName, Structs::EV_SVC_CONFERENCE_NAME_TYPE_CLI nameType, System::String^ displayName, System::String^ password);
     int EVEngineLeaveConference();
     int EVEngineDeclineIncommingCall(System::String^ conferenceNumber);
     bool EVEngineCameraEnabled();

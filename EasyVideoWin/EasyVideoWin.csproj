@@ -563,6 +563,8 @@
     <Compile Include="Model\CloudModel\CloudApiManager.cs" />
     <Compile Include="Model\CloudModel\CloudRest\AcsRest.cs" />
     <Compile Include="Model\CloudModel\CloudRest\ErrorMessageRest.cs" />
+    <Compile Include="Model\CloudModel\CloudRest\LoginResultByTokenRest.cs" />
+    <Compile Include="Model\CloudModel\CloudRest\LoginUserRest.cs" />
     <Compile Include="Model\CloudModel\CloudRest\RestPartNameInfo.cs" />
     <Compile Include="Model\EVSdkManager.cs" />
     <Compile Include="Model\LoginManager.cs" />

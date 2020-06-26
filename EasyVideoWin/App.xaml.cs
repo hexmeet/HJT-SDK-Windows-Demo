@@ -35,11 +35,15 @@ namespace EasyVideoWin
         private string _anonymousJoinConfType;
         private string _anonymousJoinConfServerAddress;
         private string _anonymousJoinConfId;
+        private string _anonymousJoinConfAlias;
         private string _anonymousJoinConfContactId;
+        private string _anonymousJoinConfContactAlias;
         private string _anonymousJoinConfContactName;
         private string _anonymousJoinConfServerProtocol;
+        private string _anonymousJoinConfDisplayName;
         private string _anonymousJoinConfPassword = "";
         private int _anonymousJoinConfServerPort = 80;
+        private string _anonymousJoinConfToken = "";
         
         /// <summary>The app on startup.</summary>
         /// <param name="sender">The sender.</param>
@@ -59,6 +63,8 @@ namespace EasyVideoWin
                 log.InfoFormat("=============== {0} is Starting =============", System.Reflection.Assembly.GetExecutingAssembly().GetName().Name);
                 log.InfoFormat("=============== Version - {0}, process name: {1} =============", Utils.GetEdition(), Process.GetCurrentProcess().ProcessName);
 
+                Utils.ClearAnonymousJoinConfData();
+
                 ParseStartupArgs(args, log);
 
                 // Spawn a thread which will be waiting for our event
@@ -75,7 +81,7 @@ namespace EasyVideoWin
                 thread.IsBackground = true;
                 thread.Start();
                 Utils.ParseCloudServerAddress();
-                if (!string.IsNullOrEmpty(_anonymousJoinConfContactId) && EasyVideoWin.Properties.Settings.Default.CloudOnly && Utils.CloudServerDomain != _anonymousJoinConfServerAddress)
+                if ((!string.IsNullOrEmpty(_anonymousJoinConfContactId) || !string.IsNullOrEmpty(_anonymousJoinConfContactAlias)) && EasyVideoWin.Properties.Settings.Default.CloudOnly && Utils.CloudServerDomain != _anonymousJoinConfServerAddress)
                 {
                     log.InfoFormat("Can not link p2p call for CloudOnly and invalid address, CloudServerDomain: {0}", Utils.CloudServerDomain);
                     MessageBox.Show(LanguageUtil.Instance.GetValueByKey("CANNOT_CALL_FOR_INVALID_SERVER_ADDRESS"));
@@ -101,20 +107,24 @@ namespace EasyVideoWin
                 // join conf
                 string joinConfAddress = Utils.GetAnonymousJoinConfServerAddress();
                 string joinConfId = Utils.GetAnonymousJoinConfId();
+                string joinConfAlias = Utils.GetAnonymousJoinConfAlias();
                 string joinConfContactId = Utils.GetAnonymousJoinConfContactId();
+                string joinConfContactAlias = Utils.GetAnonymousJoinConfContactAlias();
                 string joinConfPassword = Utils.GetAnonymousJoinConfPassword();
-                log.InfoFormat("Join conf address: {0}, conf id: {1}, contact id: {2}", joinConfAddress, joinConfId, joinConfContactId);
-                if (string.IsNullOrEmpty(joinConfAddress) || (string.IsNullOrEmpty(joinConfId) && string.IsNullOrEmpty(joinConfContactId)))
+                string joinConfToken = Helpers.Utils.GetAnonymousJoinConfToken();
+                log.InfoFormat("Join conf address: {0}, conf id: {1}, contact id: {2}, joinConfToken: {3}, joinConfAlias: {4}, joinConfContactAlias: {5}", joinConfAddress, joinConfId, joinConfContactId, joinConfToken, joinConfAlias, joinConfContactAlias);
+                if (   string.IsNullOrEmpty(joinConfAddress)
+                    || (string.IsNullOrEmpty(joinConfId) && string.IsNullOrEmpty(joinConfAlias) && string.IsNullOrEmpty(joinConfContactId) && string.IsNullOrEmpty(joinConfContactAlias))
+                )
                 {
                     log.Info("Empty conf address || (empty conf id && empty contact id).");
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(joinConfContactId) && EasyVideoWin.Properties.Settings.Default.CloudOnly && Utils.CloudServerDomain != joinConfAddress)
+                if ((!string.IsNullOrEmpty(joinConfContactId) || !string.IsNullOrEmpty(joinConfContactAlias)) && EasyVideoWin.Properties.Settings.Default.CloudOnly && Utils.CloudServerDomain != joinConfAddress)
                 {
                     log.InfoFormat("Can not link p2p call for CloudOnly and invalid address, CloudServerDomain: {0}", Utils.CloudServerDomain);
-                    Utils.SetAnonymousJoinConfServerAddress("");
-                    Utils.SetAnonymousJoinConfContactId("");
+                    Utils.ClearAnonymousJoinConfData();
                     return;
                 }
 
@@ -136,10 +146,8 @@ namespace EasyVideoWin
                         else
                         {
                             log.Info("SetAnonymousJoinConfServerAddress empty");
-                            Utils.SetAnonymousJoinConfServerAddress("");
-                            Utils.SetAnonymousJoinConfId("");
-                            Utils.SetAnonymousJoinConfContactId("");
-                            Utils.SetAnonymousJoinConfPassword("");
+                            string contactName = System.Web.HttpUtility.UrlDecode(Utils.GetAnonymousJoinConfContactName());
+                            Utils.ClearAnonymousJoinConfData();
                             if (!string.IsNullOrEmpty(joinConfId))
                             {
                                 log.Info("Dial out to conf.");
@@ -148,13 +156,21 @@ namespace EasyVideoWin
                                 CallController.Instance.JoinConference(joinConfId, "", joinConfPassword);
                                 //});
                             }
+                            else if (!string.IsNullOrEmpty(joinConfAlias))
+                            {
+                                log.Info("join conference");
+                                CloseMessageTip();
+                                CallController.Instance.JoinConference(joinConfAlias, ManagedEVSdk.Structs.EV_SVC_CONFERENCE_NAME_TYPE_CLI.EV_SVC_CONFERENCE_NAME_ALIAS, "", joinConfPassword);
+                            }
                             else if (!string.IsNullOrEmpty(joinConfContactId))
                             {
-                                log.Info("P2p Call");
-                                string contactName = System.Web.HttpUtility.UrlDecode(Utils.GetAnonymousJoinConfContactName());
-                                log.InfoFormat("contactName: {0}", contactName);
-                                Utils.SetAnonymousJoinConfContactName("");
+                                log.InfoFormat("P2p Call, joinConfContactId: {0}, contactName: {1}", joinConfContactId, contactName);
                                 CallController.Instance.P2pCallPeer(joinConfContactId, null, contactName);
+                            }
+                            else if (!string.IsNullOrEmpty(joinConfContactAlias))
+                            {
+                                log.InfoFormat("P2p Call, joinConfContactAlias: {0}, contactName: {1}", joinConfContactAlias, contactName);
+                                CallController.Instance.P2pCallPeerByUserName(joinConfContactAlias, null, contactName);
                             }
                             else
                             {
@@ -169,22 +185,32 @@ namespace EasyVideoWin
                 }
                 else if (LoginStatus.NotLogin == status || LoginStatus.LoginFailed == status)
                 {
-                    if (!string.IsNullOrEmpty(joinConfId))
+                    if (!string.IsNullOrEmpty(joinConfId) || !string.IsNullOrEmpty(joinConfAlias))
                     {
                         log.Info("Not login and need anonymous join conf");
                         //Application.Current.Dispatcher.InvokeAsync(() => {
                         CloseMessageTip();
                         //LoginManager.Instance.ServiceType = Utils.ServiceTypeEnum.Enterprise;
                         //LoginManager.Instance.LoginProgress = LoginProgressEnum.EnterpriseJoinConf;
-                        LoginManager.Instance.ServiceType = Utils.ServiceTypeEnum.None;
-                        LoginManager.Instance.LoginProgress = LoginProgressEnum.Idle;
+                        LoginManager.Instance.ServiceType = EasyVideoWin.Properties.Settings.Default.CloudOnly ? Utils.ServiceTypeEnum.Cloud : Utils.ServiceTypeEnum.None;
+                        LoginManager.Instance.LoginProgress = EasyVideoWin.Properties.Settings.Default.CloudOnly ? LoginProgressEnum.CloudJoinConf : LoginProgressEnum.Idle;
                         LoginManager.Instance.IsNeedAnonymousJoinConf = true;
                         //});
                     }
-                    else if (!string.IsNullOrEmpty(joinConfContactId))
+                    else if (!string.IsNullOrEmpty(joinConfContactId) || !string.IsNullOrEmpty(joinConfContactAlias))
                     {
                         log.Info("Not login and need to login for link p2p call");
                         LoginManager.Instance.AutoLogin4LinkP2pCall(joinConfAddress);
+                    }
+                    else if (!string.IsNullOrEmpty(joinConfToken))
+                    {
+                        log.Info("not login and need url token login");
+                        LoginManager.Instance.LoginByToken(
+                            joinConfAddress
+                            , Utils.GetAnonymousJoinConfServerProtocol()
+                            , Utils.GetAnonymousJoinConfServerPort()
+                            , joinConfToken
+                        );
                     }
                     else
                     {
@@ -226,7 +252,7 @@ namespace EasyVideoWin
                 }
                 else if (LoginStatus.LoggedIn == loginStatus || LoginStatus.AnonymousLoggedIn == loginStatus)
                 {
-                    if (!string.IsNullOrEmpty(_anonymousJoinConfContactId) && EasyVideoWin.Properties.Settings.Default.CloudOnly && Utils.CloudServerDomain != _anonymousJoinConfServerAddress)
+                    if ((!string.IsNullOrEmpty(_anonymousJoinConfContactId) || !string.IsNullOrEmpty(_anonymousJoinConfContactAlias)) && EasyVideoWin.Properties.Settings.Default.CloudOnly && Utils.CloudServerDomain != _anonymousJoinConfServerAddress)
                     {
                         log.InfoFormat("Can not link p2p call for CloudOnly and invalid address, CloudServerDomain: {0}", Utils.CloudServerDomain);
                         MessageBox.Show(LanguageUtil.Instance.GetValueByKey("CANNOT_CALL_FOR_INVALID_SERVER_ADDRESS"));
@@ -242,9 +268,9 @@ namespace EasyVideoWin
                             if (isConfRunning)
                             {
                                 string confId = Utils.GetRunningConfId();
-                                if (!confId.Equals(_anonymousJoinConfId))
+                                if (!confId.Equals(_anonymousJoinConfId) && !confId.Equals(_anonymousJoinConfAlias))
                                 {
-                                    conflictLogger.InfoFormat("Another conference is running on the application. Running conf id:{0}, current conf id:{1}", confId, _anonymousJoinConfId);
+                                    conflictLogger.InfoFormat("Another conference is running on the application. Running conf id:{0}, current conf id:{1}, conf alias:{2}", confId, _anonymousJoinConfId, _anonymousJoinConfAlias);
                                     //MessageBox.Show("Another conference is running on the application. Please terminate the conference and rejoin the conference.");
                                     MessageBox.Show(LanguageUtil.Instance.GetValueByKey("ANOTHER_CONF_RUNNING"));
                                 }
@@ -266,12 +292,12 @@ namespace EasyVideoWin
                                 //MessageBox.Show("The application has been logged in with another address. Please log out and rejoin the conference.");
                                 //MessageBox.Show(LanguageUtil.Instance.GetValueByKey("APP_LOGGED_WITH_ANOTHER_ADDRESS"));
                                 //saveConfArgs = false;
-                                if (!string.IsNullOrEmpty(_anonymousJoinConfId))
+                                if (!string.IsNullOrEmpty(_anonymousJoinConfId) || !string.IsNullOrEmpty(_anonymousJoinConfAlias))
                                 {
                                     log.Info("Set SetAnonymousLogoutAndAnonymousJoinConf to true.");
                                     Utils.SetAnonymousLogoutAndAnonymousJoinConf(true);
                                 }
-                                else if (!string.IsNullOrEmpty(_anonymousJoinConfContactId))
+                                else if (!string.IsNullOrEmpty(_anonymousJoinConfContactId) || !string.IsNullOrEmpty(_anonymousJoinConfContactAlias))
                                 {
                                     log.Info("Set SetAnonymousLogoutAndLinkP2pCall to true.");
                                     Utils.SetAnonymousLogoutAndLinkP2pCall(true);
@@ -329,11 +355,15 @@ namespace EasyVideoWin
             Utils.SetAnonymousJoinConfType(_anonymousJoinConfType);
             Utils.SetAnonymousJoinConfServerAddress(_anonymousJoinConfServerAddress);
             Utils.SetAnonymousJoinConfId(_anonymousJoinConfId);
+            Utils.SetAnonymousJoinConfAlias(_anonymousJoinConfAlias);
             Utils.SetAnonymousJoinConfContactId(_anonymousJoinConfContactId);
+            Utils.SetAnonymousJoinConfContactAlias(_anonymousJoinConfContactAlias);
             Utils.SetAnonymousJoinConfContactName(_anonymousJoinConfContactName);
+            Utils.SetAnonymousJoinConfDisplayName(_anonymousJoinConfDisplayName);
             Utils.SetAnonymousJoinConfPassword(_anonymousJoinConfPassword);
             Utils.SetAnonymousJoinConfServerProtocol(_anonymousJoinConfServerProtocol);
             Utils.SetAnonymousJoinConfServerPort(_anonymousJoinConfServerPort);
+            Utils.SetAnonymousJoinConfToken(_anonymousJoinConfToken);
         }
 
         void AppDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -424,6 +454,10 @@ namespace EasyVideoWin
                         {
                             _anonymousJoinConfId = items[1];
                         }
+                        else if (items[0].Equals("confalias"))
+                        {
+                            _anonymousJoinConfAlias = items[1];
+                        }
                         else if (items[0].Equals("contactid"))
                         {
                             _anonymousJoinConfContactId = items[1];
@@ -431,6 +465,14 @@ namespace EasyVideoWin
                         else if (items[0].Equals("contactname"))
                         {
                             _anonymousJoinConfContactName = items[1];
+                        }
+                        else if (items[0].Equals("contactalias"))
+                        {
+                            _anonymousJoinConfContactAlias = items[1];
+                        }
+                        else if (items[0].Equals("displayname"))
+                        {
+                            _anonymousJoinConfDisplayName = items[1];
                         }
                         else if (items[0].Equals("password"))
                         {
@@ -440,7 +482,7 @@ namespace EasyVideoWin
                         {
                             _anonymousJoinConfServerProtocol = items[1];
                         }
-                        if (items[0].Equals("port"))
+                        else if (items[0].Equals("port"))
                         {
                             try
                             {
@@ -450,6 +492,10 @@ namespace EasyVideoWin
                             {
                                 _anonymousJoinConfServerPort = 0;
                             }
+                        }
+                        else if (items[0].Equals("token"))
+                        {
+                            _anonymousJoinConfToken = items[1];
                         }
                     }
 

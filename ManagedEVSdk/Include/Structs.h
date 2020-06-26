@@ -31,6 +31,13 @@ public enum class EV_SVC_CALL_TYPE_CLI {
 
 [System::Serializable]
 [System::FlagsAttribute]
+public enum class EV_SVC_CONFERENCE_NAME_TYPE_CLI {
+    EV_SVC_CONFERENCE_NAME_ID = 1,
+    EV_SVC_CONFERENCE_NAME_ALIAS = 2
+};
+
+[System::Serializable]
+[System::FlagsAttribute]
 public enum class EV_SVC_CALL_ACTION_CLI {
     EV_SVC_NO_ACTION = 0,
     EV_SVC_INCOMING_CALL_RING,

@@ -65,6 +65,11 @@ namespace EasyVideoWin.ViewModel
                 return "-";
             }
 
+            if (160 == videoSize.width && 90 == videoSize.height)
+            {
+                return "90p";
+            }
+
             if (320 == videoSize.width && 180 == videoSize.height)
             {
                 return "180p";

@@ -212,7 +212,7 @@ namespace EasyVideoWin.Helpers
         /// </summary>  
         /// <param name="encryptStr">encrypted string</param>  
         /// <returns>plain string</returns>  
-        public static string AESDecrypt(string encryptStr, string key, string iv)
+        public static string AESDecrypt(string encryptStr, string key, string iv, PaddingMode paddingMode)
         {
             byte[] bKey = Encoding.UTF8.GetBytes(key);
             byte[] bIV = Encoding.UTF8.GetBytes(iv);
@@ -228,7 +228,7 @@ namespace EasyVideoWin.Helpers
             }
 
             //return encryptStr;
-            return DecryptStringFromBytes_Aes(byteArray, bKey, bIV);
+            return DecryptStringFromBytes_Aes(byteArray, bKey, bIV, paddingMode);
 
             //string decrypt = null;
             //Rijndael aes = Rijndael.Create();
@@ -257,7 +257,7 @@ namespace EasyVideoWin.Helpers
             //return decrypt;
         }
 
-        private static string DecryptStringFromBytes_Aes(byte[] cipherText, byte[] Key, byte[] IV)
+        private static string DecryptStringFromBytes_Aes(byte[] cipherText, byte[] Key, byte[] IV, PaddingMode paddingMode)
         {
             // Check arguments. 
             //if (cipherText == null || cipherText.Length <= 0)
@@ -283,6 +283,8 @@ namespace EasyVideoWin.Helpers
             {
                 aesAlg.Key = Key;
                 aesAlg.IV = IV;
+                aesAlg.Mode = CipherMode.CBC;
+                aesAlg.Padding = paddingMode;
                 // Create a decrytor to perform the stream transform.
                 ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
                 // Create the streams used for decryption. 
@@ -309,9 +311,9 @@ namespace EasyVideoWin.Helpers
         /// <param name="encryptStr">encrypted string</param>  
         /// <param name="returnNull">if return null when failed，false return String.Empty</param>  
         /// <returns>plain string</returns>  
-        public static string AESDecrypt(string encryptStr, string key, string iv, bool returnNull)
+        public static string AESDecrypt(string encryptStr, string key, string iv, bool returnNull, PaddingMode paddingMode = PaddingMode.PKCS7)
         {
-            string decrypt = AESDecrypt(encryptStr, key, iv);
+            string decrypt = AESDecrypt(encryptStr, key, iv, paddingMode);
             return returnNull ? decrypt : (decrypt == null ? String.Empty : decrypt);
         }
 

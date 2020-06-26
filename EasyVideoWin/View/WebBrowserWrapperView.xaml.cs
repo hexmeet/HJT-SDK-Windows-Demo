@@ -84,11 +84,16 @@ namespace EasyVideoWin.View
             this.browser.IsBrowserInitializedChanged += Browser_IsBrowserInitializedChanged;
             this.browser.Loaded += Browser_Loaded;
 
+            //this.browser.GotFocus += Browser_GotFocus;
+            //this.browser.LostFocus += Browser_LostFocus;
+            this.browser.PreviewTextInput += Browser_PreviewTextInput;
+
             this.Loaded += WebBrowserWrapperView_Loaded;
             this.Unloaded += WebBrowserWrapperView_Unloaded;
+            
             LoginManager.Instance.PropertyChanged += LoginManager_PropertyChanged;
         }
-
+        
         #endregion
 
         #region -- Public Method --
@@ -327,6 +332,31 @@ namespace EasyVideoWin.View
             }
         }
 
+        private void Browser_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            foreach (var character in e.Text)
+            {
+                // send every char to browser components
+                this.browser.GetBrowser().GetHost().SendKeyEvent((int)Utils.WM.WM_CHAR, (int)character, 0);
+            }
+
+            // do not let eft handle
+            e.Handled = true;
+        }
+
+        private void Browser_LostFocus(object sender, RoutedEventArgs e)
+        {
+            base.OnLostFocus(e);
+            InputMethod.SetIsInputMethodEnabled(this, false);
+            InputMethod.SetIsInputMethodSuspended(this, false);
+        }
+
+        private void Browser_GotFocus(object sender, RoutedEventArgs e)
+        {
+            InputMethod.SetIsInputMethodEnabled(this, true);
+            InputMethod.SetIsInputMethodSuspended(this, true);
+            base.OnGotFocus(e);
+        }
         #endregion
     }
 
@@ -569,6 +599,7 @@ namespace EasyVideoWin.View
         {
             log.InfoFormat("webLog:{0}", value);
         }
+
     }
 
     public class ConfCefRequestHandler : IRequestHandler
